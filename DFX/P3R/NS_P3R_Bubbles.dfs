@@ -1,0 +1,69 @@
+// Bubbles rising through the inner sea behind every menu screen. Drawn inside the UI by DreamGUI's NiagaraSystem visual:
+// a CPU-simulated sprite emitter (the only kind it draws), in canvas units -- X right, Z up, one unit a design pixel,
+// the origin at the middle of the widget it fills (1920 x 1080). Warmed up so the screen is already full of them.
+System(Name="P3R/FX/NS_P3R_Bubbles")
+{
+    Settings = {
+        WarmupTime  = 16.0;
+        FixedBounds = box(-1100, -50, -700, 1100, 50, 700);
+    }
+
+    Properties = {
+        float Rate  = 7.0   [ Group="Bubbles"; SortPriority=10; Description="Bubbles a second" ];
+    }
+
+    Emitter Bubbles
+    {
+        Settings = {
+            SimTarget   = CPU;
+            LocalSpace  = true;
+            Determinism = true;
+            RandomSeed  = 4127;
+            AllocationMode     = Fixed;
+            PreAllocationCount = 160;
+        }
+
+        EmitterUpdate = {
+            EmitterState(LifeCycleMode = Self, LoopBehavior = Infinite);
+            SpawnRate(SpawnRate = User.Rate);
+        }
+
+        ParticleSpawn = {
+            Spawn/Initialization/V2/InitializeParticle(
+                LifetimeMode   = Random,
+                LifetimeMin    = 11.0,
+                LifetimeMax    = 17.0,
+                ColorMode      = RandomRange,
+                ColorMinimum   = (0.75, 0.92, 1.0, 0.25),
+                ColorMaximum   = (1.0, 1.0, 1.0, 0.75),
+                SpriteSizeMode = RandomUniform,
+                UniformSpriteSizeMin = 10.0,
+                UniformSpriteSizeMax = 42.0
+            );
+            BoxLocation(BoxSize = (1900, 4, 120), BoxOffset = (0, 0, -600));
+            AddVelocity(
+                VelocityMode = Linear,
+                Velocity = RandomRangeVector(Minimum = (-14, 0, 58), Maximum = (14, 0, 135))
+            );
+        }
+
+        ParticleUpdate = {
+            ParticleState();
+            SolveForcesAndVelocity();
+            // Fade in from the bottom, out near the surface. An absolute alpha: scaling the current one would compound every frame.
+            Color Particles.Color = hlsl {
+                float4(Particles.Color.rgb, 0.6 * saturate(Particles.NormalizedAge * 6.0) * saturate((1.0 - Particles.NormalizedAge) * 4.0))
+            };
+        }
+
+        SpriteRenderer Core
+        {
+            Material   = "/Game/P3R/Materials/M_P3R_BubbleSprite";
+            Alignment  = Unaligned;
+            FacingMode = FaceCamera;
+
+            Bind SpriteSize -> Particles.SpriteSize;
+            Bind Color      -> Particles.Color;
+        }
+    }
+}

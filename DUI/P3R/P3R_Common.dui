@@ -1,0 +1,228 @@
+// P3R -- the library every screen of the style study starts with: the palette, the fonts, the pictures and the styles.
+//
+// The look being studied: a blue inner sea under everything; heavy, condensed, italic English words thrown at angles and
+// overlapping; black and red for what is chosen, a white slash with a pink edge behind it; the cast drawn in white,
+// cyan and ultramarine. Design size 1920 x 1080. Coordinates follow DreamGUI: +y is up, pivots from the bottom left.
+
+resources {
+    Asset Heavy = /Game/P3R/Fonts/F_P3R_Heavy
+    Asset Bold = /Game/P3R/Fonts/F_P3R_Bold
+    Asset Light = /Game/P3R/Fonts/F_P3R_Light
+    Asset Thin = /Game/P3R/Fonts/F_P3R_Thin
+
+    Color White = #FFFFFF
+    Color Black = #05060C
+    Color Red = #FF1E3C
+    Color Pink = #FF6AB4
+    Color Cyan = #16CFFB
+    Color CyanPale = #7DE6FD
+    Color Aqua = #77FEFC
+    Color DeepBlue = #102CB8
+    Color Navy = #08125A
+    Color Grey = #8A90A8
+    Color HpCyan = #2EE6FF
+    Color SpYellow = #FFE03A
+    Color Shadow = #0B2A9ACC
+    Color Clear = #00000000
+}
+
+// ---- Placement
+
+style Fill {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+// From the top left: AnchoredPosition = (x, -y) puts the widget's top left at x, y (y down the screen).
+style FromTop {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+// Centred on a point given from the top left: AnchoredPosition = (x, -y) puts the centre at x, y.
+style At {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+style FromBottomRight {
+    AnchorData.AnchorMin = (1, 0)
+    AnchorData.AnchorMax = (1, 0)
+    AnchorData.Pivot = (1, 0)
+}
+// Centred in its parent.
+style Middle {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+
+// ---- Shapes and pictures
+
+// A sharp-cornered block (RectBlock rounds 10% by default).
+style Block {
+    CornerRadiusUnitMode = Value
+    CornerRadius.X = 0
+    CornerRadius.Y = 0
+    CornerRadius.Z = 0
+    CornerRadius.W = 0
+    bRaycastTarget = false
+}
+style Picture {
+    Brush.TintColor = #FFFFFF
+    bRaycastTarget = false
+}
+style Deco {
+    bRaycastTarget = false
+}
+// What the pointer lands on: an invisible block.
+style HitBox : Block {
+    BodyColor = @Clear
+    bRaycastTarget = true
+}
+
+// ---- Type
+
+// The menu's voice: heavy condensed italic capitals.
+style Word {
+    Font = @Heavy
+    FontStyle = Italic
+    FontSize = 88
+    FontSpace = (-2, 0)
+    HAlign = Center
+    VAlign = Middle
+    OverflowType = HorizontalOverflow
+    Color = @Cyan
+    TextStyle.UnderlayColor = @Shadow
+    TextStyle.UnderlayOffset = (0.035, 0.05)
+    TextStyle.UnderlaySoftness = 0
+    bRaycastTarget = false
+}
+// Giant background letters.
+style Giant {
+    Font = @Heavy
+    FontSize = 360
+    FontSpace = (-12, 0)
+    HAlign = Center
+    VAlign = Middle
+    OverflowType = HorizontalOverflow
+    Color = @Black
+    bRaycastTarget = false
+}
+style Label {
+    Font = @Bold
+    FontSize = 28
+    HAlign = Left
+    VAlign = Middle
+    OverflowType = HorizontalOverflow
+    Color = @White
+    bRaycastTarget = false
+}
+style Figure {
+    Font = @Light
+    FontStyle = Italic
+    FontSize = 40
+    HAlign = Left
+    VAlign = Middle
+    OverflowType = HorizontalOverflow
+    Color = @White
+    bRaycastTarget = false
+}
+
+// ---- The same, placed from the top left (a style takes one base, so the anchors are written into each).
+
+style GiantAt : Giant {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0.5, 0.5)
+    RenderTransformPivot = (0.5, 0.5)
+}
+style WordAt : Word {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0.5, 0.5)
+    RenderTransformPivot = (0.5, 0.5)
+}
+style LabelTop : Label {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style FigureTop : Figure {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style PictureAt : Picture {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0.5, 0.5)
+    RenderTransformPivot = (0.5, 0.5)
+}
+style DecoFill : Deco {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style BlockTop : Block {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style BlockFill : Block {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+
+// ---- The guide in the bottom right: what the chosen item does, a "Command" rule out to the edge, the button hints.
+
+style GuideTitle : Label {
+    AnchorData.AnchorMin = (1, 0)
+    AnchorData.AnchorMax = (1, 0)
+    AnchorData.Pivot = (1, 0)
+    AnchorData.AnchoredPosition = (-56, 92)
+    AnchorData.SizeDelta = (700, 44)
+    FontSize = 34
+    FontStyle = Italic
+    HAlign = Right
+    TextStyle.UnderlayColor = #04104AE0
+    TextStyle.UnderlayOffset = (0.04, 0.06)
+}
+style GuideTag : Label {
+    AnchorData.AnchorMin = (1, 0)
+    AnchorData.AnchorMax = (1, 0)
+    AnchorData.Pivot = (0, 0)
+    AnchorData.AnchoredPosition = (-330, 74)
+    AnchorData.SizeDelta = (120, 18)
+    FontSize = 15
+    Font = @Light
+}
+style GuideRule : Block {
+    AnchorData.AnchorMin = (1, 0)
+    AnchorData.AnchorMax = (1, 0)
+    AnchorData.Pivot = (1, 0)
+    AnchorData.AnchoredPosition = (0, 82)
+    AnchorData.SizeDelta = (250, 2)
+    BodyColor = @White
+}
+style Hints : Label {
+    AnchorData.AnchorMin = (1, 0)
+    AnchorData.AnchorMax = (1, 0)
+    AnchorData.Pivot = (1, 0)
+    AnchorData.AnchoredPosition = (-48, 26)
+    AnchorData.SizeDelta = (900, 34)
+    FontSize = 24
+    FontStyle = Italic
+    HAlign = Right
+    TextStyle.UnderlayColor = #04104AE0
+    TextStyle.UnderlayOffset = (0.04, 0.06)
+}
+
+// ---- The focus target every screen keeps its keys with.
+style Catcher : Block {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    BodyColor = @Clear
+}

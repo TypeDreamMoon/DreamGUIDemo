@@ -1,0 +1,24 @@
+// P3R_Common.dsh -- what the style study's DreamGUI brush materials share.
+//
+// A DreamGUI brush material (an Image's Brush.ResourceObject) is Surface, Unlit, AlphaComposite and two-sided: what the
+// DreamUI renderer compiles for. The widget's vertex colour -- its tint and its render opacity -- arrives sRGB-encoded and
+// multiplies the result. DreamGUI's own renderer premultiplies by itself and UE's does not, so the colour is premultiplied
+// unless DreamUI_IsRenderByDreamUIRenderer says DreamGUI is drawing. The canvas sets that parameter only on a material
+// with one of its own texture parameters, which these have none of, so every material here defaults it to 1.
+
+float3 P3R_SRGBToLinear(float3 C)
+{
+    return lerp(C / 12.92, pow((C + 0.055) / 1.055, 2.4), step(0.04045, C));
+}
+
+float3 P3R_UIEmissive(float3 Straight, float Alpha, float IsDreamUIRenderer)
+{
+    return lerp(Straight * Alpha, Straight, IsDreamUIRenderer);
+}
+
+// DreamGUI's own shading of the element: its tint and opacity, its clip, its clip masks and its mask transitions, as a
+// straight colour and an alpha. A brush material that skips it ignores every clip -- a mask transition on its widget
+// would leave it drawn in full. For a material brush the element has no texture of its own, so .rgb is the tint and
+// .a the opacity with the clip applied.
+/// @asset /DreamGUI/Materials/MF_DreamUI_Shade
+extern float4 MF_DreamUI_Shade(float4 Tint = float4(1.0, 1.0, 1.0, 1.0));

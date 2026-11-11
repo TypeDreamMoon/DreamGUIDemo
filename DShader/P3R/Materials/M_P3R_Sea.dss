@@ -1,0 +1,138 @@
+// M_P3R_Sea.dss -- the ground every menu screen stands on: the place the game was paused in, sunk into the
+// protagonist's inner sea. At Sea = 0 it is the field as it was; towards 1 the frame becomes the game's bright water: a
+// gradient from the surface's aqua at the top down to pure blue, in which the room (the field and its drowned version,
+// posterized) is only a relief -- lighter parts take their colour from higher up the gradient, darker parts from lower
+// down. Swayed by waves as if seen through water, and lit from above by caustics (stepped six times a second, the way the
+// game's hold still between updates) and slanting light shafts. Dim darkens it under a sub-screen. For a full-screen
+// DreamGUI Image (see P3R_Common.dsh).
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = AlphaComposite, TwoSided = true)
+#include "P3R_Common.dsh"
+
+/// @group DreamUI   @sort 0   @desc 1 while DreamGUI's own renderer draws this (it premultiplies by itself); 0 under UE's renderer.
+uniform float DreamUI_IsRenderByDreamUIRenderer = 1.0;
+
+/// @group Sea|Pictures   @sort 10   @desc The paused field
+/// @default /Game/P3R/Textures/T_P3R_FieldClassroom
+uniform Texture2D FieldTex;
+/// @group Sea|Pictures   @sort 20   @desc The same room under water, mixed into the mapped field
+/// @default /Game/P3R/Textures/T_P3R_SeaClassroom
+uniform Texture2D DrownedTex;
+
+/// @group Sea|State   @sort 30   @slider 0 1   @desc 0 = the field as it is, 1 = the inner sea
+uniform float Sea = 1.0;
+/// @group Sea|State   @sort 40   @slider 0 1   @desc Darkening under a sub-screen
+uniform float Dim = 0.0;
+/// @group Sea|Look   @sort 50   @slider 0 1   @desc How far the room's light and shade move a point up or down the gradient
+uniform float Relief = 0.38;
+/// @group Sea|Look   @sort 60   @slider 2 12   @desc Posterize levels of the room's brightness
+uniform float Levels = 5.0;
+/// @group Sea|Look   @sort 70   @desc Gradient: at the surface, the top of the screen (sRGB)
+uniform float4 Surface = float4(0.30, 0.92, 1.0, 1.0);
+/// @group Sea|Look   @sort 75   @desc Gradient: three tenths down (sRGB)
+uniform float4 Upper = float4(0.18, 0.62, 0.95, 1.0);
+/// @group Sea|Look   @sort 80   @desc Gradient: half way down (sRGB)
+uniform float4 Middle = float4(0.09, 0.38, 0.82, 1.0);
+/// @group Sea|Look   @sort 85   @desc Gradient: three quarters down (sRGB)
+uniform float4 Lower = float4(0.04, 0.22, 0.77, 1.0);
+/// @group Sea|Look   @sort 90   @desc Gradient: at the bottom (sRGB)
+uniform float4 Floor = float4(0.02, 0.12, 0.74, 1.0);
+/// @group Sea|Look   @sort 100   @desc Caustics and light shafts (sRGB)
+uniform float4 Foam = float4(0.86, 0.98, 1.0, 1.0);
+/// @group Sea|Motion   @sort 110   @slider 0 0.05   @desc Wave sway, in screen fractions
+uniform float WaveAmp = 0.0035;
+/// @group Sea|Motion   @sort 115   @slider 1 40   @desc Waves down the screen (more = finer ripples)
+uniform float WaveCount = 8.0;
+/// @group Sea|Motion   @sort 120   @slider 0 4   @desc Wave speed
+uniform float WaveSpeed = 0.6;
+/// @group Sea|Light   @sort 130   @slider 0 2   @desc Caustics brightness
+uniform float CausticGain = 0.3;
+/// @group Sea|Light   @sort 140   @slider 0 1   @desc Light shafts brightness
+uniform float RayGain = 0.12;
+/// @group Sea|Light   @sort 150   @slider 1 30   @desc Caustic updates per second (0 = smooth)
+uniform float CausticRate = 6.0;
+
+/// @custom
+float3 P3R_SeaColour(float3 Field, float3 Drowned, float2 UV, float Time, float Levels, float Relief,
+    float3 Surface, float3 Upper, float3 Middle, float3 Lower, float3 Floor, float3 Foam,
+    float CausticGain, float RayGain, float CausticRate)
+{
+    struct FSea
+    {
+        // The water's gradient, 0 at the surface to 1 at the bottom.
+        float3 Gradient(float P, float3 S, float3 U, float3 M, float3 L, float3 F)
+        {
+            P = saturate(P);
+            float3 A = lerp(S, U, saturate(P / 0.3));
+            float3 B = lerp(U, M, saturate((P - 0.3) / 0.2));
+            float3 C = lerp(M, L, saturate((P - 0.5) / 0.25));
+            float3 D = lerp(L, F, saturate((P - 0.75) / 0.25));
+            return P < 0.3 ? A : (P < 0.5 ? B : (P < 0.75 ? C : D));
+        }
+        // An iterated sine field: bright threads where the folded waves converge, the look of light through a surface.
+        float Caustic(float2 P, float T)
+        {
+            float2 I = P;
+            float C = 1.0;
+            const float Inten = 0.005;
+            for (int N = 0; N < 5; N++)
+            {
+                float Tn = T * (1.0 - (3.5 / float(N + 1)));
+                I = P + float2(cos(Tn - I.x) + sin(Tn + I.y), sin(Tn - I.y) + cos(Tn + I.x));
+                C += 1.0 / length(float2(P.x / (sin(I.x + Tn) / Inten), P.y / (cos(I.y + Tn) / Inten)));
+            }
+            C /= 5.0;
+            C = 1.17 - pow(C, 1.4);
+            return pow(abs(C), 8.0);
+        }
+    };
+    FSea S;
+
+    // The room, posterized: a relief in the gradient, its light parts lifted towards the surface's colour.
+    float3 W = float3(0.299, 0.587, 0.114);
+    float DrownedLum = dot(Drowned, W);
+    float Lum = 0.5 * dot(Field, W) + 0.5 * DrownedLum;
+    Lum = floor(Lum * Levels + 0.5) / Levels;
+    float3 Colour = S.Gradient(UV.y - Relief * (Lum - 0.45), Surface, Upper, Middle, Lower, Floor);
+    // The drowned room's own brightest light (its caustics on the desks), stronger higher up.
+    Colour += saturate(DrownedLum - 0.55) * float3(0.5, 0.6, 0.3) * (1.0 - UV.y);
+
+    // Caustics, held between updates, strongest near the surface.
+    float Held = CausticRate > 0.0 ? floor(Time * CausticRate) / CausticRate : Time;
+    float2 P = fmod(float2(UV.x * 1.7778, UV.y) * 6.2831853 * 1.3, 6.2831853) - 250.0;
+    float Cau = S.Caustic(P, Held * 0.5 + 23.0);
+    Colour += Foam * Cau * CausticGain * (1.0 - saturate(UV.y * 1.1));
+
+    // Shafts of light slanting down from the upper right.
+    float Slant = UV.x + UV.y * 0.45;
+    float Shafts = pow(saturate(sin(Slant * 23.0 + Time * 0.15) * 0.5 + 0.5), 6.0)
+                 * pow(saturate(sin(Slant * 9.0 - Time * 0.11) * 0.5 + 0.5), 2.0);
+    Colour += Foam * Shafts * RayGain * (1.0 - saturate(UV.y * 1.25));
+    return Colour;
+}
+
+export void M_P3R_Sea(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0);
+    float T = UE.Time();
+
+    // Seen through water: the frame sways, more as the sea comes in.
+    float Sway = WaveAmp * Sea;
+    // In a graph body sin and cos are the material Sine / Cosine nodes: their period is 1, not 2 pi.
+    float2 Wavy = UV + float2(sin(UV.y * WaveCount + T * WaveSpeed * 0.33) * Sway,
+                              cos(UV.x * WaveCount * 0.57 + T * WaveSpeed * 0.27) * Sway * 0.6);
+
+    float3 Field = FieldTex.Sample(UV).rgb;
+    float3 FieldWavy = FieldTex.Sample(Wavy).rgb;
+    float3 Drown = DrownedTex.Sample(Wavy).rgb;
+
+    float3 SeaColour = P3R_SeaColour(FieldWavy, Drown, UV, T, Levels, Relief,
+        Surface.rgb, Upper.rgb, Middle.rgb, Lower.rgb, Floor.rgb, Foam.rgb, CausticGain, RayGain, CausticRate);
+    float3 Colour = lerp(Field, SeaColour, saturate(Sea));
+    Colour *= 1.0 - Dim * 0.6;
+
+    // The widget's tint, opacity and clip (an ink mask transition reveals the sea through it).
+    float4 Shaded = MF_DreamUI_Shade();
+    float3 Straight = P3R_SRGBToLinear(Colour) * Shaded.rgb;
+    m.EmissiveColor = P3R_UIEmissive(Straight, Shaded.a, DreamUI_IsRenderByDreamUIRenderer);
+    m.Opacity = Shaded.a;
+}

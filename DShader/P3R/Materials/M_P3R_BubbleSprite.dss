@@ -1,0 +1,17 @@
+// M_P3R_BubbleSprite.dss -- the sprite material of the rising bubbles (NS_P3R_Bubbles). DreamGUI draws a Niagara system
+// in the UI itself and takes from the particle material only its Texture parameter and its blend: additive here, so the
+// bubbles brighten the sea they rise through. Particle colour times the bubble picture.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = Additive, TwoSided = true)
+
+/// @group Sprite   @sort 10   @desc The bubble
+/// @default /Game/P3R/Textures/T_P3R_Bubble
+uniform Texture2D Texture;
+
+export void M_P3R_BubbleSprite(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0);
+    float4 Pic = Texture.Sample(UV);
+    float4 VC = UE.VertexColor();
+    m.EmissiveColor = Pic.rgb * VC.rgb * Pic.a * VC.a;
+    m.Opacity = Pic.a * VC.a;
+}

@@ -1,0 +1,233 @@
+// STATUS (UP3RStatusScreen): the party down the left as black bands with their faces cut in; on the right the protagonist
+// in close-up, a hand over his face, in front of a white disc with STATUS running round its edge; "L1 状态确认 R1" thrown
+// across the top right on a pale band. Between his fingertips and his palm a shard of glass shows the chosen member's
+// eyes, as the game's does -- the hand is a layer of its own in front of the shard -- and choosing another member
+// flashes the shard white and slides the new eyes into it.
+class /Game/P3R/UI/WBP_P3R_Status
+use "P3R/P3R_Common.dui"
+use "P3R/Components/P3R_PartyRow.dui" as PartyRow
+
+resources {
+    Asset HandArt = /Game/P3R/Textures/T_P3R_HeroHand
+    Asset HandFront = /Game/P3R/Textures/T_P3R_HeroHandFront
+    Asset Eyes0 = /Game/P3R/Textures/T_P3R_Eyes_0
+    Asset ShardSystem = /Game/P3R/FX/NS_P3R_Shards
+}
+
+// The shard's outline: the gap between his fingertips and his palm (in the Shard box, y up); the hand in front hides
+// its edges.
+style ShardOutline : DecoFill {
+    Points = [(0, 0.06), (0.02, 0.94), (1, 1), (0.98, 0)]
+}
+style InShard : Deco {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    RenderTransformPivot = (0.5, 0.5)
+    bClipToBelow = true
+}
+style RowAt : FromTop {
+    AnchorData.SizeDelta = (885, 84)
+}
+style Chevron : Deco {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (40, 56)
+    Color = @Red
+}
+
+Widget Root : Fill {
+    + MaskTransition {
+        Preset = Ink
+        Progress = 1
+        Softness = 0.05
+        Centre = (0.26, 0.62)
+        Grain = 3
+        Seed = 3
+        bHitTestMask = false
+    }
+    RectBlock Catch : Catcher {}
+
+    // ---- The white disc with STATUS round its edge: behind his head, so the top right of the screen is white.
+    Widget Disc : At {
+        AnchorData.AnchoredPosition = (1290, -170)
+        AnchorData.SizeDelta = (1400, 1400)
+        RenderTransformPivot = (0.5, 0.5)
+        Raycastable = Disabled
+        RectBlock DiscFill : Block {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            CornerRadius.X = 700
+            CornerRadius.Y = 700
+            CornerRadius.Z = 700
+            CornerRadius.W = 700
+            BodyColor = #F4F5FCF4
+        }
+        Text DiscWord : Word {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0.5, 0.5)
+            AnchorData.SizeDelta = (1100, 160)
+            FontStyle = None
+            FontSize = 150
+            FontSpace = (6, 0)
+            Color = #A9AEC4
+            TextStyle.UnderlayColor = @Clear
+            Text = "STATUS" @noloc
+            + MeshModifierTextOnPath {
+                Source = Circle
+                Radius = 610
+                CircleCentre = (0, 0)
+                StartAngle = 225
+                SweepAngle = 100
+                bClockwise = true
+                Align = Centre
+                Anchor = Top
+            }
+        }
+    }
+
+    // ---- The protagonist, a hand over his face, and the shard between his fingers (moved together).
+    Widget HeroGroup : Fill {
+        RenderTransformPivot = (0.66, 0.7)
+        Raycastable = Disabled
+        // Drawn through M_P3R_Figure by the class.
+        Image Hero : PictureAt {
+            AnchorData.AnchoredPosition = (1522, -554)
+            AnchorData.SizeDelta = (1405, 1053)
+            Brush.ResourceObject = @HandArt
+        }
+        Widget Shard : At {
+            AnchorData.AnchoredPosition = (1489, -332)
+            AnchorData.SizeDelta = (520, 180)
+            RenderTransformPivot = (0.5, 0.5)
+            RenderRotation = (0, 0, -8)
+            // A pale rim, then the glass itself, which everything after it is drawn inside.
+            Shape ShardRim : DecoFill {
+                Points = [(-0.02, 0.0), (0.0, 1.0), (1.02, 1.04), (1.0, -0.04)]
+                Color = #EAF8FFE0
+            }
+            Shape ShardGlass : ShardOutline { Color = #0B1650 }
+            Image ShardEyes : InShard {
+                AnchorData.AnchoredPosition = (0, 6)
+                AnchorData.SizeDelta = (564, 188)
+                Brush.ResourceObject = @Eyes0
+                Brush.TintColor = #FFFFFF
+            }
+            RectBlock ShardFlash : InShard {
+                AnchorData.SizeDelta = (620, 240)
+                CornerRadiusUnitMode = Value
+                CornerRadius.X = 0
+                CornerRadius.Y = 0
+                CornerRadius.Z = 0
+                CornerRadius.W = 0
+                BodyColor = #FFFFFF
+                RenderOpacity = 0
+            }
+            Shape ShardGlare : DecoFill {
+                Points = [(0.18, 1.1), (0.34, 1.1), (0.12, -0.1), (-0.04, -0.1)]
+                Color = #FFFFFF
+                BlendMode = Additive
+                RenderOpacity = 0.28
+                bClipToBelow = true
+            }
+        }
+        // The hand, cut out of the same picture, in front of the shard (drawn through M_P3R_Figure too).
+        Image HeroFront : PictureAt {
+            AnchorData.AnchoredPosition = (1522, -554)
+            AnchorData.SizeDelta = (1405, 1053)
+            Brush.ResourceObject = @HandFront
+        }
+    }
+
+    NiagaraSystem Shards {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0.5, 0.5)
+        AnchorData.AnchoredPosition = (1400, -620)
+        AnchorData.SizeDelta = (1000, 900)
+        System = @ShardSystem
+        bAutoActivate = true
+        bRaycastTarget = false
+    }
+
+    // ---- L1 状态确认 R1, thrown across the top right.
+    Shape TopBand : Deco {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (840, 0)
+        AnchorData.SizeDelta = (1080, 260)
+        Points = [(0, 0.5), (1, 1), (1, 0.74), (0.03, 0.03)]
+        Color = #9CA1CCE0
+    }
+    Widget Header : At {
+        AnchorData.AnchoredPosition = (1200, -118)
+        AnchorData.SizeDelta = (760, 140)
+        RenderTransformPivot = (0.5, 0.5)
+        RenderRotation = (0, 0, -15)
+        Raycastable = Disabled
+        Shape LeftChevron : Chevron {
+            AnchorData.AnchoredPosition = (14, -10)
+            Points = [(1, 0.05), (0, 0.5), (1, 0.95), (0.72, 0.5)]
+        }
+        Text L1 : WordAt {
+            AnchorData.AnchoredPosition = (112, -72)
+            AnchorData.SizeDelta = (170, 130)
+            FontSize = 140
+            Color = @White
+            Text = "L1" @noloc
+        }
+        Text Mode : LabelTop {
+            AnchorData.AnchoredPosition = (196, -40)
+            AnchorData.SizeDelta = (300, 52)
+            FontSize = 44
+            TextStyle.UnderlayColor = #04104AE0
+            TextStyle.UnderlayOffset = (0.04, 0.06)
+            HAlign = Center
+            Text = "状态确认"
+        }
+        Text R1 : WordAt {
+            AnchorData.AnchoredPosition = (610, -72)
+            AnchorData.SizeDelta = (170, 130)
+            FontSize = 140
+            Color = @White
+            Text = "R1" @noloc
+        }
+        Shape RightChevron : Chevron {
+            AnchorData.AnchoredPosition = (726, -10)
+            Points = [(0, 0.05), (1, 0.5), (0, 0.95), (0.28, 0.5)]
+        }
+    }
+
+    // ---- The party.
+    PartyRow Row0 : RowAt { AnchorData.AnchoredPosition = (0, -203) }
+    PartyRow Row1 : RowAt { AnchorData.AnchoredPosition = (0, -292) }
+    PartyRow Row2 : RowAt { AnchorData.AnchoredPosition = (0, -381) }
+    PartyRow Row3 : RowAt { AnchorData.AnchoredPosition = (0, -470) }
+    PartyRow Row4 : RowAt { AnchorData.AnchoredPosition = (0, -559) }
+    PartyRow Row5 : RowAt { AnchorData.AnchoredPosition = (0, -648) }
+    PartyRow Row6 : RowAt { AnchorData.AnchoredPosition = (0, -737) }
+
+    // ---- The guide: dark, since it lies on his white collar here.
+    Text Guide : GuideTitle {
+        Color = @Navy
+        TextStyle.UnderlayColor = @Clear
+        Text = "要查看谁的状态？"
+    }
+    Text GuideTag : GuideTag { Color = @Navy  Text = "Guide" @noloc }
+    RectBlock GuideRule : GuideRule { BodyColor = @Navy }
+    Text Hints : Hints {
+        Color = @Navy
+        TextStyle.UnderlayColor = @Clear
+        Text = "Q/E 切换　Ⓐ 状态　Ⓑ 返回"
+    }
+
+    // The blue veil the page opens under (a close-up settling).
+    RectBlock Closeup : BlockFill {
+        BodyColor = #0A2CC8
+        Visibility = Collapsed
+    }
+}

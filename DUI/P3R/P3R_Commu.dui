@@ -1,0 +1,155 @@
+// COMMU (UP3RCommuScreen): the bonds. The protagonist stands in the sea right of centre holding up a tarot card, his face
+// cut off by the top of the screen; behind him the top right is a white wall that takes his grey shadow, and a huge grey
+// COMMU climbs across it. LIST top left, and under it the cards of the bonds stepping out to the right, the chosen one
+// white and pushed out further.
+class /Game/P3R/UI/WBP_P3R_Commu
+use "P3R/P3R_Common.dui"
+use "P3R/Components/P3R_CommuRow.dui" as CommuRow
+
+resources {
+    Asset CardArt = /Game/P3R/Textures/T_P3R_HeroCard
+    Asset CardFront = /Game/P3R/Textures/T_P3R_HeroCardFront
+    Asset TarotBack = /Game/P3R/Textures/T_P3R_TarotBack
+}
+
+style RowAt : FromTop {
+    AnchorData.SizeDelta = (620, 124)
+}
+
+Widget Root : Fill {
+    + MaskTransition {
+        Preset = Ink
+        Progress = 1
+        Softness = 0.05
+        Centre = (0.26, 0.62)
+        Grain = 3
+        Seed = 5
+        bHitTestMask = false
+    }
+    RectBlock Catch : Catcher {}
+
+    // The white wall in the top right, and on it his shadow (the same picture as one flat grey, shown only on the wall).
+    Shape Wall : DecoFill {
+        Points = [(0.617, 1), (1, 1), (1, 0.611), (0.672, 0), (0.648, 0)]
+        Color = #F3F4F8
+    }
+    Image HeroShadow : PictureAt {
+        AnchorData.AnchoredPosition = (1325, -540)
+        AnchorData.SizeDelta = (840, 1080)
+        Brush.ResourceObject = @CardArt
+        bClipToBelow = true
+    }
+    Text Giant : GiantAt {
+        AnchorData.AnchoredPosition = (1560, -640)
+        AnchorData.SizeDelta = (1700, 460)
+        RenderRotation = (0, 0, -49)
+        FontSize = 420
+        Color = #A3A7B3
+        Text = "COMMU" @noloc
+    }
+
+    // Drawn through M_P3R_Figure by the class. The card in his hand is blank in the picture; the UI card lies over it.
+    Image Hero : PictureAt {
+        AnchorData.AnchoredPosition = (1025, -540)
+        AnchorData.SizeDelta = (840, 1080)
+        Brush.ResourceObject = @CardArt
+    }
+    // The card he holds up: the chosen bond's arcana (our own deck, Art/extras.py) -- it comes up showing its back and
+    // turns over, and turns over in depth again whenever the choice changes; a sheen runs across its face as it lands.
+    // The class swaps the face.
+    Widget Card : At {
+        AnchorData.AnchoredPosition = (943, -267)
+        AnchorData.SizeDelta = (122, 197)
+        RenderTransformPivot = (0.5, 0.5)
+        RenderRotation = (0, 0, -2)
+        Raycastable = Disabled
+        Image CardFace : Picture {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            Brush.ResourceObject = @TarotBack
+        }
+        Shape CardSheen : DecoFill {
+            Points = [(-0.3, -0.05), (-0.08, -0.05), (0.32, 1.05), (0.1, 1.05)]
+            Color = #CFF4FF
+            BlendMode = Additive
+            RenderOpacity = 0
+            bClipToBelow = true
+        }
+        // On the card's empty band at the bottom.
+        Text CardName : Label {
+            AnchorData.AnchorMin = (0.5, 0)
+            AnchorData.AnchorMax = (0.5, 0)
+            AnchorData.Pivot = (0.5, 0)
+            AnchorData.AnchoredPosition = (0, 13)
+            AnchorData.SizeDelta = (100, 22)
+            Font = @Bold
+            FontSize = 15
+            HAlign = Center
+            Color = #E9C76A
+            TextStyle.UnderlayColor = @Clear
+            Text = "愚者"
+        }
+    }
+    // A flash over the held card when it lands.
+    RectBlock CardGlint : Block {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0.5, 0.5)
+        AnchorData.AnchoredPosition = (943, -267)
+        AnchorData.SizeDelta = (122, 197)
+        RenderTransformPivot = (0.5, 0.5)
+        RenderRotation = (0, 0, -2)
+        BodyColor = #FFFFFF
+        BlendMode = Additive
+        RenderOpacity = 0
+    }
+    // His fingers, cut out of the same picture, in front of the card: he holds it rather than the card lying on him.
+    Image HeroFront : PictureAt {
+        AnchorData.AnchoredPosition = (1025, -540)
+        AnchorData.SizeDelta = (840, 1080)
+        Brush.ResourceObject = @CardFront
+    }
+
+    // ---- LIST in its flag.
+    Shape Flag : Deco {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (0, -60)
+        AnchorData.SizeDelta = (760, 190)
+        Points = [(0, 0.05), (0.62, 0.25), (1, 1), (0.08, 0.8)]
+        Color = #1A2FD0
+    }
+    Text List : LabelTop {
+        AnchorData.AnchoredPosition = (72, -118)
+        AnchorData.SizeDelta = (500, 112)
+        Font = @Heavy
+        FontStyle = Italic
+        FontSize = 110
+        FontSpace = (-4, 0)
+        TextStyle.UnderlayColor = #04104AE0
+        TextStyle.UnderlayOffset = (0.03, 0.04)
+        Text = "LIST" @noloc
+    }
+
+    // ---- The cards.
+    CommuRow Row0 : RowAt { AnchorData.AnchoredPosition = (90, -250) }
+    CommuRow Row1 : RowAt { AnchorData.AnchoredPosition = (114, -390) }
+    CommuRow Row2 : RowAt { AnchorData.AnchoredPosition = (138, -530) }
+    CommuRow Row3 : RowAt { AnchorData.AnchoredPosition = (162, -670) }
+    CommuRow Row4 : RowAt { AnchorData.AnchoredPosition = (186, -810) }
+    CommuRow Row5 : RowAt { AnchorData.AnchoredPosition = (210, -950) }
+
+    // ---- The guide.
+    Text Guide : GuideTitle { Text = "要查看哪段羁绊？" }
+    Text GuideTag : GuideTag { Text = "Guide" @noloc }
+    RectBlock GuideRule : GuideRule {}
+    Text Hints : Hints { Text = "Ⓐ 决定　Ⓑ 返回" }
+
+    // The blue veil the page opens under (a close-up settling).
+    RectBlock Closeup : BlockFill {
+        BodyColor = #0A2CC8
+        Visibility = Collapsed
+    }
+}

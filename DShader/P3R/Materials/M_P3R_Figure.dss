@@ -1,0 +1,66 @@
+// M_P3R_Figure.dss -- the protagonist as the pause menus draw him: a toon-shaded figure in white, cyan and ultramarine
+// whose dark masses (the blazer, the deepest shadows) let the sea through, as the game's menu model blends its blue
+// into the scene behind it. Thin outlines stay solid -- a dark pixel only clears where its neighbourhood is dark too --
+// so the drawing keeps its lines while the cloth becomes water. A slow ripple runs through it, and Silhouette turns the
+// whole figure into the dark-blue shape that sweeps across a menu when a page opens.
+// For a DreamGUI Image (see P3R_Common.dsh); the widget's tint and opacity multiply it. The texture is set per widget.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = AlphaComposite, TwoSided = true)
+#include "P3R_Common.dsh"
+
+/// @group DreamUI   @sort 0   @desc 1 while DreamGUI's own renderer draws this (it premultiplies by itself); 0 under UE's renderer.
+uniform float DreamUI_IsRenderByDreamUIRenderer = 1.0;
+
+/// @group Figure|Picture   @sort 10   @desc The figure, on a transparent ground
+/// @default /Game/P3R/Textures/T_P3R_HeroFloat
+uniform Texture2D FigureTex;
+/// @group Figure|Water   @sort 20   @slider 0 1   @desc How much of the sea shows through the figure's dark masses
+uniform float SeeThrough = 0.4;
+/// @group Figure|Water   @sort 30   @slider 0 0.01   @desc How far round a pixel to look before calling it a mass rather than a line (UV)
+uniform float LineReach = 0.004;
+/// @group Figure|Water   @sort 40   @slider 0 0.01   @desc Ripple amplitude (UV)
+uniform float RippleAmp = 0.0018;
+/// @group Figure|Water   @sort 50   @slider 0 8   @desc Ripples down the picture
+uniform float RippleCount = 2.5;
+/// @group Figure|Water   @sort 60   @slider 0 2   @desc Ripple speed (turns per second)
+uniform float RippleSpeed = 0.22;
+/// @group Figure|Look   @sort 70   @slider 0 1   @desc 1 draws the figure as a flat dark-blue shape
+uniform float Silhouette = 0.0;
+/// @group Figure|Look   @sort 80   @desc The silhouette's colour (sRGB); its alpha scales the figure's opacity
+uniform float4 SilhouetteColour = float4(0.02, 0.09, 0.52, 0.93);
+/// @group Figure|Look   @sort 90   @slider 0 1   @desc How much of the figure's light shows in the silhouette (0 = one flat colour, a cast shadow)
+uniform float SilhouetteShade = 1.0;
+
+export void M_P3R_Figure(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0);
+    float T = UE.Time();
+
+    // A slow ripple, sideways, travelling down the figure (the graph's sine runs one period per unit).
+    float2 Wavy = UV + float2(sin(UV.y * RippleCount + T * RippleSpeed) * RippleAmp, 0.0);
+    float4 C = FigureTex.Sample(Wavy);
+
+    // Dark and blue here, and dark and blue all round: a mass, not a line.
+    float L = dot(C.rgb, float3(0.2126, 0.7152, 0.0722));
+    float4 N1 = FigureTex.Sample(Wavy + float2(LineReach, 0.0));
+    float4 N2 = FigureTex.Sample(Wavy - float2(LineReach, 0.0));
+    float4 N3 = FigureTex.Sample(Wavy + float2(0.0, LineReach));
+    float4 N4 = FigureTex.Sample(Wavy - float2(0.0, LineReach));
+    float3 Avg = (N1.rgb + N2.rgb + N3.rgb + N4.rgb) * 0.25;
+    float LAvg = dot(Avg, float3(0.2126, 0.7152, 0.0722));
+    float AlphaAvg = (N1.a + N2.a + N3.a + N4.a) * 0.25;
+    float Blue = saturate((C.b - max(C.r, C.g)) * 3.0);
+    float Mass = saturate((0.16 - L) / 0.1) * saturate((0.16 - LAvg) / 0.1) * Blue * saturate(AlphaAvg * 1.5 - 0.4);
+    float Alpha = C.a * (1.0 - Mass * SeeThrough);
+
+    // The silhouette: one flat colour, a little lighter where the figure was lit (unless it is a cast shadow).
+    float3 Flat = P3R_SRGBToLinear(SilhouetteColour.rgb) * lerp(1.0, 0.85 + 0.3 * L, SilhouetteShade);
+    float3 Colour = lerp(C.rgb, Flat, Silhouette);
+    Alpha = Alpha * lerp(1.0, SilhouetteColour.a, Silhouette);
+
+    // The widget's tint, opacity and clip.
+    float4 Shaded = MF_DreamUI_Shade();
+    float3 Straight = saturate(Colour * Shaded.rgb);
+    float A = Alpha * Shaded.a;
+    m.EmissiveColor = P3R_UIEmissive(Straight, A, DreamUI_IsRenderByDreamUIRenderer);
+    m.Opacity = A;
+}

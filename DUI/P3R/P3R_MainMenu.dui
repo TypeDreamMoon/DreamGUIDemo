@@ -1,0 +1,279 @@
+// The pause menu, final design (UP3RMainMenu). The protagonist hangs upside down in the inner sea on the left, over a
+// white slab with the word MAIN and the item's number running down the edge; nine heavy italic words are thrown at their
+// own angles down the middle, overlapping; the chosen one turns black, its upper half red, over a white slash with a
+// pink edge that stretches and turns to whichever word is chosen. The money top left, the guide bottom right.
+//
+// Every word is a node of its own (Word0..Word8: a hit box, the text, and the red wedge that shows only where the text
+// is drawn); where each sits and how it is turned is written here, and the class reads it back as the word's rest pose.
+class /Game/P3R/UI/WBP_P3R_MainMenu
+use "P3R/P3R_Common.dui"
+
+resources {
+    Asset HeroArt = /Game/P3R/Textures/T_P3R_HeroFloat
+    Asset HandArt = /Game/P3R/Textures/T_P3R_HeroHand
+    Asset ShardSystem = /Game/P3R/FX/NS_P3R_Shards
+}
+
+// One menu word: centred on its point, turned about its middle.
+style MenuWord : At {
+    AnchorData.SizeDelta = (220, 84)
+    RenderTransformPivot = (0.5, 0.5)
+    + UIButton { TransitionType = None }
+}
+style WordHit : HitBox {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style WordText : Word {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    TextStyle.UnderlayColor = @Clear
+}
+// The word's shadow: a dark copy a few pixels down and right, drawn under the face (a per-glyph underlay would paint
+// over the neighbouring letter where the tight italic letters overlap).
+style WordShadow : WordText {
+    AnchorData.AnchoredPosition = (4, -6)
+    Color = @Shadow
+}
+// The red that lies over the upper half of the chosen word -- shown only where the word's own letters are drawn.
+style WordRed : Deco {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    PointUnit = Normalized
+    Points = [(-0.57, -0.19), (0.93, 1.36), (0.76, 0.19)]
+    Color = @Red
+    bClipToBelow = true
+}
+
+Widget Root : Fill {
+    RectBlock Catch : Catcher {}
+
+    // ---- Left: the slab, MAIN and the number, the protagonist, the confetti.
+    Shape Slab : Deco {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        Points = [(0, 0), (0.15, 0), (0.33, 1), (0, 1)]
+        Color = #FFFFFFF2
+    }
+    Text Number : GiantAt {
+        AnchorData.AnchoredPosition = (78, -150)
+        AnchorData.SizeDelta = (520, 320)
+        RenderTransformPivot = (0.5, 0.5)
+        RenderRotation = (0, 0, 90)
+        FontSize = 300
+        Color = #A7ACC2
+        Text = "01" @noloc
+    }
+    Text MainWord : GiantAt {
+        AnchorData.AnchoredPosition = (118, -668)
+        AnchorData.SizeDelta = (1000, 380)
+        RenderTransformPivot = (0.5, 0.5)
+        RenderRotation = (0, 0, 90)
+        FontSize = 390
+        Text = "MAIN" @noloc
+    }
+
+    // Drawn through M_P3R_Figure by the class. A close-up, as the game frames him: his upside-down head low on the left
+    // over the slab, his white shirt and raised arm running up diagonally out of the top of the screen.
+    Image Hero : PictureAt {
+        AnchorData.AnchoredPosition = (570, -540)
+        AnchorData.SizeDelta = (1140, 1080)
+        RenderTransformPivot = (0.5, 0.5)
+        Brush.ResourceObject = @HeroArt
+        + MeshModifierWarp {
+            Style = Wave
+            Orientation = Vertical
+            Bend = 2.5
+            PhaseSpeed = 0.35
+            CellLength = 24
+        }
+    }
+
+    NiagaraSystem Shards {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0.5, 0.5)
+        AnchorData.AnchoredPosition = (560, -540)
+        AnchorData.SizeDelta = (1100, 1080)
+        System = @ShardSystem
+        bAutoActivate = true
+        bRaycastTarget = false
+    }
+
+    // The protagonist turning to the camera as a page opens: his close-up as one dark-blue shape, swept across the menu
+    // under the words (the class shows and moves it).
+    Image Sweep : PictureAt {
+        AnchorData.AnchoredPosition = (140, -640)
+        AnchorData.SizeDelta = (2000, 1500)
+        RenderRotation = (0, 0, -10)
+        Brush.ResourceObject = @HandArt
+        Visibility = Collapsed
+    }
+
+    // ---- The money, top left.
+    Widget Money : FromTop {
+        AnchorData.AnchoredPosition = (98, -56)
+        AnchorData.SizeDelta = (330, 96)
+        RectBlock MoneyPlate : BlockFill {
+            BodyColor = @White
+            bEnableBorder = true
+            BorderWidth = 2
+            BorderColor = @Black
+        }
+        Text MoneyValue : FigureTop {
+            AnchorData.AnchoredPosition = (18, -6)
+            AnchorData.SizeDelta = (300, 50)
+            FontSize = 46
+            Color = @Black
+            Text = "¥38,550" @noloc
+        }
+        Text MoneyTag : LabelTop {
+            AnchorData.AnchoredPosition = (20, -56)
+            AnchorData.SizeDelta = (300, 18)
+            Font = @Light
+            FontSize = 16
+            Color = @Black
+            Text = "money" @noloc
+        }
+        Text MoneyTag2 : LabelTop {
+            AnchorData.AnchoredPosition = (20, -73)
+            AnchorData.SizeDelta = (300, 18)
+            Font = @Light
+            FontSize = 16
+            Color = @Black
+            Text = "in one's possession" @noloc
+        }
+    }
+
+    // ---- The cursor: a white slash with a pink edge, laid over the chosen word's box (the class moves it).
+    Widget Cursor : At {
+        AnchorData.AnchoredPosition = (960, -540)
+        AnchorData.SizeDelta = (100, 100)
+        RenderTransformPivot = (0.5, 0.5)
+        Raycastable = Disabled
+        Shape CursorPink : Deco {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            Points = [(-0.55, -0.1), (1.0, 1.46), (0.8, 0.26)]
+            Color = @Pink
+        }
+        Shape CursorWhite : Deco {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            Points = [(-0.59, -0.14), (0.92, 1.35), (0.74, 0.22)]
+            Color = @White
+        }
+    }
+
+    // ---- The nine words, top to bottom.
+    Widget Word0 : MenuWord {
+        AnchorData.AnchoredPosition = (945, -318)
+        AnchorData.SizeDelta = (196, 84)
+        RenderRotation = (0, 0, -24.6)
+        RectBlock Word0Hit : WordHit {}
+        Text Word0Shadow : WordShadow { Text = "SKILL" @noloc }
+        Text Word0Text : WordText { Text = "SKILL" @noloc }
+        Shape Word0Red : WordRed {}
+    }
+    Widget Word1 : MenuWord {
+        AnchorData.AnchoredPosition = (968, -404)
+        AnchorData.SizeDelta = (160, 84)
+        RenderRotation = (0, 0, -9.2)
+        RectBlock Word1Hit : WordHit {}
+        Text Word1Shadow : WordShadow { Text = "ITEM" @noloc }
+        Text Word1Text : WordText { Text = "ITEM" @noloc }
+        Shape Word1Red : WordRed {}
+    }
+    Widget Word2 : MenuWord {
+        AnchorData.AnchoredPosition = (934, -474)
+        AnchorData.SizeDelta = (212, 84)
+        RenderRotation = (0, 0, -17.9)
+        RectBlock Word2Hit : WordHit {}
+        Text Word2Shadow : WordShadow { Text = "EQUIP" @noloc }
+        Text Word2Text : WordText { Text = "EQUIP" @noloc }
+        Shape Word2Red : WordRed {}
+    }
+    Widget Word3 : MenuWord {
+        AnchorData.AnchoredPosition = (950, -530)
+        AnchorData.SizeDelta = (300, 84)
+        RenderRotation = (0, 0, -17.4)
+        RectBlock Word3Hit : WordHit {}
+        Text Word3Shadow : WordShadow { Text = "PERSONA" @noloc }
+        Text Word3Text : WordText { Text = "PERSONA" @noloc }
+        Shape Word3Red : WordRed {}
+    }
+    Widget Word4 : MenuWord {
+        AnchorData.AnchoredPosition = (984, -634)
+        AnchorData.SizeDelta = (248, 84)
+        RenderRotation = (0, 0, 1.8)
+        RectBlock Word4Hit : WordHit {}
+        Text Word4Shadow : WordShadow { Text = "STATUS" @noloc }
+        Text Word4Text : WordText { Text = "STATUS" @noloc }
+        Shape Word4Red : WordRed {}
+    }
+    Widget Word5 : MenuWord {
+        AnchorData.AnchoredPosition = (934, -704)
+        AnchorData.SizeDelta = (214, 84)
+        RenderRotation = (0, 0, -12.6)
+        RectBlock Word5Hit : WordHit {}
+        Text Word5Shadow : WordShadow { Text = "QUEST" @noloc }
+        Text Word5Text : WordText { Text = "QUEST" @noloc }
+        Shape Word5Red : WordRed {}
+    }
+    Widget Word6 : MenuWord {
+        AnchorData.AnchoredPosition = (1024, -782)
+        AnchorData.SizeDelta = (236, 84)
+        RenderRotation = (0, 0, -7.5)
+        RectBlock Word6Hit : WordHit {}
+        Text Word6Shadow : WordShadow { Text = "COMMU" @noloc }
+        Text Word6Text : WordText { Text = "COMMU" @noloc }
+        Shape Word6Red : WordRed {}
+    }
+    Widget Word7 : MenuWord {
+        AnchorData.AnchoredPosition = (984, -846)
+        AnchorData.SizeDelta = (338, 84)
+        RenderRotation = (0, 0, -1.5)
+        RectBlock Word7Hit : WordHit {}
+        Text Word7Shadow : WordShadow { Text = "CALENDAR" @noloc }
+        Text Word7Text : WordText { Text = "CALENDAR" @noloc }
+        Shape Word7Red : WordRed {}
+    }
+    Widget Word8 : MenuWord {
+        AnchorData.AnchoredPosition = (956, -904)
+        AnchorData.SizeDelta = (256, 84)
+        RenderRotation = (0, 0, 12.5)
+        RectBlock Word8Hit : WordHit {}
+        Text Word8Shadow : WordShadow { Text = "SYSTEM" @noloc }
+        Text Word8Text : WordText { Text = "SYSTEM" @noloc }
+        Shape Word8Red : WordRed {}
+    }
+
+    // ---- The guide, bottom right, and which design is showing, top right.
+    Text Guide : GuideTitle { Text = "使用技能" }
+    Text GuideTag : GuideTag { Text = "Command" @noloc }
+    RectBlock GuideRule : GuideRule {}
+    Text Hints : Hints { Text = "Ⓐ 决定　Ⓑ 关闭" }
+    // A flash of light over everything as the menu is uncovered again on the way back from a page.
+    RectBlock Flash : BlockFill {
+        BodyColor = #5C8CFF
+        BlendMode = Additive
+        Visibility = Collapsed
+    }
+    Text Design : Label {
+        AnchorData.AnchorMin = (1, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (1, 1)
+        AnchorData.AnchoredPosition = (-40, -28)
+        AnchorData.SizeDelta = (600, 26)
+        FontSize = 18
+        HAlign = Right
+        Color = #FFFFFFB0
+        Text = "最终版 · Tab 切换设计稿"
+    }
+}

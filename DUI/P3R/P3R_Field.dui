@@ -1,0 +1,117 @@
+// The field (UP3RFieldHud): the classroom after school, and the game's light HUD over it -- the date and time of day
+// top right over a huge pale WEEKDAY with the moon's phase beside it, where you are bottom left, and how to open the menu.
+class /Game/P3R/UI/WBP_P3R_Field
+use "P3R/P3R_Common.dui"
+
+style Circle : Block {
+    CornerRadius.X = 42
+    CornerRadius.Y = 42
+    CornerRadius.Z = 42
+    CornerRadius.W = 42
+}
+
+Widget Root : Fill {
+    RectBlock Catch : Catcher {}
+
+    // ---- Date, time of day, the moon.
+    Widget Clock : FromTop {
+        AnchorData.AnchoredPosition = (1340, -24)
+        AnchorData.SizeDelta = (560, 160)
+        Raycastable = Disabled
+        Text Weekday : LabelTop {
+            AnchorData.AnchoredPosition = (-30, 6)
+            AnchorData.SizeDelta = (640, 130)
+            Font = @Heavy
+            FontStyle = Italic
+            FontSize = 150
+            FontSpace = (-6, 0)
+            Color = #2C8CFF66
+            Text = "WEEKDAY" @noloc
+        }
+        Text Date : LabelTop {
+            AnchorData.AnchoredPosition = (40, -10)
+            AnchorData.SizeDelta = (220, 100)
+            Font = @Heavy
+            FontStyle = Italic
+            FontSize = 104
+            TextStyle.UnderlayColor = #0B2AB8E6
+            TextStyle.UnderlayOffset = (0.04, 0.05)
+            Text = "4/21" @noloc
+        }
+        Text Day : LabelTop {
+            AnchorData.AnchoredPosition = (252, -20)
+            AnchorData.SizeDelta = (60, 50)
+            FontSize = 40
+            TextStyle.UnderlayColor = #0B2AB8E6
+            TextStyle.UnderlayOffset = (0.04, 0.05)
+            Text = "二"
+        }
+        Text Time : LabelTop {
+            AnchorData.AnchoredPosition = (150, -100)
+            AnchorData.SizeDelta = (200, 44)
+            FontSize = 34
+            Color = #7DE6FD
+            TextStyle.UnderlayColor = #0B2AB8E6
+            TextStyle.UnderlayOffset = (0.04, 0.05)
+            Text = "放学后"
+        }
+        Text LimitTag : LabelTop {
+            AnchorData.AnchoredPosition = (360, -18)
+            AnchorData.SizeDelta = (90, 20)
+            Font = @Light
+            FontSize = 17
+            FontSpace = (4, 0)
+            Text = "LIMIT" @noloc
+        }
+        Text Limit : LabelTop {
+            AnchorData.AnchoredPosition = (354, -36)
+            AnchorData.SizeDelta = (70, 60)
+            Font = @Heavy
+            FontStyle = Italic
+            FontSize = 58
+            Color = #FFE03A
+            TextStyle.UnderlayColor = #0B2AB8E6
+            TextStyle.UnderlayOffset = (0.04, 0.05)
+            Text = "13" @noloc
+        }
+        RectBlock MoonLit : Circle {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (430, -30)
+            AnchorData.SizeDelta = (84, 84)
+            BodyColor = #FFF4B0
+        }
+        RectBlock MoonDark : Circle {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (448, -30)
+            AnchorData.SizeDelta = (84, 84)
+            BodyColor = #0B1238
+        }
+    }
+
+    // ---- Where you are.
+    Shape Place : Deco {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (0, 0)
+        AnchorData.Pivot = (0, 0)
+        AnchorData.AnchoredPosition = (0, 120)
+        AnchorData.SizeDelta = (560, 64)
+        Points = [(0, 0), (0.95, 0), (1, 1), (0, 1)]
+        Color = #0B1A7AE6
+    }
+    Text PlaceName : Label {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (0, 0)
+        AnchorData.Pivot = (0, 0)
+        AnchorData.AnchoredPosition = (40, 130)
+        AnchorData.SizeDelta = (500, 44)
+        FontSize = 32
+        Text = "辰月学园　2F　二年F班教室"
+    }
+
+    // ---- How to open the menu.
+    Text Prompt : Hints { Text = "Tab / Esc / Ⓨ　打开菜单" }
+}

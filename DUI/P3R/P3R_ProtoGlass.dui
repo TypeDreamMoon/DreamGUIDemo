@@ -1,0 +1,157 @@
+// An early design of the pause menu (UP3RProtoGlass): the street the game was paused in, sharp; over it two flat
+// polygons in which the street is gaussian-blurred and whitened -- not glass, no edges -- an ink drawing of the
+// protagonist printed on the first, the second only frost; the items as tall white capitals stacked down a slope, the
+// chosen one on a cyan bar, with what it does in small print beside it.
+class /Game/P3R/UI/WBP_P3R_ProtoGlass
+use "P3R/P3R_Common.dui"
+
+resources {
+    Asset CityArt = /Game/P3R/Textures/T_P3R_NightStreet
+    Asset InkGlass = /Game/P3R/Materials/M_P3R_InkGlass
+    Asset BoardMask = /Game/P3R/Textures/T_P3R_BoardMask
+    Asset SideMask = /Game/P3R/Textures/T_P3R_SideMask
+}
+
+style ProtoWord : At {
+    AnchorData.SizeDelta = (420, 86)
+    RenderTransformPivot = (0, 0.5)
+    RenderRotation = (0, 0, -13)
+    + UIButton { TransitionType = None }
+}
+style ProtoHit : HitBox {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style ProtoText : Label {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    Font = @Heavy
+    FontSize = 92
+    FontSpace = (1, 0)
+    TextStyle.UnderlayColor = #00000090
+    TextStyle.UnderlayOffset = (0.02, 0.03)
+    TextStyle.UnderlaySoftness = 0.2
+}
+
+Widget Root : Fill {
+    + MaskTransition {
+        Preset = Ink
+        Progress = 1
+        Softness = 0.05
+        Centre = (0.5, 0.5)
+        Grain = 3
+        Seed = 21
+        bHitTestMask = false
+    }
+    RectBlock Catch : Catcher {}
+
+    Image City : Picture {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        Brush.ResourceObject = @CityArt
+        Brush.TintColor = #B4B4C4
+    }
+
+    // ---- The two polygons (Art/extras.py). The blur covers the frame but its strength is the polygon's mask (1 inside,
+    // 0 -- the street untouched -- outside); a clip mask would draw the subtree off screen, where there is no street to
+    // blur. The frost is the same polygon as a shape; only the drawing, which needs no backdrop, sits in a masked group.
+    Widget Board : Fill {
+        Raycastable = Disabled
+        BackgroundBlur BoardBlur {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BlurStrength = 9
+            StrengthMap.Kind = Texture
+            StrengthMap.Texture = @BoardMask
+            bRaycastTarget = false
+        }
+        Shape BoardFrost : DecoFill {
+            Points = [(0.129, 0.511), (0.797, 0.847), (0.906, 0.514), (0.5, -0.02), (0.239, 0.097)]
+            Color = #F0F3FA8C
+        }
+        Widget BoardPrint : Fill {
+            Clipping = ClipToBounds
+            ClipMask.Source = Texture
+            ClipMask.Texture = @BoardMask
+            ClipMask.Threshold = 0.5
+            ClipMask.Softness = 0.02
+            Image BoardInk : PictureAt {
+                AnchorData.AnchoredPosition = (1187, -345)
+                AnchorData.SizeDelta = (1350, 1012)
+                RenderRotation = (0, 0, -12)
+                Brush.ResourceObject = @InkGlass
+            }
+        }
+    }
+    Widget Side : Fill {
+        Raycastable = Disabled
+        BackgroundBlur SideBlur {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BlurStrength = 10
+            StrengthMap.Kind = Texture
+            StrengthMap.Texture = @SideMask
+            bRaycastTarget = false
+        }
+        Shape SideFrost : DecoFill {
+            Points = [(0.867, 0.556), (0.918, 0.706), (1.008, 0.722), (1.008, -0.028), (0.656, -0.028)]
+            Color = #F2F5FF9C
+        }
+    }
+
+    // ---- The cyan bar and the words.
+    Shape Bar : Deco {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 0.5)
+        AnchorData.AnchoredPosition = (240, -335)
+        AnchorData.SizeDelta = (560, 70)
+        RenderTransformPivot = (0, 0.5)
+        RenderRotation = (0, 0, -13)
+        Points = [(0, 0), (0.94, 0), (1, 1), (0.04, 1)]
+        Color = #3ED8F2
+    }
+
+    Widget Item0 : ProtoWord { AnchorData.AnchoredPosition = (600, -300)  Text Item0Text : ProtoText { Text = "SKILL" @noloc }  RectBlock Item0Hit : ProtoHit {} }
+    Widget Item1 : ProtoWord { AnchorData.AnchoredPosition = (636, -372)  Text Item1Text : ProtoText { Text = "ITEM" @noloc }  RectBlock Item1Hit : ProtoHit {} }
+    Widget Item2 : ProtoWord { AnchorData.AnchoredPosition = (672, -444)  Text Item2Text : ProtoText { Text = "EQUIP" @noloc }  RectBlock Item2Hit : ProtoHit {} }
+    Widget Item3 : ProtoWord { AnchorData.AnchoredPosition = (708, -516)  Text Item3Text : ProtoText { Text = "PERSONA" @noloc }  RectBlock Item3Hit : ProtoHit {} }
+    Widget Item4 : ProtoWord { AnchorData.AnchoredPosition = (744, -588)  Text Item4Text : ProtoText { Text = "STATUS" @noloc }  RectBlock Item4Hit : ProtoHit {} }
+    Widget Item5 : ProtoWord { AnchorData.AnchoredPosition = (780, -660)  Text Item5Text : ProtoText { Text = "COMMU" @noloc }  RectBlock Item5Hit : ProtoHit {} }
+    Widget Item6 : ProtoWord { AnchorData.AnchoredPosition = (816, -732)  Text Item6Text : ProtoText { Text = "CALENDAR" @noloc }  RectBlock Item6Hit : ProtoHit {} }
+    Widget Item7 : ProtoWord { AnchorData.AnchoredPosition = (852, -804)  Text Item7Text : ProtoText { Text = "QUEST" @noloc }  RectBlock Item7Hit : ProtoHit {} }
+    Widget Item8 : ProtoWord { AnchorData.AnchoredPosition = (888, -876)  Text Item8Text : ProtoText { Text = "SYSTEM" @noloc }  RectBlock Item8Hit : ProtoHit {} }
+
+    Text Note : LabelTop {
+        AnchorData.AnchoredPosition = (700, -262)
+        AnchorData.SizeDelta = (360, 34)
+        FontSize = 26
+        TextStyle.UnderlayColor = #000000A0
+        TextStyle.UnderlayOffset = (0.04, 0.05)
+        Text = "使用技能"
+    }
+    Text Money : FigureTop {
+        AnchorData.AnchoredPosition = (760, -960)
+        AnchorData.SizeDelta = (400, 70)
+        FontSize = 64
+        Color = #FFFFFFD0
+        Text = "¥9,999,999" @noloc
+    }
+
+    Text Design : Label {
+        AnchorData.AnchorMin = (1, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (1, 1)
+        AnchorData.AnchoredPosition = (-40, -28)
+        AnchorData.SizeDelta = (600, 26)
+        FontSize = 18
+        HAlign = Right
+        Color = #FFFFFFB0
+        Text = "早期设计稿 A · Tab 切换设计稿"
+    }
+}

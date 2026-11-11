@@ -1,0 +1,72 @@
+// The confetti of the menu: small sharp shards in pink, lilac, white and cyan, drifting and turning slowly near the
+// characters. Drawn inside the UI by DreamGUI's NiagaraSystem visual (CPU sprites; X right, Z up, design pixels, the
+// origin at the middle of the widget it fills). Warmed up so they are already there when the menu opens.
+System(Name="P3R/FX/NS_P3R_Shards")
+{
+    Settings = {
+        WarmupTime  = 8.0;
+        FixedBounds = box(-700, -50, -700, 700, 50, 700);
+    }
+
+    Properties = {
+        float Rate = 4.0 [ Group="Shards"; SortPriority=10; Description="Shards a second" ];
+    }
+
+    Emitter Shards
+    {
+        Settings = {
+            SimTarget   = CPU;
+            LocalSpace  = true;
+            Determinism = true;
+            RandomSeed  = 9157;
+            AllocationMode     = Fixed;
+            PreAllocationCount = 48;
+        }
+
+        EmitterUpdate = {
+            EmitterState(LifeCycleMode = Self, LoopBehavior = Infinite);
+            SpawnRate(SpawnRate = User.Rate);
+        }
+
+        ParticleSpawn = {
+            Spawn/Initialization/V2/InitializeParticle(
+                LifetimeMode   = Random,
+                LifetimeMin    = 4.0,
+                LifetimeMax    = 7.5,
+                ColorMode      = RandomRange,
+                ColorMinimum   = (1.0, 0.36, 0.72, 0.95),
+                ColorMaximum   = (0.45, 0.88, 1.0, 0.95),
+                SpriteSizeMode = RandomUniform,
+                UniformSpriteSizeMin = 16.0,
+                UniformSpriteSizeMax = 44.0,
+                SpriteRotationMode = Random
+            );
+            BoxLocation(BoxSize = (1000, 4, 900));
+            AddVelocity(
+                VelocityMode = Linear,
+                Velocity = RandomRangeVector(Minimum = (-22, 0, -12), Maximum = (22, 0, 26))
+            );
+            float Particles.SpinRate = RandomRangeFloat(Minimum = -70.0, Maximum = 70.0);
+        }
+
+        ParticleUpdate = {
+            ParticleState();
+            SpriteRotationRate(RotationRate = Particles.SpinRate);
+            SolveForcesAndVelocity();
+            Color Particles.Color = hlsl {
+                float4(Particles.Color.rgb, 0.9 * sin(Particles.NormalizedAge * 3.14159))
+            };
+        }
+
+        SpriteRenderer Core
+        {
+            Material   = "/Game/P3R/Materials/M_P3R_ShardSprite";
+            Alignment  = Unaligned;
+            FacingMode = FaceCamera;
+
+            Bind SpriteSize     -> Particles.SpriteSize;
+            Bind Color          -> Particles.Color;
+            Bind SpriteRotation -> Particles.SpriteRotation;
+        }
+    }
+}

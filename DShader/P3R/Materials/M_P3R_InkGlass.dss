@@ -1,0 +1,66 @@
+// M_P3R_InkGlass.dss -- the slab of the first menu prototype: a sheet of frosted glass with a black-and-white ink drawing
+// printed on it, tilted over the street. The ink is solid black; the paper between is only a white frosting, through
+// which the street shows blurred (the Glass widget under it does the blurring). The sheet clears towards its edges, and
+// two bands of gloss slide slowly across it.
+// For a DreamGUI Image (see P3R_Common.dsh); the widget's tint and opacity multiply it.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = AlphaComposite, TwoSided = true)
+#include "P3R_Common.dsh"
+
+/// @group DreamUI   @sort 0   @desc 1 while DreamGUI's own renderer draws this (it premultiplies by itself); 0 under UE's renderer.
+uniform float DreamUI_IsRenderByDreamUIRenderer = 1.0;
+
+/// @group Glass|Picture   @sort 10   @desc The ink drawing
+/// @default /Game/P3R/Textures/T_P3R_HeroInk
+uniform Texture2D InkTex;
+/// @group Glass|Look   @sort 20   @slider 0 0.01   @desc How far the ink's colour fringes split
+uniform float Fringe = 0.0;
+/// @group Glass|Look   @sort 30   @slider 0 1   @desc Opacity of the ink
+uniform float Body = 0.97;
+/// @group Glass|Look   @sort 35   @slider 0 1   @desc Opacity of the white between the ink: how much of the frosted street it hides
+uniform float Paper = 0.0;
+/// @group Glass|Look   @sort 36   @desc The white's colour (sRGB)
+uniform float4 PaperTint = float4(0.93, 0.95, 1.0, 1.0);
+/// @group Glass|Look   @sort 40   @slider 0 0.5   @desc Width of the clear border, in fractions of the sheet
+uniform float EdgeClear = 0.0;
+/// @group Glass|Look   @sort 50   @desc Tint of the glass where it clears (sRGB)
+uniform float4 GlassTint = float4(0.78, 0.92, 1.0, 1.0);
+/// @group Glass|Motion   @sort 60   @slider 0 1   @desc Gloss bands' speed
+uniform float GlossSpeed = 0.08;
+/// @group Glass|Motion   @sort 70   @slider 0 1   @desc Gloss bands' brightness
+uniform float GlossGain = 0.0;
+
+export void M_P3R_InkGlass(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0);
+    float T = UE.Time();
+
+    // The drawing behind the surface, its ink split into cyan and red a hair either way.
+    float R = InkTex.Sample(UV + float2(Fringe, 0.0)).r;
+    float G = InkTex.Sample(UV).g;
+    float B = InkTex.Sample(UV - float2(Fringe, 0.0)).b;
+    float3 Ink = float3(R, G, B);
+
+    // Ink solid, the paper a frosting.
+    float InkAmount = 1.0 - smoothstep(0.25, 0.75, dot(Ink, float3(0.299, 0.587, 0.114)));
+    float3 Printed = lerp(PaperTint.rgb, Ink, InkAmount);
+    float PrintedAlpha = lerp(Paper, Body, InkAmount);
+
+    // Clear towards the edges, as a slab of glass seen at an angle does.
+    float2 Edge = min(UV, 1.0 - UV);
+    float Inner = saturate(min(Edge.x, Edge.y) / max(EdgeClear, 0.001));
+    float3 Colour = lerp(GlassTint.rgb, Printed, Inner);
+    float Alpha = lerp(0.3, PrintedAlpha, Inner);
+
+    // Two slanted gloss bands sliding across.
+    float Slant = UV.x * 0.8 - UV.y;
+    float Band1 = pow(saturate(1.0 - abs(frac(Slant * 0.7 - T * GlossSpeed) - 0.5) * 9.0), 2.0);
+    float Band2 = pow(saturate(1.0 - abs(frac(Slant * 0.7 - T * GlossSpeed + 0.37) - 0.5) * 22.0), 2.0);
+    Colour += (Band1 * 0.8 + Band2) * GlossGain;
+
+    // The widget's tint, opacity and clip.
+    float4 Shaded = MF_DreamUI_Shade();
+    float3 Straight = saturate(P3R_SRGBToLinear(Colour) * Shaded.rgb);
+    float A = Alpha * Shaded.a;
+    m.EmissiveColor = P3R_UIEmissive(Straight, A, DreamUI_IsRenderByDreamUIRenderer);
+    m.Opacity = A;
+}

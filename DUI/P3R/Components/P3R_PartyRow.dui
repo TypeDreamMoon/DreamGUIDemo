@@ -1,0 +1,126 @@
+// One member in the STATUS list (UP3RPartyRow): a black band from the screen's edge; the role thrown across its left end;
+// the member's face cut into a slanted window of their colour; the name; then level, HP and SP in thin italic figures,
+// HP and SP each over a bar of how much is left. The chosen band turns white with a red edge. Laid out in 885 x 84.
+class /Game/P3R/UI/Components/WBP_P3R_PartyRow
+use "P3R/P3R_Common.dui"
+
+resources {
+    Asset Face0 = /Game/P3R/Textures/T_P3R_Face_0
+}
+
+style Band : DecoFill {
+    Points = [(0, 0), (0.968, 0), (1, 1), (0, 1)]
+}
+style Tiny : LabelTop {
+    Font = @Light
+    FontStyle = Italic
+    FontSize = 19
+}
+style Num : FigureTop {
+    FontSize = 62
+    FontSpace = (-1, 0)
+}
+
+Widget Root : Fill {
+    + UIButton { TransitionType = None }
+    RectBlock Hit : HitBox {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+    }
+
+    Shape Body : Band { Color = #07080F }
+    // The chosen member's band: white, edged red, wiped on from the left (the class plays it).
+    Widget Chosen : Fill {
+        AnchorData.SizeDelta = (8, 8)
+        + MaskTransition {
+            Preset = Wipe
+            Progress = 0
+            Softness = 0.02
+            Angle = 20
+            bHitTestMask = false
+        }
+        Shape Edge : Band { Color = @Red }
+        Widget ChosenInner : Fill {
+            AnchorData.SizeDelta = (-8, -8)
+            Shape ChosenBody : Band { Color = #F6F7FB }
+        }
+    }
+
+    // The face window: the member's colour, the face shown only where the window is drawn.
+    Shape Window : Deco {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 0.5)
+        AnchorData.AnchoredPosition = (56, 0)
+        AnchorData.SizeDelta = (250, 0)
+        Points = [(0.16, 0), (1, 0), (0.84, 1), (0, 1)]
+        Color = #3A7BFF
+    }
+    Image Face : Picture {
+        AnchorData.AnchorMin = (0, 0.5)
+        AnchorData.AnchorMax = (0, 0.5)
+        AnchorData.Pivot = (0.5, 0.5)
+        AnchorData.AnchoredPosition = (196, -48)
+        AnchorData.SizeDelta = (330, 440)
+        Brush.ResourceObject = @Face0
+        bClipToBelow = true
+    }
+    Shape WindowShade : Deco {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 0.5)
+        AnchorData.AnchoredPosition = (56, 0)
+        AnchorData.SizeDelta = (250, 0)
+        Points = [(0.6, 0), (1, 0), (0.84, 1), (0.76, 1)]
+        Color = #07080F
+    }
+
+    Text Role : WordAt {
+        AnchorData.AnchoredPosition = (58, -46)
+        AnchorData.SizeDelta = (190, 60)
+        RenderRotation = (0, 0, -28)
+        FontSize = 50
+        Color = @White
+        TextStyle.UnderlayColor = #000000C0
+        Text = "PARTY" @noloc
+    }
+
+    Text Name : LabelTop {
+        AnchorData.AnchoredPosition = (262, -18)
+        AnchorData.SizeDelta = (220, 48)
+        FontSize = 34
+        HAlign = Center
+        Text = "朝雾 凛"
+    }
+
+    Shape Slash : Deco {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (0, 0)
+        AnchorData.Pivot = (0, 0)
+        AnchorData.AnchoredPosition = (486, 10)
+        AnchorData.SizeDelta = (32, 64)
+        Points = [(0, 0), (0.18, 0), (1, 1), (0.82, 1)]
+        Color = #3A7BFF
+    }
+    Text LvTag : Tiny { AnchorData.AnchoredPosition = (510, -52)  AnchorData.SizeDelta = (40, 22)  Text = "PLV" @noloc }
+    Text Lv : Num { AnchorData.AnchoredPosition = (544, -10)  AnchorData.SizeDelta = (80, 66)  FontSize = 52  Text = "28" @noloc }
+
+    Text HpTag : Tiny { AnchorData.AnchoredPosition = (600, -52)  AnchorData.SizeDelta = (30, 22)  Color = @HpCyan  Text = "HP" @noloc }
+    Text Hp : Num { AnchorData.AnchoredPosition = (628, -4)  AnchorData.SizeDelta = (112, 68)  Color = @HpCyan  Text = "280" @noloc }
+    RectBlock HpBar : BlockTop {
+        AnchorData.AnchoredPosition = (622, -70)
+        AnchorData.SizeDelta = (112, 7)
+        RenderTransformPivot = (0, 0.5)
+        BodyColor = @HpCyan
+    }
+
+    Text SpTag : Tiny { AnchorData.AnchoredPosition = (738, -52)  AnchorData.SizeDelta = (30, 22)  Color = @SpYellow  Text = "SP" @noloc }
+    Text Sp : Num { AnchorData.AnchoredPosition = (764, -4)  AnchorData.SizeDelta = (112, 68)  Color = @SpYellow  Text = "183" @noloc }
+    RectBlock SpBar : BlockTop {
+        AnchorData.AnchoredPosition = (758, -70)
+        AnchorData.SizeDelta = (100, 7)
+        RenderTransformPivot = (0, 0.5)
+        BodyColor = @SpYellow
+    }
+}

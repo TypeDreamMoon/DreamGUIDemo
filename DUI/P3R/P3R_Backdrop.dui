@@ -1,0 +1,48 @@
+// The ground under every screen (UP3RBackdrop): the field the game was paused in, and over it the same frame sunk into
+// the inner sea (M_P3R_Sea), revealed and taken back by an ink mask that steps like hand-drawn frames. Bubbles rise
+// through it all the time the sea is in.
+class /Game/P3R/UI/WBP_P3R_Backdrop
+use "P3R/P3R_Common.dui"
+
+resources {
+    Asset FieldArt = /Game/P3R/Textures/T_P3R_FieldClassroom
+    Asset SeaMaterial = /Game/P3R/Materials/M_P3R_Sea
+    Asset BubbleSystem = /Game/P3R/FX/NS_P3R_Bubbles
+}
+
+Widget Root : Fill {
+    Raycastable = Disabled
+
+    Image Field : Picture {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        Brush.ResourceObject = @FieldArt
+    }
+
+    Image Sea : Picture {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        Brush.ResourceObject = @SeaMaterial
+        + MaskTransition {
+            Preset = Ink
+            Progress = 0
+            Softness = 0.04
+            Centre = (0.26, 0.62)
+            Grain = 3
+            Seed = 7
+            bHitTestMask = false
+        }
+    }
+
+    NiagaraSystem Bubbles {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        System = @BubbleSystem
+        bAutoActivate = true
+        bRaycastTarget = false
+        RenderOpacity = 0
+    }
+}

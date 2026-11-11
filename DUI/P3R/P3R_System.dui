@@ -1,0 +1,218 @@
+// SYSTEM (UP3RSystemMenu): the sea pulled back into a dark disc in the upper right, with the pause menu's words sunk
+// in it; around it white, cut by a giant black SYSTEM falling across the screen. SYSTEM is the menu's ninth item, so a
+// huge grey 9 hangs over the disc, and the protagonist falls beneath it reaching up for it. The seven commands are the
+// same thrown words as the pause menu, with the same cursor.
+class /Game/P3R/UI/WBP_P3R_System
+use "P3R/P3R_Common.dui"
+
+resources {
+    Asset SeaMaterial = /Game/P3R/Materials/M_P3R_Sea
+    Asset FallArt = /Game/P3R/Textures/T_P3R_HeroFall
+}
+
+style SubWord : At {
+    AnchorData.SizeDelta = (390, 94)
+    RenderTransformPivot = (0.5, 0.5)
+    + UIButton { TransitionType = None }
+}
+style SubHit : HitBox {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style SubText : Word {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    FontSize = 98
+    TextStyle.UnderlayColor = @Clear
+}
+style SubShadow : SubText {
+    AnchorData.AnchoredPosition = (4, -6)
+    Color = @Shadow
+}
+style SubRed : DecoFill {
+    Points = [(-0.57, -0.19), (0.93, 1.36), (0.76, 0.19)]
+    Color = @Red
+    bClipToBelow = true
+}
+// A pause-menu word sunk in the disc.
+style Ghost : WordAt {
+    AnchorData.SizeDelta = (380, 96)
+    FontSize = 88
+    Color = #2A44C8
+    TextStyle.UnderlayColor = @Clear
+}
+
+Widget Root : Fill {
+    + MaskTransition {
+        Preset = Ink
+        Progress = 1
+        Softness = 0.05
+        Centre = (0.26, 0.62)
+        Grain = 3
+        Seed = 11
+        bHitTestMask = false
+    }
+    RectBlock Catch : Catcher {}
+
+    RectBlock Paper : BlockFill { BodyColor = #F7F8FC }
+
+    // ---- The disc: the sea, darker, and the pause menu sunk in it. Centred above the top right, so its edge sweeps
+    // from the top of the screen down past the bottom right.
+    Widget Disc : At {
+        AnchorData.AnchoredPosition = (1789, 278)
+        AnchorData.SizeDelta = (2726, 2726)
+        RenderTransformPivot = (0.5, 0.5)
+        Clipping = ClipToBounds
+        ClipMask.Shape = Ellipse
+        ClipMask.Feather = (2, 2, 2, 2)
+        Raycastable = Disabled
+
+        // Exactly over the screen, so the sea in the disc is the same frame as everywhere else.
+        Image DiscSea : Picture {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0.5, 0.5)
+            AnchorData.AnchoredPosition = (-829, -818)
+            AnchorData.SizeDelta = (1920, 1080)
+            Brush.ResourceObject = @SeaMaterial
+            Brush.TintColor = #7074E8
+        }
+        // Towards the game's indigo.
+        RectBlock DiscShade : BlockFill { BodyColor = #13149AB0 }
+
+        Text Ghost0 : Ghost { AnchorData.AnchoredPosition = (380, -1660)  RenderRotation = (0, 0, -14)  Text = "STATUS" @noloc }
+        Text Ghost1 : Ghost { AnchorData.AnchoredPosition = (430, -1712)  RenderRotation = (0, 0, -18)  Text = "EQUIP" @noloc }
+        Text Ghost2 : Ghost { AnchorData.AnchoredPosition = (360, -1832)  RenderRotation = (0, 0, -16)  Text = "PERSONA" @noloc }
+        Text Ghost3 : Ghost { AnchorData.AnchoredPosition = (330, -1990)  RenderRotation = (0, 0, -24)  Text = "QUEST" @noloc }
+        Text Ghost4 : Ghost { AnchorData.AnchoredPosition = (390, -2160) RenderRotation = (0, 0, -12)  Text = "SYSTEM" @noloc }
+    }
+
+    // ---- SYSTEM falling across the white.
+    Text Giant : GiantAt {
+        AnchorData.AnchoredPosition = (882, -931)
+        AnchorData.SizeDelta = (2400, 620)
+        RenderRotation = (0, 0, 38)
+        FontSize = 600
+        FontSpace = (-18, 0)
+        Text = "SYSTEM" @noloc
+    }
+
+    // ---- The 9, and the protagonist reaching up for it.
+    Text Nine : GiantAt {
+        AnchorData.AnchoredPosition = (980, -345)
+        AnchorData.SizeDelta = (600, 720)
+        FontStyle = Italic
+        FontSize = 800
+        Color = #8B91A8
+        Text = "9" @noloc
+    }
+    // Large and low, half in the disc, his legs past the bottom of the screen, over the black letters; the class draws
+    // him without see-through.
+    Image Hero : PictureAt {
+        AnchorData.AnchoredPosition = (1020, -970)
+        AnchorData.SizeDelta = (782, 1043)
+        Brush.ResourceObject = @FallArt
+    }
+
+    // ---- The cursor and the seven commands.
+    Widget Cursor : At {
+        AnchorData.AnchoredPosition = (960, -540)
+        AnchorData.SizeDelta = (100, 100)
+        RenderTransformPivot = (0.5, 0.5)
+        Raycastable = Disabled
+        Shape CursorPink : DecoFill {
+            Points = [(-0.55, -0.1), (1.0, 1.46), (0.8, 0.26)]
+            Color = @Pink
+        }
+        Shape CursorWhite : DecoFill {
+            Points = [(-0.59, -0.14), (0.92, 1.35), (0.74, 0.22)]
+            Color = @White
+        }
+    }
+
+    Widget Cmd0 : SubWord {
+        AnchorData.AnchoredPosition = (1383, -172)
+        AnchorData.SizeDelta = (390, 94)
+        RenderRotation = (0, 0, -8)
+        RectBlock Cmd0Hit : SubHit {}
+        Text Cmd0Shadow : SubShadow { Text = "TUTORIAL" @noloc }
+        Text Cmd0Text : SubText { Text = "TUTORIAL" @noloc }
+        Shape Cmd0Red : SubRed {}
+    }
+    Widget Cmd1 : SubWord {
+        AnchorData.AnchoredPosition = (1440, -234)
+        AnchorData.SizeDelta = (294, 94)
+        RenderRotation = (0, 0, -6)
+        RectBlock Cmd1Hit : SubHit {}
+        Text Cmd1Shadow : SubShadow { Text = "CONFIG" @noloc }
+        Text Cmd1Text : SubText { Text = "CONFIG" @noloc }
+        Shape Cmd1Red : SubRed {}
+    }
+    Widget Cmd2 : SubWord {
+        AnchorData.AnchoredPosition = (1478, -298)
+        AnchorData.SizeDelta = (494, 94)
+        RenderRotation = (0, 0, -10)
+        RectBlock Cmd2Hit : SubHit {}
+        Text Cmd2Shadow : SubShadow { Text = "DICTIONARY" @noloc }
+        Text Cmd2Text : SubText { Text = "DICTIONARY" @noloc }
+        Shape Cmd2Red : SubRed {}
+    }
+    Widget Cmd3 : SubWord {
+        AnchorData.AnchoredPosition = (1568, -372)
+        AnchorData.SizeDelta = (430, 94)
+        RenderRotation = (0, 0, -4)
+        RectBlock Cmd3Hit : SubHit {}
+        Text Cmd3Shadow : SubShadow { Text = "DATA LOAD" @noloc }
+        Text Cmd3Text : SubText { Text = "DATA LOAD" @noloc }
+        Shape Cmd3Red : SubRed {}
+    }
+    Widget Cmd4 : SubWord {
+        AnchorData.AnchoredPosition = (1508, -436)
+        AnchorData.SizeDelta = (430, 94)
+        RenderRotation = (0, 0, -9)
+        RectBlock Cmd4Hit : SubHit {}
+        Text Cmd4Shadow : SubShadow { Text = "DATA SAVE" @noloc }
+        Text Cmd4Text : SubText { Text = "DATA SAVE" @noloc }
+        Shape Cmd4Red : SubRed {}
+    }
+    Widget Cmd5 : SubWord {
+        AnchorData.AnchoredPosition = (1545, -506)
+        AnchorData.SizeDelta = (398, 94)
+        RenderRotation = (0, 0, -7)
+        RectBlock Cmd5Hit : SubHit {}
+        Text Cmd5Shadow : SubShadow { Text = "ROLLBACK" @noloc }
+        Text Cmd5Text : SubText { Text = "ROLLBACK" @noloc }
+        Shape Cmd5Red : SubRed {}
+    }
+    Widget Cmd6 : SubWord {
+        AnchorData.AnchoredPosition = (1425, -594)
+        AnchorData.SizeDelta = (610, 94)
+        RenderRotation = (0, 0, 6)
+        RectBlock Cmd6Hit : SubHit {}
+        Text Cmd6Shadow : SubShadow { Text = "RETURN to TITLE" @noloc }
+        Text Cmd6Text : SubText { Text = "RETURN to TITLE" @noloc }
+        Shape Cmd6Red : SubRed {}
+    }
+
+    // ---- The guide.
+    Text Guide : GuideTitle {
+        Color = @Black
+        TextStyle.UnderlayColor = @Clear
+        Text = "查看教程"
+    }
+    Text GuideTag : GuideTag { Color = @Black  Text = "Command" @noloc }
+    RectBlock GuideRule : GuideRule { BodyColor = @Black }
+    Text Hints : Hints {
+        Color = @Black
+        TextStyle.UnderlayColor = @Clear
+        Text = "Ⓐ 决定　Ⓑ 返回"
+    }
+
+    // The blue veil the page opens under (a close-up settling).
+    RectBlock Closeup : BlockFill {
+        BodyColor = #0A2CC8
+        Visibility = Collapsed
+    }
+}

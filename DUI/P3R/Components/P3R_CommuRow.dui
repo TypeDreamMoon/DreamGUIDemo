@@ -1,0 +1,111 @@
+// One bond in the COMMU list (UP3RCommuRow): a slanted aqua card with a black edge -- the arcana's numeral in a box on
+// the left, its name large, the rank on the right, and who the bond is with on a pale strip below. The chosen card turns
+// white with a red end and its numeral box black -- the white wiped on from the left along the card's slant. Laid out
+// in a 620 x 124 rect; the class fills in the text.
+class /Game/P3R/UI/Components/WBP_P3R_CommuRow
+use "P3R/P3R_Common.dui"
+
+style CardShape : DecoFill {
+    Points = [(0, 0), (0.965, 0), (1, 1), (0.035, 1)]
+}
+
+Widget Root : Fill {
+    + UIButton { TransitionType = None }
+    RectBlock Hit : HitBox {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+    }
+
+    // The card: a black edge, the face inset into it, the strip, the red end of the chosen one.
+    Shape Edge : CardShape { Color = @Black }
+    Widget Face : Fill {
+        AnchorData.SizeDelta = (-10, -10)
+        Shape FaceFill : CardShape { Color = #8EEAF4 }
+        Shape Strip : DecoFill {
+            Points = [(0.115, 0), (0.965, 0), (0.98, 0.4), (0.13, 0.4)]
+            Color = #C8F7FB
+        }
+        // The chosen look, wiped on when the card is chosen (the class plays it).
+        Widget Chosen : Fill {
+            + MaskTransition {
+                Preset = Wipe
+                Progress = 0
+                Softness = 0.02
+                Angle = 15
+                bHitTestMask = false
+            }
+            Shape ChosenFill : CardShape { Color = @White }
+            Shape ChosenStrip : DecoFill {
+                Points = [(0.115, 0), (0.965, 0), (0.98, 0.4), (0.13, 0.4)]
+                Color = #E6E9F2
+            }
+            Shape RedEnd : DecoFill {
+                Points = [(0.94, 0), (0.965, 0), (1, 1), (0.975, 1)]
+                Color = @Red
+            }
+        }
+    }
+
+    // The numeral box.
+    Widget Badge : FromTop {
+        AnchorData.AnchoredPosition = (22, -12)
+        AnchorData.SizeDelta = (72, 90)
+        Shape BadgeEdge : DecoFill {
+            Points = [(0, 0), (0.86, 0), (1, 1), (0.14, 1)]
+            Color = @Black
+        }
+        Shape BadgeFill : DecoFill {
+            Points = [(0.08, 0.06), (0.82, 0.06), (0.93, 0.94), (0.19, 0.94)]
+            Color = @White
+        }
+        Text Numeral : Word {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            FontSize = 60
+            Color = @Black
+            TextStyle.UnderlayColor = @Clear
+            Text = "I" @noloc
+        }
+    }
+
+    Text Arcana : LabelTop {
+        AnchorData.AnchoredPosition = (108, -6)
+        AnchorData.SizeDelta = (300, 66)
+        Font = @Heavy
+        FontStyle = Italic
+        FontSize = 56
+        Color = #0A1440
+        Text = "魔术师"
+    }
+    Text RankTag : LabelTop {
+        AnchorData.AnchoredPosition = (380, -28)
+        AnchorData.SizeDelta = (100, 32)
+        Font = @Heavy
+        FontStyle = Italic
+        FontSize = 26
+        HAlign = Right
+        Color = #0A1440
+        Text = "RANK" @noloc
+    }
+    Text RankValue : LabelTop {
+        AnchorData.AnchoredPosition = (474, 4)
+        AnchorData.SizeDelta = (120, 78)
+        Font = @Heavy
+        FontStyle = Italic
+        FontSize = 80
+        HAlign = Center
+        Color = #0A1440
+        Text = "6" @noloc
+    }
+    Text Partner : LabelTop {
+        AnchorData.AnchoredPosition = (96, -80)
+        AnchorData.SizeDelta = (500, 40)
+        Font = @Bold
+        FontSize = 30
+        HAlign = Center
+        Color = #0A1440
+        Text = "邻座的同学"
+    }
+}

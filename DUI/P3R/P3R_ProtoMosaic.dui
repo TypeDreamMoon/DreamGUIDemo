@@ -1,0 +1,93 @@
+// Another early design of the pause menu (UP3RProtoMosaic): black, a mosaic of stills from the story scattered over it
+// -- close shots with a shallow depth of field, see Art/mosaic.py -- a great clean blue triangle cutting in from the
+// lower right, and the items in thin condensed type set among the stills. The chosen item's still lights up; the others
+// stay grey.
+class /Game/P3R/UI/WBP_P3R_ProtoMosaic
+use "P3R/P3R_Common.dui"
+
+resources {
+    Asset Still0 = /Game/P3R/Textures/T_P3R_Mosaic_0
+    Asset Still1 = /Game/P3R/Textures/T_P3R_Mosaic_1
+    Asset Still2 = /Game/P3R/Textures/T_P3R_Mosaic_2
+    Asset Still3 = /Game/P3R/Textures/T_P3R_Mosaic_3
+    Asset Still4 = /Game/P3R/Textures/T_P3R_Mosaic_4
+    Asset Still5 = /Game/P3R/Textures/T_P3R_Mosaic_5
+    Asset Still6 = /Game/P3R/Textures/T_P3R_Mosaic_6
+    Asset Still7 = /Game/P3R/Textures/T_P3R_Mosaic_7
+}
+
+style Tile : PictureAt {
+    Brush.TintColor = #C8C8D0
+}
+style ThinWord : LabelTop {
+    Font = @Light
+    FontSize = 122
+    FontSpace = (-2, 0)
+    Color = @White
+}
+
+Widget Root : Fill {
+    + MaskTransition {
+        Preset = Ink
+        Progress = 1
+        Softness = 0.05
+        Centre = (0.5, 0.5)
+        Grain = 3
+        Seed = 31
+        bHitTestMask = false
+    }
+    RectBlock Catch : Catcher {}
+    RectBlock Black : BlockFill { BodyColor = #000000 }
+
+    Shape Triangle : DecoFill {
+        Points = [(0.414, 0), (0.883, 1), (1, 1), (1, 0)]
+        Color = #2E6BEA
+    }
+
+    Image Tile0 : Tile { AnchorData.AnchoredPosition = (424, -150)  AnchorData.SizeDelta = (217, 216)  Brush.ResourceObject = @Still0 }
+    Image Tile1 : Tile { AnchorData.AnchoredPosition = (806, -300)  AnchorData.SizeDelta = (517, 284)  Brush.ResourceObject = @Still1 }
+    Image Tile2 : Tile { AnchorData.AnchoredPosition = (1195, -150)  AnchorData.SizeDelta = (225, 300)  Brush.ResourceObject = @Still2 }
+    Image Tile3 : Tile { AnchorData.AnchoredPosition = (443, -581)  AnchorData.SizeDelta = (563, 262)  Brush.ResourceObject = @Still3 }
+    Image Tile4 : Tile { AnchorData.AnchoredPosition = (823, -611)  AnchorData.SizeDelta = (177, 317)  Brush.ResourceObject = @Still4 }
+    Image Tile5 : Tile { AnchorData.AnchoredPosition = (116, -795)  AnchorData.SizeDelta = (232, 135)  Brush.ResourceObject = @Still5 }
+    Image Tile6 : Tile { AnchorData.AnchoredPosition = (504, -904)  AnchorData.SizeDelta = (288, 353)  Brush.ResourceObject = @Still6 }
+    Image Tile7 : Tile { AnchorData.AnchoredPosition = (889, -868)  AnchorData.SizeDelta = (458, 183)  Brush.ResourceObject = @Still7 }
+
+    Widget Label0 : FromTop { AnchorData.AnchoredPosition = (770, -40)  AnchorData.SizeDelta = (300, 120)  + UIButton { TransitionType = None }  RectBlock Label0Hit : HitBox { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (1, 1)  AnchorData.SizeDelta = (0, 0) }  Text Label0Text : ThinWord { AnchorData.SizeDelta = (300, 120)  Text = "Skill" @noloc } }
+    Widget Label1 : FromTop { AnchorData.AnchoredPosition = (1120, -238)  AnchorData.SizeDelta = (260, 120)  + UIButton { TransitionType = None }  RectBlock Label1Hit : HitBox { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (1, 1)  AnchorData.SizeDelta = (0, 0) }  Text Label1Text : ThinWord { AnchorData.SizeDelta = (260, 120)  Text = "Item" @noloc } }
+    Widget Label2 : FromTop { AnchorData.AnchoredPosition = (176, -362)  AnchorData.SizeDelta = (300, 120)  + UIButton { TransitionType = None }  RectBlock Label2Hit : HitBox { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (1, 1)  AnchorData.SizeDelta = (0, 0) }  Text Label2Text : ThinWord { AnchorData.SizeDelta = (300, 120)  Text = "Equip" @noloc } }
+    Widget Label3 : FromTop { AnchorData.AnchoredPosition = (918, -572)  AnchorData.SizeDelta = (420, 130)  + UIButton { TransitionType = None }  RectBlock Label3Hit : HitBox { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (1, 1)  AnchorData.SizeDelta = (0, 0) }  Text Label3Text : ThinWord { AnchorData.SizeDelta = (420, 130)  FontSize = 132  Text = "Persona" @noloc } }
+    Widget Label4 : FromTop { AnchorData.AnchoredPosition = (918, -684)  AnchorData.SizeDelta = (380, 130)  + UIButton { TransitionType = None }  RectBlock Label4Hit : HitBox { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (1, 1)  AnchorData.SizeDelta = (0, 0) }  Text Label4Text : ThinWord { AnchorData.SizeDelta = (380, 130)  FontSize = 132  Text = "Status" @noloc } }
+
+    RectBlock Underline : BlockTop {
+        AnchorData.AnchoredPosition = (770, -150)
+        AnchorData.SizeDelta = (220, 2)
+        RenderTransformPivot = (0, 0.5)
+        BodyColor = #FFFFFF90
+    }
+    Text Note : LabelTop {
+        AnchorData.AnchoredPosition = (1135, -918)
+        AnchorData.SizeDelta = (420, 40)
+        FontSize = 32
+        Text = "使用技能"
+    }
+    Text Money : FigureTop {
+        AnchorData.AnchoredPosition = (664, -966)
+        AnchorData.SizeDelta = (400, 60)
+        FontSize = 52
+        FontStyle = None
+        Text = "¥9.999.999" @noloc
+    }
+
+    Text Design : Label {
+        AnchorData.AnchorMin = (1, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (1, 1)
+        AnchorData.AnchoredPosition = (-40, -28)
+        AnchorData.SizeDelta = (600, 26)
+        FontSize = 18
+        HAlign = Right
+        Color = #FFFFFFB0
+        Text = "早期设计稿 B · Tab 切换设计稿"
+    }
+}

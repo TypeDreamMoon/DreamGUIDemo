@@ -1,0 +1,16 @@
+// M_P3R_ShardSprite.dss -- the sprite material of the drifting confetti shards (NS_P3R_Shards): a sharp white triangle
+// tinted by the particle's colour, alpha blended. DreamGUI takes the Texture parameter and the blend from it.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = Translucent, TwoSided = true)
+
+/// @group Sprite   @sort 10   @desc The shard
+/// @default /Game/P3R/Textures/T_P3R_Shard
+uniform Texture2D Texture;
+
+export void M_P3R_ShardSprite(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0);
+    float4 Pic = Texture.Sample(UV);
+    float4 VC = UE.VertexColor();
+    m.EmissiveColor = Pic.rgb * VC.rgb;
+    m.Opacity = Pic.a * VC.a;
+}
