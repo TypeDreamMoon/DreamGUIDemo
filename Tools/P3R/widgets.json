@@ -1,0 +1,14 @@
+{
+  "widgets": [
+    { "asset": "/Game/P3R/UI/Components/WBP_P3R_CommuRow", "parent": "/Script/P3RUIDemo.P3RCommuRow", "source": "P3R/Components/P3R_CommuRow.dui" },
+    { "asset": "/Game/P3R/UI/Components/WBP_P3R_PartyRow", "parent": "/Script/P3RUIDemo.P3RPartyRow", "source": "P3R/Components/P3R_PartyRow.dui" },
+    { "asset": "/Game/P3R/UI/WBP_P3R_Backdrop", "parent": "/Script/P3RUIDemo.P3RBackdrop", "source": "P3R/P3R_Backdrop.dui" },
+    { "asset": "/Game/P3R/UI/WBP_P3R_Field", "parent": "/Script/P3RUIDemo.P3RFieldHud", "source": "P3R/P3R_Field.dui" },
+    { "asset": "/Game/P3R/UI/WBP_P3R_MainMenu", "parent": "/Script/P3RUIDemo.P3RMainMenu", "source": "P3R/P3R_MainMenu.dui" },
+    { "asset": "/Game/P3R/UI/WBP_P3R_ProtoGlass", "parent": "/Script/P3RUIDemo.P3RProtoGlass", "source": "P3R/P3R_ProtoGlass.dui" },
+    { "asset": "/Game/P3R/UI/WBP_P3R_ProtoMosaic", "parent": "/Script/P3RUIDemo.P3RProtoMosaic", "source": "P3R/P3R_ProtoMosaic.dui" },
+    { "asset": "/Game/P3R/UI/WBP_P3R_System", "parent": "/Script/P3RUIDemo.P3RSystemMenu", "source": "P3R/P3R_System.dui" },
+    { "asset": "/Game/P3R/UI/WBP_P3R_Commu", "parent": "/Script/P3RUIDemo.P3RCommuScreen", "source": "P3R/P3R_Commu.dui" },
+    { "asset": "/Game/P3R/UI/WBP_P3R_Status", "parent": "/Script/P3RUIDemo.P3RStatusScreen", "source": "P3R/P3R_Status.dui" }
+  ]
+}
