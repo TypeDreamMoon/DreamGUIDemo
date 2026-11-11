@@ -1,0 +1,19 @@
+// DBH_Common.dsh -- what the Detroit: Become Human test's DreamGUI brush materials share.
+//
+// A DreamGUI brush material (an Image's Brush.ResourceObject) is Surface, Unlit, AlphaComposite and two-sided: what the
+// DreamUI renderer compiles for, and what a world-space canvas drawn by UE's renderer expects. The widget's vertex
+// colour -- its tint and its render opacity -- arrives sRGB-encoded and multiplies the result. DreamGUI's own renderer
+// premultiplies by itself and UE's does not, so the colour is premultiplied unless DreamUI_IsRenderByDreamUIRenderer says
+// DreamGUI is drawing (DBH_UIEmissive). The canvas sets that parameter only on a material that also has one of its texture
+// parameters (UDreamCanvas::IsMaterialContainsDreamUIParameter reads texture parameters alone), so these materials, which
+// have none, default it to 1: every one of them is drawn by DreamGUI's renderer.
+
+float3 DBH_SRGBToLinear(float3 C)
+{
+    return lerp(C / 12.92, pow((C + 0.055) / 1.055, 2.4), step(0.04045, C));
+}
+
+float3 DBH_UIEmissive(float3 Straight, float Alpha, float IsDreamUIRenderer)
+{
+    return lerp(Straight * Alpha, Straight, IsDreamUIRenderer);
+}

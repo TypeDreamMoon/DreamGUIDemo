@@ -1,0 +1,22 @@
+// A status line: its name on the left, its value on the right. A component with no class of its own: what a host sets
+// on it is declared here, and its texts are bound to that.
+class /Game/UITests/NieR/UI/Components/NieR_Stat
+use "UITests/NieR/NieR_Common.dui"
+
+props {
+    Text Label
+    Text Value
+}
+
+Widget Root : ComponentRoot {
+    Text : StatText { Text <- Label }
+    Text : StatText {
+        Text <- Value
+        HAlign = Right
+    }
+}
+
+style StatText : FillLabel {
+    FontSize = 22
+    FontSpace = (1, 0)
+}

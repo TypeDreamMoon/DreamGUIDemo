@@ -1,0 +1,162 @@
+// The NieR test screens' library: the components by the short names the screens place them by (`Row`, `Tab`, ...),
+// the palette, the fonts and textures, and the styles. Screens and components start with
+// `use "UITests/NieR/NieR_Common.dui"`; the component names come with it, since a library's `use ... as` lines travel
+// with it. Coordinates are the 1920x1080 design's, measured from reference screenshots; a box placed from its parent's
+// top-left corner takes AnchoredPosition = (x, -y), since DreamGUI's +y is up.
+
+// Components: widget Blueprints built from Components/*.dui, each the child of its class in NieRComponents.h -- but
+// Stat, which has no behaviour of its own and declares its props in its .dui.
+use "UITests/NieR/Components/NieR_Row.dui" as Row
+use "UITests/NieR/Components/NieR_Tab.dui" as Tab
+use "UITests/NieR/Components/NieR_Header.dui" as Header
+use "UITests/NieR/Components/NieR_HintBar.dui" as HintBar
+use "UITests/NieR/Components/NieR_Prompt.dui" as Prompt
+use "UITests/NieR/Components/NieR_ListPage.dui" as ListPage
+use "UITests/NieR/Components/NieR_StatusPanel.dui" as StatusPanel
+use "UITests/NieR/Components/NieR_Stat.dui" as Stat
+
+resources {
+    Asset Font = /Game/UITests/NieR/Fonts/NieR_Font
+    Asset FontMedium = /Game/UITests/NieR/Fonts/NieR_Font_Medium
+
+    Asset MenuBackground = /Game/UITests/NieR/Textures/NieR_T_MenuBackground
+    Asset TitleBackground = /Game/UITests/NieR/Textures/NieR_T_TitleBackground
+    Asset BandTexture = /Game/UITests/NieR/Textures/NieR_T_BandTop
+    Asset CursorTexture = /Game/UITests/NieR/Textures/NieR_T_Cursor
+    Asset HexTexture = /Game/UITests/NieR/Textures/NieR_T_Hex
+    Asset IconMap = /Game/UITests/NieR/Textures/NieR_T_Icon_Map
+    Asset IconQuests = /Game/UITests/NieR/Textures/NieR_T_Icon_Quests
+    Asset IconItems = /Game/UITests/NieR/Textures/NieR_T_Icon_Items
+    Asset IconWeapons = /Game/UITests/NieR/Textures/NieR_T_Icon_Weapons
+    Asset IconSkills = /Game/UITests/NieR/Textures/NieR_T_Icon_Skills
+    Asset IconIntel = /Game/UITests/NieR/Textures/NieR_T_Icon_Intel
+    Asset IconSystem = /Game/UITests/NieR/Textures/NieR_T_Icon_System
+
+    Color Ink = #514D42
+    Color InkText = #4E4A3D
+    Color Paper = #F5F1CF
+    Color Title = #4B4739
+    Color TitleShadow = #B6B19B
+    Color RowBox = #CDC5A6
+    Color Mark = #4A463D
+    Color Panel = #F4F0D2
+    Color PanelEdge = #9C967D
+    Color HintFill = #F8F4CC
+    Color HintInk = #3E3A2E
+    Color Accent = #423F34
+    Color TabBox = #C4BD9F
+    Color Rail = #AFA98F
+    Color ListEdge = #8F8A73
+    Color Track = #D8D2B6
+    Color Clear = #00000000
+}
+
+// ---- Placement
+
+style TopLeft {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style Fill {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+// A component's own root: it fills the instance, and leaves the instance's size to whoever placed it.
+style ComponentRoot : Fill {
+    bIgnoreLayout = true
+}
+
+// ---- Pieces
+
+style Flat {
+    CornerRadiusUnitMode = Value
+    CornerRadius.X = 0
+    CornerRadius.Y = 0
+    CornerRadius.Z = 0
+    CornerRadius.W = 0
+    bRaycastTarget = false
+}
+style FlatFill : Flat {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style FlatTopLeft : Flat {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style Picture {
+    Brush.TintColor = #FFFFFF
+    bRaycastTarget = false
+}
+style FillPicture : Picture {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style Band : Picture {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+    AnchorData.SizeDelta = (1920, 40)
+    Brush.ResourceObject = @BandTexture
+}
+style Label {
+    Font = @Font
+    FontSize = 24
+    Color = @InkText
+    HAlign = Left
+    VAlign = Middle
+    bRaycastTarget = false
+}
+style FillLabel : Label {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style Rule : Flat {
+    AnchorData.SizeDelta = (0, 2)
+    BodyColor = @PanelEdge
+}
+// The vertical lists of rows: wrapping from the last row to the first.
+style RowList : TopLeft {
+    bRestrictNavigationArea = true
+    NavigationBoundaryRule = Wrap
+}
+
+// ---- Component sizes, as their placers give them
+
+style MenuRow {
+    AnchorData.SizeDelta = (400, 48)
+    BoxColor = #CDC5A6E6
+}
+style CategoryRow {
+    AnchorData.SizeDelta = (312, 48)
+}
+style OptionRow {
+    AnchorData.SizeDelta = (1100, 48)
+}
+style ListRow {
+    AnchorData.SizeDelta = (470, 44)
+    Look = List
+    CursorX = -112
+}
+style NavTab {
+    AnchorData.SizeDelta = (215, 48)
+}
+style PageHeader : TopLeft {
+    AnchorData.SizeDelta = (1400, 70)
+}
+style BottomHint : TopLeft {
+    AnchorData.AnchoredPosition = (62, -911)
+    AnchorData.SizeDelta = (1794, 93)
+}
+style PageSize {
+    AnchorData.SizeDelta = (1120, 618)
+}
+style StatLine {
+    AnchorData.SizeDelta = (0, 36)
+}

@@ -1,0 +1,50 @@
+// The print on the back of Connor's jacket, 400 x 300, worn in the world and drawn by UE's renderer: ANDROID across the
+// shoulders, the blue triangle, and the model number on its white tab. No behaviour: the class is the base.
+class /Game/UITests/Detroit/UI/Components/Detroit_Jacket
+use "UITests/Detroit/Detroit_Common.dui"
+
+Widget Root : ComponentRoot {
+    Text : CenteredLabel {
+        AnchorData.AnchoredPosition = (0, 96)
+        AnchorData.SizeDelta = (400, 70)
+        Font = @FontBold
+        FontSize = 56
+        FontSpace = (4, 0)
+        Color = #E4E8EB
+        Text = "ANDROID"
+    }
+    Polygon : Centered {
+        AnchorData.AnchoredPosition = (0, -6)
+        AnchorData.SizeDelta = (92, 80)
+        Sides = 3
+        StartAngle = 90
+        Color = #2F86D8
+        bRaycastTarget = false
+    }
+    Polygon : Centered {
+        AnchorData.AnchoredPosition = (0, -12)
+        AnchorData.SizeDelta = (52, 44)
+        Sides = 3
+        StartAngle = 90
+        Color = #6FB6F2
+        bRaycastTarget = false
+    }
+    RectBlock : FlatCentered {
+        AnchorData.AnchoredPosition = (0, -96)
+        AnchorData.SizeDelta = (156, 46)
+        CornerRadius.X = 10
+        CornerRadius.Y = 10
+        CornerRadius.Z = 10
+        CornerRadius.W = 10
+        BodyColor = #E4E8EB
+    }
+    Text : CenteredLabel {
+        AnchorData.AnchoredPosition = (0, -96)
+        AnchorData.SizeDelta = (156, 46)
+        Font = @FontBold
+        FontSize = 34
+        FontSpace = (1, 0)
+        Color = #22262C
+        Text = "RK800"
+    }
+}

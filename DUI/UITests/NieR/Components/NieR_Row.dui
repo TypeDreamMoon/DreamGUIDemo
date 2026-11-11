@@ -1,0 +1,106 @@
+// One menu row (UNieRRow): its box, marker, label and value. The lines above and below and the pointer show while the
+// row is highlighted. The instance's size is its placer's; everything here fills it.
+class /Game/UITests/NieR/UI/Components/NieR_Row
+use "UITests/NieR/NieR_Common.dui"
+
+Widget Root : ComponentRoot {
+    + UIButton { TransitionType = None }
+
+    RectBlock Bar : FlatFill {
+        BodyColor = @RowBox
+        bRaycastTarget = true
+    }
+
+    // Marker and label from the left; whichever value the row's Kind shows, on the right.
+    HorizontalBox : Fill {
+        Padding = (10, 0, 0, 0)
+        Spacing = 14
+        RectBlock Mark : Flat {
+            AnchorData.SizeDelta = (24, 24)
+            BodyColor = @Mark
+            @slot VerticalAlignment = Center
+        }
+        Image Hex : Picture {
+            Brush.ResourceObject = @HexTexture
+            Brush.ImageSize = (20, 20)
+            @slot { VerticalAlignment = Center  Padding = (2, 0, 0, 0) }
+        }
+        Text LabelText : Label { @fill }
+        Text CountText : Label {
+            HAlign = Right
+            @slot { MinDesiredSize = (110, 0)  Padding = (0, 0, 20, 0) }
+        }
+        HorizontalBox Cycle {
+            @slot Padding = (0, 0, 30, 0)
+            Text ArrowL : Arrow { Text = "◀" }
+            Text ValueText : Label {
+                HAlign = Center
+                @slot { MinDesiredSize = (360, 0)  MaxDesiredSize = (360, 0) }
+            }
+            Text ArrowR : Arrow { Text = "▶" }
+        }
+        HorizontalBox Gauge {
+            Spacing = 16
+            @slot Padding = (0, 0, 20, 0)
+            HorizontalBox {
+                Spacing = 6
+                @slot VerticalAlignment = Center
+                RectBlock Seg0 : Segment {}
+                RectBlock Seg1 : Segment {}
+                RectBlock Seg2 : Segment {}
+                RectBlock Seg3 : Segment {}
+                RectBlock Seg4 : Segment {}
+                RectBlock Seg5 : Segment {}
+                RectBlock Seg6 : Segment {}
+                RectBlock Seg7 : Segment {}
+                RectBlock Seg8 : Segment {}
+                RectBlock Seg9 : Segment {}
+            }
+            Text GaugeText : Label {
+                HAlign = Right
+                @slot MinDesiredSize = (80, 0)
+            }
+        }
+    }
+
+    // 2 px across the top, 7 px above it, and 3 px across the bottom, 4 px below; both 2 px wider than the row on each
+    // side, opening from the left.
+    RectBlock LineT : Flat {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (0, 0)
+        AnchorData.AnchoredPosition = (-2, 5)
+        AnchorData.SizeDelta = (4, 2)
+        RenderTransformPivot = (0, 0.5)
+        BodyColor = @Ink
+    }
+    RectBlock LineB : Flat {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (-2, -4)
+        AnchorData.SizeDelta = (4, 3)
+        RenderTransformPivot = (0, 0.5)
+        BodyColor = @Ink
+    }
+    // The pointer, left of the row (its x is the row's CursorX).
+    Image Pointer : Picture {
+        AnchorData.AnchorMin = (0, 0.5)
+        AnchorData.AnchorMax = (0, 0.5)
+        AnchorData.Pivot = (0, 0.5)
+        AnchorData.AnchoredPosition = (-62, 0)
+        AnchorData.SizeDelta = (48, 24)
+        Brush.ResourceObject = @CursorTexture
+        Brush.TintColor = @Ink
+    }
+}
+
+style Arrow : Label {
+    FontSize = 18
+    HAlign = Center
+    @slot MinDesiredSize = (40, 0)
+}
+style Segment : Flat {
+    AnchorData.SizeDelta = (30, 16)
+    BodyColor = @Ink
+}

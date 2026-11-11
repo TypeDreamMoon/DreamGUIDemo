@@ -1,0 +1,111 @@
+// The start screen (UNieRTitleScreen): the title over the stars, "Press Any Key", and the start menu once a key is
+// pressed. The title is set in the UI font: the game's logotype is its own artwork.
+use "UITests/NieR/NieR_Common.dui"
+
+Widget Root : Fill {
+    + NieRScreenScope { InputMode = Menu  bCloseOnBack = false }
+
+    Image : FillPicture { Brush.ResourceObject = @TitleBackground }
+
+    Text Logo : Centered {
+        AnchorData.AnchoredPosition = (0, -385)
+        AnchorData.SizeDelta = (1920, 170)
+        Text = "NieR:Automata"
+        FontSize = 132
+        FontSpace = (3, 0)
+        Color = #EEF0EC
+    }
+    RectBlock LogoRule : FlatTopLeft {
+        AnchorData.AnchoredPosition = (520, -552)
+        AnchorData.SizeDelta = (980, 2)
+        BodyColor = #D9DEDF
+    }
+    // The blocks that blink and shift beside the title's end.
+    Widget Glitch : TopLeft {
+        AnchorData.AnchoredPosition = (1268, -398)
+        AnchorData.SizeDelta = (200, 50)
+        RectBlock : Block { AnchorData.AnchoredPosition = (14, -6); AnchorData.SizeDelta = (10, 10) }
+        RectBlock : Block { AnchorData.AnchoredPosition = (31, -21); AnchorData.SizeDelta = (6, 6) }
+        RectBlock : Block { AnchorData.AnchoredPosition = (52, -2); AnchorData.SizeDelta = (12, 12); BodyColor = #C9CDCB }
+        RectBlock : Block { AnchorData.AnchoredPosition = (70, -18); AnchorData.SizeDelta = (8, 8) }
+        RectBlock : Block { AnchorData.AnchoredPosition = (88, -9); AnchorData.SizeDelta = (14, 14); BodyColor = #9EA4A6 }
+        RectBlock : Block { AnchorData.AnchoredPosition = (107, -26); AnchorData.SizeDelta = (6, 6) }
+        RectBlock : Block { AnchorData.AnchoredPosition = (121, -4); AnchorData.SizeDelta = (10, 10); BodyColor = #C9CDCB }
+        RectBlock : Block { AnchorData.AnchoredPosition = (139, -15); AnchorData.SizeDelta = (8, 8) }
+        RectBlock : Block { AnchorData.AnchoredPosition = (156, -28); AnchorData.SizeDelta = (12, 12); BodyColor = #9EA4A6 }
+        RectBlock : Block { AnchorData.AnchoredPosition = (172, -8); AnchorData.SizeDelta = (6, 6) }
+    }
+
+    Widget PressKey : Fill {
+        Text PressText : Centered {
+            AnchorData.AnchoredPosition = (0, -722)
+            AnchorData.SizeDelta = (1920, 44)
+            Text = "Press Any Key"
+            FontSize = 26
+            FontSpace = (1, 0)
+            Color = #DCE2E6
+        }
+        RectBlock : FlatTopLeft {
+            AnchorData.AnchoredPosition = (720, -768)
+            AnchorData.SizeDelta = (486, 1)
+            BodyColor = #C9D0D6
+        }
+        RectBlock : FlatTopLeft {
+            AnchorData.AnchoredPosition = (1200, -765)
+            AnchorData.SizeDelta = (6, 6)
+            CornerRadius.X = 3
+            CornerRadius.Y = 3
+            CornerRadius.Z = 3
+            CornerRadius.W = 3
+            BodyColor = #DCE2E6
+        }
+    }
+    // The whole screen is the button "any key" presses -- or a click.
+    Widget PressHit : Fill {
+        + UIButton { TransitionType = None }
+        RectBlock : FlatFill {
+            BodyColor = @Clear
+            bRaycastTarget = true
+        }
+    }
+
+    VerticalBox Menu : RowList {
+        AnchorData.AnchoredPosition = (760, -628)
+        AnchorData.SizeDelta = (400, 312)
+        Spacing = 18
+        rows Row : MenuRow (Label, Action, Description) {
+            "Continue",  "menu",     "Continue from the last save."
+            "New Game",  "menu",     "Start a new game."
+            "Load Game", "menu",     "Load a saved game."
+            "Settings",  "settings", "Change the game's settings."
+            "Exit Game", "exit",     "Quit to the desktop."
+        }
+    }
+    Text MenuPrompts : Centered {
+        AnchorData.AnchoredPosition = (0, -980)
+        AnchorData.SizeDelta = (1920, 30)
+        Text = "Enter  Confirm      Esc  Back      W S / ↑ ↓  Select"
+        FontSize = 18
+        FontSpace = (1, 0)
+        Color = #AEB6BE
+    }
+
+    Text : Centered {
+        AnchorData.AnchoredPosition = (0, -1030)
+        AnchorData.SizeDelta = (1920, 30)
+        Text = "© 2026 DreamGUI UI style test · a layout study after NieR:Automata"
+        FontSize = 16
+        FontSpace = (1, 0)
+        Color = #8C96A3
+    }
+}
+
+style Centered : Label {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+    HAlign = Center
+}
+style Block : FlatTopLeft {
+    BodyColor = #EEF0EC
+}

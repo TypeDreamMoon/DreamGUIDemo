@@ -1,0 +1,42 @@
+// M_DBH_Thirium.dss -- blue blood on the floor: a splash with a ragged edge and droplets round it, glowing the way
+// thirium does in Connor's analysis mode and invisible outside it. For a flat plane laid on the floor; Seed makes each
+// splash its own shape and Reveal (0..1) is how visible it is.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = Translucent, TwoSided = true)
+
+/// @group Thirium|Motion   @sort 10   @slider 0 1   @desc How visible the stain is (analysis mode)
+uniform float Reveal = 0.0;
+/// @group Thirium|Shape   @sort 20   @slider 0 100   @desc Picks the splash's shape
+uniform float Seed = 0.0;
+/// @group Thirium|Look   @sort 30   @desc The glow (linear colour)
+uniform float4 GlowColor = float4(0.03, 0.42, 1.0, 1.0);
+/// @group Thirium|Look   @sort 40   @slider 0 30   @desc Brightness
+uniform float Intensity = 5.0;
+
+/// @custom
+float DBH_Splat(float2 UV, float Seed)
+{
+    float2 P = UV * 2.0 - 1.0;
+    float Angle = atan2(P.y, P.x);
+    float R = length(P);
+    float Edge = 0.50 + 0.10 * sin(Angle * 5.0 + Seed * 3.1) + 0.06 * sin(Angle * 11.0 + Seed * 7.3) + 0.035 * sin(Angle * 23.0 + Seed);
+    float Mask = 1.0 - smoothstep(Edge - 0.025, Edge, R);
+    for (int i = 0; i < 8; ++i)
+    {
+        float Fi = i;
+        float A = Fi * 2.4 + Seed * 5.0;
+        float D = 0.62 + 0.26 * frac(sin(Fi * 12.3 + Seed) * 437.5);
+        float2 C = float2(cos(A), sin(A)) * D;
+        float Rad = 0.025 + 0.045 * frac(sin(Fi * 7.1 + Seed * 3.3) * 911.1);
+        Mask = max(Mask, 1.0 - smoothstep(Rad - 0.015, Rad, length(P - C)));
+    }
+    // Thinner toward the rim of the main splash, as a dried stain is.
+    return Mask * (0.55 + 0.45 * smoothstep(Edge, 0.0, R));
+}
+
+export void M_DBH_Thirium(inout material m)
+{
+    float Mask = DBH_Splat(UE.TexCoord(Index = 0), Seed);
+    float Pulse = 0.85 + 0.15 * sin(UE.Time() * 2.2 + Seed);
+    m.EmissiveColor = GlowColor.rgb * Intensity * Pulse;
+    m.Opacity = saturate(Mask * Reveal);
+}

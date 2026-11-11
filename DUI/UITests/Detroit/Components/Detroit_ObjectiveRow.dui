@@ -1,0 +1,139 @@
+// One objective (UDetroitObjectiveRow): "SEARCH FOR" over "BLUE BLOOD TRACES" on a dark plate when it is the one to do,
+// dimmed with a check once done, and only a bracket frame round a padlock and "[...]" while it is not known yet. The
+// instance's size is its placer's; everything here fills it.
+class /Game/UITests/Detroit/UI/Components/Detroit_ObjectiveRow
+use "UITests/Detroit/Detroit_Common.dui"
+
+Widget Root : ComponentRoot {
+    RectBlock Box : FlatFill {
+        BodyColor = @Plate
+        RenderTransformPivot = (0, 0.5)
+    }
+
+    // The frame's corners, 8 px outside the plate.
+    Widget CTL : TopLeft {
+        AnchorData.AnchoredPosition = (-8, 8)
+        AnchorData.SizeDelta = (18, 18)
+        RectBlock : Corner { AnchorData.SizeDelta = (18, 2) }
+        RectBlock : Corner { AnchorData.SizeDelta = (2, 18) }
+    }
+    Widget CTR {
+        AnchorData.AnchorMin = (1, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (1, 1)
+        AnchorData.AnchoredPosition = (8, 8)
+        AnchorData.SizeDelta = (18, 18)
+        RectBlock : CornerFromRight { AnchorData.SizeDelta = (18, 2) }
+        RectBlock : CornerFromRight { AnchorData.SizeDelta = (2, 18) }
+    }
+    Widget CBL {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (0, 0)
+        AnchorData.Pivot = (0, 0)
+        AnchorData.AnchoredPosition = (-8, -8)
+        AnchorData.SizeDelta = (18, 18)
+        RectBlock : CornerFromBottom { AnchorData.SizeDelta = (18, 2) }
+        RectBlock : CornerFromBottom { AnchorData.SizeDelta = (2, 18) }
+    }
+    Widget CBR {
+        AnchorData.AnchorMin = (1, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (1, 0)
+        AnchorData.AnchoredPosition = (8, -8)
+        AnchorData.SizeDelta = (18, 18)
+        RectBlock : CornerFromBottomRight { AnchorData.SizeDelta = (18, 2) }
+        RectBlock : CornerFromBottomRight { AnchorData.SizeDelta = (2, 18) }
+    }
+
+    VerticalBox Words : Fill {
+        Padding = (34, 12, 16, 12)
+        Spacing = 0
+        HorizontalBox {
+            Spacing = 10
+            Text LeadText : RowBold {}
+            Text LeadRestText : RowLight {}
+        }
+        Text Line2Text : RowBold {}
+    }
+
+    HorizontalBox Locked : Fill {
+        Padding = (34, 0, 16, 0)
+        Spacing = 14
+        Widget LockIcon {
+            AnchorData.SizeDelta = (22, 28)
+            @slot VerticalAlignment = Center
+            Ring : Centered {
+                AnchorData.AnchoredPosition = (0, 6)
+                AnchorData.SizeDelta = (16, 16)
+                StartAngle = 0
+                EndAngle = 180
+                LineWidth = 3
+                Color = @White
+                bRaycastTarget = false
+            }
+            RectBlock : FlatCentered {
+                AnchorData.AnchoredPosition = (0, -5)
+                AnchorData.SizeDelta = (20, 15)
+                CornerRadius.X = 2
+                CornerRadius.Y = 2
+                CornerRadius.Z = 2
+                CornerRadius.W = 2
+                BodyColor = @White
+            }
+        }
+        Text : RowLight {
+            Text = "[...]"
+            @slot VerticalAlignment = Center
+        }
+    }
+
+    // The check of a done objective, left of the words.
+    Widget Check : TopLeft {
+        AnchorData.AnchoredPosition = (8, -34)
+        AnchorData.SizeDelta = (22, 22)
+        RectBlock : FlatTopLeft {
+            AnchorData.AnchoredPosition = (2, -10)
+            AnchorData.SizeDelta = (9, 3)
+            RenderRotation = (0, 0, -45)
+            BodyColor = @Cyan
+        }
+        RectBlock : FlatTopLeft {
+            AnchorData.AnchoredPosition = (6, -12)
+            AnchorData.SizeDelta = (16, 3)
+            RenderRotation = (0, 0, 45)
+            BodyColor = @Cyan
+        }
+    }
+}
+
+style Corner : FlatTopLeft {
+    BodyColor = @White
+}
+style CornerFromRight : Flat {
+    AnchorData.AnchorMin = (1, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (1, 1)
+    BodyColor = @White
+}
+style CornerFromBottom : Flat {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (0, 0)
+    AnchorData.Pivot = (0, 0)
+    BodyColor = @White
+}
+style CornerFromBottomRight : Flat {
+    AnchorData.AnchorMin = (1, 0)
+    AnchorData.AnchorMax = (1, 0)
+    AnchorData.Pivot = (1, 0)
+    BodyColor = @White
+}
+style RowBold : Label {
+    Font = @FontBold
+    FontSize = 27
+    FontSpace = (1, 0)
+}
+style RowLight : Label {
+    Font = @FontLight
+    FontSize = 27
+    FontSpace = (1, 0)
+}

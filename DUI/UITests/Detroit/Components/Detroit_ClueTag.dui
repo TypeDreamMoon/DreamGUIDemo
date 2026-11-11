@@ -1,0 +1,164 @@
+// A clue's label in the room (UDetroitClueTag), 1000 x 400 with the clue at its centre. In analysis mode a yellow marker
+// sits on a clue not analyzed yet, pulsing, with its key under it while the clue is in reach; while the clue is analyzed
+// the staged readout runs beside it; once it is, an unlocked padlock takes the marker's place and the title comes in on
+// its plate -- a light first line, a bold second -- with measurement lines and their numbers around it.
+class /Game/UITests/Detroit/UI/Components/Detroit_ClueTag
+use "UITests/Detroit/Detroit_Common.dui"
+
+props {
+    Text TitleA = "CLUE"
+    Text TitleB = "FOUND"
+    Text Suffix
+}
+
+Widget Root : ComponentRoot {
+    // The marker.
+    Widget Marker : Centered {
+        AnchorData.SizeDelta = (60, 60)
+        RectBlock MarkerPulse : FlatFill {
+            bEnableBody = false
+            bEnableBorder = true
+            BorderWidth = 3
+            BorderColor = @Yellow
+        }
+        RectBlock : FlatFill { BodyColor = #F2B400E6 }
+        // A document: a dark sheet with three lines on it.
+        RectBlock : FlatCentered { AnchorData.SizeDelta = (22, 28); BodyColor = @Ink }
+        RectBlock : FlatCentered { AnchorData.AnchoredPosition = (0, 6); AnchorData.SizeDelta = (12, 2); BodyColor = @Yellow }
+        RectBlock : FlatCentered { AnchorData.AnchoredPosition = (0, 0); AnchorData.SizeDelta = (12, 2); BodyColor = @Yellow }
+        RectBlock : FlatCentered { AnchorData.AnchoredPosition = (-2, -6); AnchorData.SizeDelta = (8, 2); BodyColor = @Yellow }
+        Widget MarkerKey : Centered {
+            AnchorData.AnchoredPosition = (0, -64)
+            AnchorData.SizeDelta = (40, 40)
+            RectBlock : KeyRing {}
+            Text : KeyText { Text = "E"; FontSize = 18 }
+        }
+    }
+
+    // The readout while the clue is analyzed.
+    Widget Readout : TopLeft {
+        AnchorData.AnchoredPosition = (560, -134)
+        AnchorData.SizeDelta = (420, 130)
+        Text ReadPct : Shadowed {
+            AnchorData.AnchoredPosition = (0, 0)
+            AnchorData.SizeDelta = (420, 50)
+            Font = @FontBold
+            FontSize = 40
+            Color = @Orange
+            Text = "0%"
+        }
+        Text ReadStage : Shadowed {
+            AnchorData.AnchoredPosition = (0, -50)
+            AnchorData.SizeDelta = (420, 36)
+            Font = @FontMedium
+            FontSize = 28
+            FontSpace = (1, 0)
+            Color = @Orange
+            Text = "SYNC IN PROGRESS"
+        }
+        RectBlock : Bar { AnchorData.AnchoredPosition = (0, -98); AnchorData.SizeDelta = (320, 5); BodyColor = #FFFFFF30 }
+        RectBlock ReadFill : Bar { AnchorData.AnchoredPosition = (0, -98); AnchorData.SizeDelta = (320, 5); BodyColor = @Orange }
+    }
+
+    // The tag of an analyzed clue.
+    Widget Tag : Fill {
+        RectBlock Measure0 : Measure {
+            AnchorData.AnchoredPosition = (590, -102)
+            AnchorData.SizeDelta = (380, 2)
+            RenderRotation = (0, 0, 7)
+        }
+        RectBlock Measure1 : Measure {
+            AnchorData.AnchoredPosition = (640, -300)
+            AnchorData.SizeDelta = (310, 2)
+            RenderRotation = (0, 0, -9)
+        }
+        RectBlock Measure2 : Measure {
+            AnchorData.AnchoredPosition = (430, -258)
+            AnchorData.SizeDelta = (190, 2)
+            RenderRotation = (0, 0, -32)
+        }
+        Text Num0 : Number { AnchorData.AnchoredPosition = (905, -62) }
+        Text Num1 : Number { AnchorData.AnchoredPosition = (860, -320) }
+        Text Num2 : Number { AnchorData.AnchoredPosition = (452, -322) }
+
+        RectBlock PlateBack : Bar {
+            AnchorData.AnchoredPosition = (546, -110)
+            AnchorData.SizeDelta = (440, 168)
+            BodyColor = @PlateBack
+        }
+        RectBlock Plate : Bar {
+            AnchorData.AnchoredPosition = (560, -124)
+            AnchorData.SizeDelta = (416, 150)
+            BodyColor = @Plate
+        }
+        Text TitleAText : TagLight {
+            AnchorData.AnchoredPosition = (582, -128)
+            AnchorData.SizeDelta = (390, 64)
+            Text <- TitleA
+        }
+        HorizontalBox : TopLeft {
+            AnchorData.AnchoredPosition = (580, -190)
+            AnchorData.SizeDelta = (400, 76)
+            Spacing = 2
+            Text TitleBText : TagBold { Text <- TitleB }
+            Text SuffixText : TagLight { Text <- Suffix }
+        }
+
+        // The unlocked padlock, where the marker was: the shackle lifted out of its body.
+        Widget Lock : Centered {
+            AnchorData.SizeDelta = (64, 76)
+            Widget Shackle : Fill {
+                Ring : Centered {
+                    AnchorData.AnchoredPosition = (0, 16)
+                    AnchorData.SizeDelta = (34, 34)
+                    StartAngle = 0
+                    EndAngle = 180
+                    LineWidth = 7
+                    Color = @White
+                    bRaycastTarget = false
+                }
+                RectBlock : FlatCentered { AnchorData.AnchoredPosition = (-13.5, 8); AnchorData.SizeDelta = (7, 16); BodyColor = @White }
+                RectBlock : FlatCentered { AnchorData.AnchoredPosition = (13.5, 4); AnchorData.SizeDelta = (7, 8); BodyColor = @White }
+            }
+            RectBlock : FlatCentered {
+                AnchorData.AnchoredPosition = (0, -14)
+                AnchorData.SizeDelta = (46, 36)
+                CornerRadius.X = 4
+                CornerRadius.Y = 4
+                CornerRadius.Z = 4
+                CornerRadius.W = 4
+                BodyColor = @White
+                bEnableOuterShadow = true
+                OuterShadowColor = #00000080
+                OuterShadowSize = 2
+                OuterShadowBlur = 6
+            }
+            RectBlock : FlatCentered { AnchorData.AnchoredPosition = (0, -12); AnchorData.SizeDelta = (6, 12); BodyColor = @Ink }
+        }
+    }
+}
+
+style Measure : Bar {
+    BodyColor = @CyanSoft
+}
+style Number : Shadowed {
+    AnchorData.SizeDelta = (120, 30)
+    Font = @FontMedium
+    FontSize = 24
+    FontSpace = (1, 0)
+    Color = @Cyan
+    Text = "000.0"
+}
+style TagLight : Shadowed {
+    Font = @FontLight
+    FontSize = 58
+    FontSpace = (3, 0)
+}
+style TagBold : Label {
+    Font = @FontBold
+    FontSize = 62
+    FontSpace = (2, 0)
+    TextStyle.UnderlayColor = @Shadow
+    TextStyle.UnderlayOffset = (2, -2)
+    TextStyle.UnderlaySoftness = 0.5
+}

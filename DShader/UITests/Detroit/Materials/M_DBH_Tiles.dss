@@ -1,0 +1,63 @@
+// M_DBH_Tiles.dss -- the crime scene's surfaces: square tiles laid in world space on whatever plane a surface faces,
+// each a shade of its own, dark grout, and grime that gathers toward the floor and in blotches. TileSize and the colours
+// make the walls (small pale tiles) and the floor (large dark ones) from one material.
+#pragma material(Backend = Graph)
+
+/// @group Tiles|Look   @sort 10   @desc The tile (linear colour)
+uniform float4 TileColor = float4(0.26, 0.31, 0.32, 1.0);
+/// @group Tiles|Look   @sort 20   @desc The grout between tiles (linear colour)
+uniform float4 GroutColor = float4(0.035, 0.035, 0.035, 1.0);
+/// @group Tiles|Shape   @sort 30   @slider 2 200   @desc A tile's side, world units
+uniform float TileSize = 20.0;
+/// @group Tiles|Shape   @sort 40   @slider 0 0.3   @desc The grout's width, as a part of a tile
+uniform float GroutWidth = 0.05;
+/// @group Tiles|Look   @sort 50   @slider 0 2   @desc How dirty
+uniform float Grime = 1.0;
+/// @group Tiles|Look   @sort 60   @slider 0 1   @desc Roughness of a clean tile
+uniform float TileRoughness = 0.28;
+
+/// @custom
+float4 DBH_TilePattern(float3 W, float3 N, float Size, float Grout)
+{
+    float3 AN = abs(N);
+    float2 UV = AN.x > AN.y ? W.yz : W.xz;
+    if (AN.z > 0.7)
+    {
+        UV = W.xy;
+    }
+    float2 T = UV / Size;
+    float2 Id = floor(T);
+    float2 F = frac(T);
+    float G = 1.0 - step(Grout, F.x) * step(F.x, 1.0 - Grout) * step(Grout, F.y) * step(F.y, 1.0 - Grout);
+    float H = frac(sin(dot(Id, float2(12.9898, 78.233))) * 43758.5453);
+    // Value noise for the blotches, two octaves.
+    float Noise = 0.0;
+    float Amp = 0.65;
+    float2 Q = UV / 55.0;
+    for (int o = 0; o < 2; ++o)
+    {
+        float2 I = floor(Q);
+        float2 Fq = frac(Q);
+        float2 U = Fq * Fq * (3.0 - 2.0 * Fq);
+        float a = frac(sin(dot(I, float2(127.1, 311.7))) * 43758.5453);
+        float b = frac(sin(dot(I + float2(1.0, 0.0), float2(127.1, 311.7))) * 43758.5453);
+        float c = frac(sin(dot(I + float2(0.0, 1.0), float2(127.1, 311.7))) * 43758.5453);
+        float d = frac(sin(dot(I + float2(1.0, 1.0), float2(127.1, 311.7))) * 43758.5453);
+        Noise += Amp * lerp(lerp(a, b, U.x), lerp(c, d, U.x), U.y);
+        Q *= 2.7;
+        Amp *= 0.5;
+    }
+    float Low = AN.z > 0.7 ? 0.35 : saturate(1.0 - W.z / 150.0);
+    float GrimeAmount = saturate(smoothstep(0.45, 0.95, Noise) + Low * 0.55);
+    return float4(H, G, GrimeAmount, Noise);
+}
+
+export void M_DBH_Tiles(inout material m)
+{
+    float4 T = DBH_TilePattern(UE.WorldPosition(), UE.VertexNormalWS(), TileSize, GroutWidth);
+    float3 Base = TileColor.rgb * (0.82 + 0.36 * T.x);
+    Base = lerp(Base, GroutColor.rgb, T.y);
+    Base = lerp(Base, Base * float3(0.30, 0.28, 0.24), saturate(T.z * Grime));
+    m.BaseColor = Base;
+    m.Roughness = lerp(TileRoughness, 0.9, saturate(T.y + T.z * Grime));
+}

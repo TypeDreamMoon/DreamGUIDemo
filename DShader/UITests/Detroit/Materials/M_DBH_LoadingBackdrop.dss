@@ -1,0 +1,134 @@
+// M_DBH_LoadingBackdrop.dss -- the loading screen's ground, as the game draws it: a lattice of huge equilateral panes,
+// one side of each level, in the palest greys, white and lilac, sliding slowly and swaying a degree or so. Over it a
+// second, larger lattice drifts the other way, of which only some panes show, as a white or lilac film; so panes
+// overlap at angles that do not line up. A third of the panes fade across their face into the ground, as light falling
+// across glass does, and now and then one turns to another shade. For a full-screen DreamGUI Image (see DBH_Common.dsh).
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = AlphaComposite, TwoSided = true)
+#include "DBH_Common.dsh"
+
+/// @group DreamUI   @sort 0   @desc 1 while DreamGUI's own renderer draws this (it premultiplies by itself); 0 under UE's renderer.
+/// The canvas sets it per draw on a material that has one of DreamGUI's parameters; the default is the DreamUI renderer's,
+/// where every one of these is drawn.
+uniform float DreamUI_IsRenderByDreamUIRenderer = 1.0;
+
+/// @group Backdrop|Look   @sort 10   @desc The ground, and most panes (sRGB)
+uniform float4 BaseColor = float4(0.937, 0.925, 0.941, 1.0);
+/// @group Backdrop|Look   @sort 20   @desc A lighter pane (sRGB)
+uniform float4 LightColor = float4(0.961, 0.953, 0.965, 1.0);
+/// @group Backdrop|Look   @sort 30   @desc A white pane (sRGB)
+uniform float4 WhiteColor = float4(0.992, 0.992, 0.996, 1.0);
+/// @group Backdrop|Look   @sort 40   @desc A lilac pane (sRGB)
+uniform float4 LilacColor = float4(0.953, 0.945, 0.984, 1.0);
+/// @group Backdrop|Look   @sort 50   @desc A darker pane (sRGB)
+uniform float4 ShadeColor = float4(0.910, 0.902, 0.922, 1.0);
+/// @group Backdrop|Shape   @sort 60   @slider 0.5 3   @desc Width over height of the image, so the panes stay equilateral
+uniform float Aspect = 1.7778;
+/// @group Backdrop|Shape   @sort 70   @slider 0.2 2   @desc A pane's side, in heights of the image
+uniform float PaneSize = 0.90;
+/// @group Backdrop|Motion   @sort 80   @slider 0 4   @desc Drift speed (1 = the game's pace)
+uniform float Speed = 1.0;
+
+/// @custom
+float4 DBH_Lattice(float2 UV, float Time, float Aspect, float PaneSize, float4 Base, float4 Light, float4 White, float4 Lilac, float4 Shade)
+{
+    // A local struct is how a Custom node carries functions of its own.
+    struct FLattice
+    {
+        float3 Base;
+        float3 Light;
+        float3 White;
+        float3 Lilac;
+        float3 Shade;
+
+        float Hash(float3 Q)
+        {
+            return frac(sin(dot(Q, float3(12.9898, 78.233, 37.719))) * 43758.5453);
+        }
+        float3 Lin(float3 C)
+        {
+            return lerp(C / 12.92, pow((C + 0.055) / 1.055, 2.4), step(0.04045, C));
+        }
+        float2 Turn(float2 P, float Angle)
+        {
+            float C = cos(Angle);
+            float S = sin(Angle);
+            return float2(C * P.x - S * P.y, S * P.x + C * P.y);
+        }
+        // Which pane of a lattice of side S, one side level, P falls in -- its cell, and 0 below the cell's diagonal or
+        // 1 above -- and, in Local, P from that pane's centre.
+        float3 Pane(float2 P, float S, out float2 Local)
+        {
+            float H = S * 0.8660254;
+            float B = P.y / H;
+            float A = P.x / S - 0.5 * B;
+            float2 I = floor(float2(A, B));
+            float2 F = float2(A, B) - I;
+            float Upper = step(1.0, F.x + F.y);
+            float2 C = I + (Upper > 0.5 ? float2(2.0, 2.0) : float2(1.0, 1.0)) / 3.0;
+            Local = P - float2(S * (C.x + 0.5 * C.y), H * C.y);
+            return float3(I, Upper);
+        }
+        float3 Pick(float H)
+        {
+            return H < 0.30 ? Base : (H < 0.50 ? Light : (H < 0.72 ? White : (H < 0.87 ? Lilac : Shade)));
+        }
+        // How much of a pane's own shade shows at Local: all of it, or for a third of the panes fading across the face.
+        float Across(float3 Id, float2 Local, float S, float Seed)
+        {
+            float Angle = Hash(Id + float3(Seed, 3.3, 1.1)) * 6.2831853;
+            float G = dot(Local, float2(cos(Angle), sin(Angle))) / S;
+            return Hash(Id + float3(9.1, Seed, 2.0)) < 0.35 ? saturate(0.5 + G * 1.8) : 1.0;
+        }
+        // A pane's shade at Time: it holds one for a few seconds, then turns to the next.
+        float3 Shade1(float3 Id, float Time, float Seed)
+        {
+            float E = Time / 4.5 + Hash(Id + Seed) * 3.0;
+            float K = floor(E);
+            float Turning = smoothstep(0.75, 1.0, E - K);
+            float3 C0 = Pick(Hash(Id + float3(K * 1.7, Seed, 0.0)));
+            float3 C1 = Pick(Hash(Id + float3((K + 1.0) * 1.7, Seed, 0.0)));
+            return lerp(C0, C1, Turning);
+        }
+    };
+
+    FLattice L;
+    L.Base = Base.rgb;
+    L.Light = Light.rgb;
+    L.White = White.rgb;
+    L.Lilac = Lilac.rgb;
+    L.Shade = Shade.rgb;
+    float2 P = float2((UV.x - 0.5) * Aspect, UV.y - 0.5);
+
+    // The near lattice: sliding down and to the right, swaying.
+    float S1 = PaneSize;
+    float2 P1 = L.Turn(P, 0.03 * sin(Time * 0.21)) + float2(0.030, 0.022) * Time + float2(0.13, 0.31);
+    float2 Local1;
+    float3 Id1 = L.Pane(P1, S1, Local1);
+    float3 Col = lerp(L.Base, L.Shade1(Id1, Time, 0.0), L.Across(Id1, Local1, S1, 0.0));
+
+    // The far lattice: larger, the other way; two in five of its panes show, mostly white, as a film.
+    float S2 = PaneSize * 1.37;
+    float2 P2 = L.Turn(P, -0.025 * sin(Time * 0.17 + 1.0)) + float2(-0.045, 0.012) * Time + float2(0.41, 0.07);
+    float2 Local2;
+    float3 Id2 = L.Pane(P2, S2, Local2);
+    float E2 = Time / 6.0 + L.Hash(Id2 + 4.0) * 5.0;
+    float K2 = floor(E2);
+    float Shown = L.Hash(Id2 + float3(K2 * 2.3, 5.5, 0.0));
+    float Next = L.Hash(Id2 + float3((K2 + 1.0) * 2.3, 5.5, 0.0));
+    float Turning = smoothstep(0.7, 1.0, E2 - K2);
+    float Film = lerp(Shown < 0.4 ? 1.0 : 0.0, Next < 0.4 ? 1.0 : 0.0, Turning) * 0.8 * L.Across(Id2, Local2, S2, 7.0);
+    float3 FilmColor = L.Hash(Id2 + 8.0) < 0.75 ? L.White : L.Lilac;
+    Col = lerp(Col, FilmColor, Film);
+    return float4(L.Lin(Col), 1.0);
+}
+
+export void M_DBH_LoadingBackdrop(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0);
+    float4 Ground = DBH_Lattice(UV, UE.Time() * Speed, Aspect, PaneSize, BaseColor, LightColor, WhiteColor, LilacColor, ShadeColor);
+    float4 VC = UE.VertexColor();
+    float3 Color = Ground.rgb * DBH_SRGBToLinear(VC.rgb);
+    float Alpha = Ground.a * VC.a;
+    m.EmissiveColor = DBH_UIEmissive(Color, Alpha, DreamUI_IsRenderByDreamUIRenderer);
+    m.Opacity = Alpha;
+}

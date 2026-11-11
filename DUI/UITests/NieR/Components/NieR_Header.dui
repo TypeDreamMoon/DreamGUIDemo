@@ -1,0 +1,28 @@
+// A page title (UNieRHeader): 55 px Medium, wide-set, with its pale shadow 6 px down and right, and the smaller
+// subtitle after it. Both texts are centred in 70 px; with M PLUS 1p's metrics a baseline sits 0.38 em below the middle,
+// so the 26 px subtitle goes down (55 - 26) * 0.38 = 11 px to share the title's baseline: 22 px of top padding.
+class /Game/UITests/NieR/UI/Components/NieR_Header
+use "UITests/NieR/NieR_Common.dui"
+
+Widget Root : ComponentRoot {
+    Text TitleShadow : FillLabel {
+        AnchorData.AnchoredPosition = (6, -6)
+        Font = @FontMedium
+        FontSize = 55
+        FontSpace = (9, 0)
+        Color = @TitleShadow
+    }
+    HorizontalBox TitleLine : Fill {
+        Text TitleText : Label {
+            Font = @FontMedium
+            FontSize = 55
+            FontSpace = (9, 0)
+            Color = @Title
+        }
+        Text SubText : Label {
+            FontSize = 26
+            Color = @Title
+            @slot Padding = (4, 22, 0, 0)
+        }
+    }
+}

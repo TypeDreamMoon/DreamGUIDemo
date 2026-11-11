@@ -1,0 +1,89 @@
+// A page of the system menu (UNieRListPage): the list panel, whose rows a screen writes inside the page (they go into
+// its default slot, Rows), and the detail panel beside it, which shows the highlighted row.
+class /Game/UITests/NieR/UI/Components/NieR_ListPage
+use "UITests/NieR/NieR_Common.dui"
+
+HorizontalBox Root : ComponentRoot {
+    Spacing = 67
+
+    Widget {
+        @slot { MinDesiredSize = (515, 0)  MaxDesiredSize = (515, 0) }
+        RectBlock : Flat {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.SizeDelta = (8, 0)
+            BodyColor = @ListEdge
+        }
+        RectBlock : FlatFill {
+            AnchorData.AnchoredPosition = (4, 0)
+            AnchorData.SizeDelta = (-8, 0)
+            BodyColor = @Panel
+        }
+        // The scroll track and its thumb.
+        RectBlock : FlatTopLeft {
+            AnchorData.AnchoredPosition = (498, -20)
+            AnchorData.SizeDelta = (3, 578)
+            BodyColor = @Track
+        }
+        RectBlock : FlatTopLeft {
+            AnchorData.AnchoredPosition = (497, -20)
+            AnchorData.SizeDelta = (5, 140)
+            BodyColor = @Ink
+        }
+        slot Rows default : RowList {
+            AnchorData.AnchoredPosition = (16, -18)
+            AnchorData.SizeDelta = (470, 582)
+            + VerticalBox { Spacing = 15 }
+        }
+    }
+
+    VerticalBox {
+        @fill
+        @slot Padding = (0, 4, 0, 0)
+        RectBlock : Flat {
+            + Overlay { Padding = (20, 0, 18, 0) }
+            BodyColor = @Ink
+            @slot MinDesiredSize = (0, 48)
+            Text DetailTitle : Label {
+                FontSpace = (1, 0)
+                Color = @Paper
+            }
+        }
+        RectBlock : Flat {
+            + VerticalBox { Padding = (26, 16, 26, 0) }
+            BodyColor = @Panel
+            @fill
+            RectBlock : Flat {
+                BodyColor = @RowBox
+                @slot MinDesiredSize = (0, 262)
+                Image IconImage : Picture {
+                    AnchorData.SizeDelta = (160, 160)
+                    Brush.ImageSize = (160, 160)
+                    Color = @Ink
+                }
+            }
+            RectBlock : Rule {
+                @slot Padding = (0, 12, 0, 0)
+            }
+            Text DetailBody : DetailText {
+                VAlign = Top
+                WrapTextAt = 486
+                @fill
+                @slot Padding = (0, 12, 0, 0)
+            }
+            // "Number Held", on the pages that count what they list.
+            if bShowCount {
+                Text DetailCount : DetailText {
+                    HAlign = Right
+                    @slot Padding = (0, 0, 0, 14)
+                }
+            }
+        }
+    }
+}
+
+style DetailText : Label {
+    FontSize = 22
+    FontSpace = (1, 0)
+}

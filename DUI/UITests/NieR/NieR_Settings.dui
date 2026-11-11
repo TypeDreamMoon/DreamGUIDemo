@@ -1,0 +1,115 @@
+// The settings screen (UNieRSettingsScreen): the categories, and one page of options for each.
+use "UITests/NieR/NieR_Common.dui"
+
+Widget Root : Fill {
+    + NieRScreenScope { InputMode = Menu  bCloseOnBack = false }
+
+    Image : FillPicture { Brush.ResourceObject = @MenuBackground }
+    Image : Band { AnchorData.AnchoredPosition = (0, -34) }
+    Image : Band { AnchorData.AnchoredPosition = (0, -1011) }
+    Header Header : PageHeader {
+        AnchorData.AnchoredPosition = (67, -82)
+        Title = "SETTINGS"
+    }
+    RectBlock : FlatTopLeft {
+        AnchorData.AnchoredPosition = (63, -258)
+        AnchorData.SizeDelta = (12, 470)
+        BodyColor = @Rail
+    }
+
+    Widget Categories : Lists {
+        AnchorData.SizeDelta = (312, 460)
+        rows Row : CategoryRow (Label, Description) {
+            "Language", "Adjust language settings."
+            "Game",     "Adjust game settings."
+            "Camera",   "Adjust camera settings."
+            "Screen",   "Adjust screen settings."
+            "Sound",    "Adjust sound settings."
+            "Other",    "Adjust other settings."
+        }
+    }
+
+    // One page of options per category. A cycle row steps through Values ('|' between them), a gauge row through
+    // ten segments; a row that does not start at the first value says so in its block.
+    Widget OptPage_0 : Lists {
+        rows Row : Cycle (Label, Values, Description) {
+            "Text Language",  "English|日本語|简体中文|繁體中文|한국어|Français|Deutsch", "The language of menus and subtitles."
+            "Voice Language", "English|Japanese", "The language the characters speak." { ValueIndex = 1 }
+            "Subtitles",      "On|Off",           "Show subtitles during conversations and cutscenes."
+        }
+    }
+    Widget OptPage_1 : Lists {
+        rows Row : Cycle (Label, Values, Description) {
+            "Difficulty",   "Easy|Normal|Hard|Very Hard", "Change the difficulty. Takes effect at once." { ValueIndex = 1 }
+            "Auto-Save",    "On|Off",             "Save automatically at access points and between areas."
+            "Vibration",    "On|Off",             "Controller vibration."
+            "Lock-On",      "Toggle|Hold",        "Press once to lock on, or hold to keep the lock."
+            "Hacking Mode", "Default|Simplified", "How hacking mini-games are played."
+        }
+    }
+    Widget OptPage_2 : Lists {
+        rows Row : Gauge (Label, BarValue, Description) {
+            "Camera Distance",  5, "How far the camera stays from the character."
+            "Horizontal Speed", 6, "How fast the camera turns left and right."
+            "Vertical Speed",   6, "How fast the camera turns up and down."
+        }
+        rows Row : Cycle (Label, Values, Description) {
+            "Horizontal Axis", "Normal|Inverted", "Invert the camera's horizontal axis."
+            "Vertical Axis",   "Normal|Inverted", "Invert the camera's vertical axis."
+        }
+    }
+    Widget OptPage_3 : Lists {
+        rows Row : Cycle (Label, Values, Description) {
+            "Display Mode", "Windowed|Borderless|Fullscreen", "How the game window is shown." { ValueIndex = 1 }
+            "Resolution",   "1280x720|1600x900|1920x1080|2560x1440|3840x2160", "The size of the game's picture." { ValueIndex = 2 }
+        }
+        rows Row : Gauge (Label, BarValue, Description) {
+            "Brightness", 5, "Adjust the brightness of the screen."
+        }
+        rows Row : Cycle (Label, Values, Description) {
+            "Motion Blur", "On|Off",           "Blur fast motion."
+            "HUD",         "Full|Minimal|Off", "How much of the heads-up display is shown."
+        }
+    }
+    Widget OptPage_4 : Lists {
+        rows Row : Gauge (Label, BarValue, Description) {
+            "Master Volume", 10, "The volume of everything."
+            "BGM",            8, "The volume of the music."
+            "Sound Effects",  8, "The volume of sound effects."
+            "Voices",         9, "The volume of voices."
+        }
+        rows Row : Cycle (Label, Values, Description) {
+            "Speaker Setup", "Stereo|5.1 Surround|7.1 Surround", "The speakers the sound is mixed for."
+        }
+    }
+    Widget OptPage_5 : Lists {
+        rows Row : Cycle (Label, Values, Description) {
+            "Show Tutorials", "On|Off", "Show tutorials when new mechanics appear."
+            "Damage Numbers", "On|Off", "Show the damage dealt above enemies."
+        }
+        Row : OptionRow { Label = "Reset to Defaults"; Action = "reset"; Description = "Put every setting back to its default." }
+    }
+
+    HintBar Hint : BottomHint {
+        Hint = "Adjust language settings."
+        rows Prompt (Keys, Label) {
+            "W S",   "Select"
+            "Q E",   "Category"
+            "Enter", "Confirm"
+            "Esc",   "Back"
+        }
+    }
+}
+
+// The lists: 132 px in, 273 px down, a row every 77 px.
+style Lists : RowList {
+    AnchorData.AnchoredPosition = (132, -273)
+    AnchorData.SizeDelta = (1100, 460)
+    + VerticalBox { Spacing = 29 }
+}
+style Cycle : OptionRow {
+    Kind = Cycle
+}
+style Gauge : OptionRow {
+    Kind = Bar
+}

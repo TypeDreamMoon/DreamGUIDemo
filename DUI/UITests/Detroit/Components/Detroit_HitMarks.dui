@@ -1,0 +1,142 @@
+// The HIT MARKS analysis panel (UDetroitAnalysisPanel), 1100 x 560, floating over the clue it reads: the blue icon box,
+// the title and what it found, the reconstruction picture (M_DBH_Hologram, wiped in by the class) with its label, the
+// yellow corner brackets, dashed guides (M_DBH_Dash) and their measurements.
+class /Game/UITests/Detroit/UI/Components/Detroit_HitMarks
+use "UITests/Detroit/Detroit_Common.dui"
+
+Widget Root : ComponentRoot {
+    Widget Content : Fill {
+        // Guides: dashed along the top and the bottom, a solid rule down the left.
+        Image GuideTop : Dashes {
+            AnchorData.AnchoredPosition = (120, -46)
+            AnchorData.SizeDelta = (940, 3)
+        }
+        Image GuideLow : Dashes {
+            AnchorData.AnchoredPosition = (120, -536)
+            AnchorData.SizeDelta = (820, 2)
+        }
+        RectBlock GuideLeft : FlatTopLeft {
+            AnchorData.AnchoredPosition = (72, -110)
+            AnchorData.SizeDelta = (2, 400)
+            RenderTransformPivot = (0.5, 1)
+            BodyColor = @CyanFaint
+        }
+        Text Num0 : Number { AnchorData.AnchoredPosition = (150, -58) }
+        Text Num1 : Number { AnchorData.AnchoredPosition = (6, -300); RenderRotation = (0, 0, 90) }
+        Text Num2 : Number { AnchorData.AnchoredPosition = (640, -500) }
+
+        // The icon box: Connor's triangle in a blue square.
+        RectBlock IconBox : FlatTopLeft {
+            AnchorData.AnchoredPosition = (40, -30)
+            AnchorData.SizeDelta = (66, 66)
+            BodyColor = #1E6FA870
+            bEnableBorder = true
+            BorderWidth = 3
+            BorderColor = @Cyan
+            PolygonLine : Centered {
+                AnchorData.AnchoredPosition = (0, -2)
+                AnchorData.SizeDelta = (34, 30)
+                Sides = 3
+                StartAngle = 90
+                LineWidth = 3
+                Color = @White
+                bRaycastTarget = false
+            }
+        }
+
+        // The brackets round the findings.
+        Widget BrTL : Bracket {
+            AnchorData.AnchoredPosition = (126, -100)
+            RectBlock : BracketLine { AnchorData.SizeDelta = (26, 3) }
+            RectBlock : BracketLine { AnchorData.SizeDelta = (3, 26) }
+        }
+        Widget BrTR : Bracket {
+            AnchorData.AnchoredPosition = (738, -100)
+            RectBlock : BracketLine { AnchorData.AnchoredPosition = (0, 0); AnchorData.SizeDelta = (26, 3) }
+            RectBlock : BracketLine { AnchorData.AnchoredPosition = (23, 0); AnchorData.SizeDelta = (3, 26) }
+        }
+        Widget BrBL : Bracket {
+            AnchorData.AnchoredPosition = (126, -264)
+            RectBlock : BracketLine { AnchorData.AnchoredPosition = (0, -23); AnchorData.SizeDelta = (26, 3) }
+            RectBlock : BracketLine { AnchorData.AnchoredPosition = (0, 0); AnchorData.SizeDelta = (3, 26) }
+        }
+        Widget BrBR : Bracket {
+            AnchorData.AnchoredPosition = (738, -264)
+            RectBlock : BracketLine { AnchorData.AnchoredPosition = (0, -23); AnchorData.SizeDelta = (26, 3) }
+            RectBlock : BracketLine { AnchorData.AnchoredPosition = (23, 0); AnchorData.SizeDelta = (3, 26) }
+        }
+
+        Text Title : Shadowed {
+            AnchorData.AnchoredPosition = (146, -96)
+            AnchorData.SizeDelta = (620, 84)
+            Font = @FontBold
+            FontSize = 70
+            FontSpace = (2, 0)
+            Color = @Cyan
+            Text = "HIT MARKS"
+        }
+        VerticalBox Body : TopLeft {
+            AnchorData.AnchoredPosition = (150, -182)
+            AnchorData.SizeDelta = (600, 90)
+            Spacing = 0
+            Text : Finding { Text = "Non-critical damage Level 2" }
+            Text : Finding { Text = "Caused by baseball bat" }
+        }
+
+        // The reconstruction: the picture in its frame, and its label.
+        Widget HoloFrame : TopLeft {
+            AnchorData.AnchoredPosition = (468, -232)
+            AnchorData.SizeDelta = (600, 300)
+            RectBlock : FlatFill { BodyColor = #0A121C70 }
+            Image Holo : FillPicture { Brush.ResourceObject = @HologramMaterial }
+            RectBlock : FlatFill {
+                bEnableBody = false
+                bEnableBorder = true
+                BorderWidth = 2
+                BorderColor = @CyanFaint
+            }
+            RectBlock : FlatTopLeft { AnchorData.AnchoredPosition = (-4, 4); AnchorData.SizeDelta = (18, 3); BodyColor = @Cyan }
+            RectBlock : FlatTopLeft { AnchorData.AnchoredPosition = (-4, 4); AnchorData.SizeDelta = (3, 18); BodyColor = @Cyan }
+        }
+        Widget HoloLabel : TopLeft {
+            AnchorData.AnchoredPosition = (560, -416)
+            AnchorData.SizeDelta = (300, 40)
+            RectBlock : FlatTopLeft { AnchorData.AnchoredPosition = (0, -18); AnchorData.SizeDelta = (8, 8); BodyColor = @White }
+            RectBlock : Bar { AnchorData.AnchoredPosition = (8, -21); AnchorData.SizeDelta = (30, 2); BodyColor = @WhiteSoft }
+            Text : Shadowed {
+                AnchorData.AnchoredPosition = (46, -4)
+                AnchorData.SizeDelta = (260, 34)
+                Font = @FontMedium
+                FontSize = 24
+                Text = "Multiple impacts"
+            }
+        }
+    }
+}
+
+style Dashes : TopLeftPicture {
+    Brush.ResourceObject = @DashMaterial
+    Brush.TintColor = @CyanSoft
+    RenderTransformPivot = (0, 0.5)
+}
+style Bracket : TopLeft {
+    AnchorData.SizeDelta = (26, 26)
+}
+style BracketLine : FlatTopLeft {
+    BodyColor = @Yellow
+}
+style Number : Shadowed {
+    AnchorData.SizeDelta = (130, 30)
+    Font = @FontMedium
+    FontSize = 26
+    FontSpace = (1, 0)
+    Color = @CyanSoft
+    Text = "000.0"
+}
+style Finding : Label {
+    Font = @FontMedium
+    FontSize = 32
+    TextStyle.UnderlayColor = @Shadow
+    TextStyle.UnderlayOffset = (2, -2)
+    TextStyle.UnderlaySoftness = 0.5
+}

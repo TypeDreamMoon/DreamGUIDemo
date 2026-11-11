@@ -1,0 +1,27 @@
+// M_DBH_Dash.dss -- a dashed line for the analysis panels' guides: Dashes dashes along the image's width, each Duty of
+// its period long, crawling Crawl periods a second. Coloured by the widget (its tint and opacity). For a DreamGUI Image
+// (see DBH_Common.dsh).
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = AlphaComposite, TwoSided = true)
+#include "DBH_Common.dsh"
+
+/// @group DreamUI   @sort 0   @desc 1 while DreamGUI's own renderer draws this (it premultiplies by itself); 0 under UE's renderer.
+/// The canvas sets it per draw only on a material that has one of DreamGUI's texture parameters, which these have none of, so
+/// the default is the DreamUI renderer's, where every one of these is drawn.
+uniform float DreamUI_IsRenderByDreamUIRenderer = 1.0;
+/// @group Dash|Shape   @sort 10   @slider 1 200   @desc Dashes along the width
+uniform float Dashes = 40.0;
+/// @group Dash|Shape   @sort 20   @slider 0 1   @desc How much of each period is dash
+uniform float Duty = 0.55;
+/// @group Dash|Motion   @sort 30   @slider -4 4   @desc Periods per second the dashes travel
+uniform float Crawl = 0.0;
+
+export void M_DBH_Dash(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0);
+    float Dash = step(frac(UV.x * Dashes - UE.Time() * Crawl), Duty);
+    float4 VC = UE.VertexColor();
+    float3 Color = DBH_SRGBToLinear(VC.rgb);
+    float Alpha = Dash * VC.a;
+    m.EmissiveColor = DBH_UIEmissive(Color, Alpha, DreamUI_IsRenderByDreamUIRenderer);
+    m.Opacity = Alpha;
+}

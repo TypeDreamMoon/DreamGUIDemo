@@ -1,0 +1,103 @@
+// The objectives in the room (UDetroitObjectives), 900 x 620: the white FIND DEVIANT header with bars at its ends, tabs
+// above and below and brackets round it, a rule down from it, and the objectives under it. The class plays the entrance
+// and changes the rows' states as the investigation goes.
+class /Game/UITests/Detroit/UI/Components/Detroit_Objectives
+use "UITests/Detroit/Detroit_Common.dui"
+
+Widget Root : ComponentRoot {
+    Widget Content : Fill {
+        // The header.
+        RectBlock HeaderBox : FlatTopLeft {
+            AnchorData.AnchoredPosition = (150, -40)
+            AnchorData.SizeDelta = (600, 74)
+            BodyColor = @Paper
+            bEnableOuterShadow = true
+            OuterShadowColor = #00000060
+            OuterShadowSize = 2
+            OuterShadowBlur = 10
+        }
+        RectBlock StripeL0 : Stripe { AnchorData.AnchoredPosition = (164, -47); AnchorData.SizeDelta = (3, 60) }
+        RectBlock StripeL1 : Stripe { AnchorData.AnchoredPosition = (171, -47); AnchorData.SizeDelta = (7, 60) }
+        RectBlock StripeL2 : Stripe { AnchorData.AnchoredPosition = (182, -47); AnchorData.SizeDelta = (2, 60) }
+        RectBlock StripeR0 : Stripe { AnchorData.AnchoredPosition = (733, -47); AnchorData.SizeDelta = (3, 60) }
+        RectBlock StripeR1 : Stripe { AnchorData.AnchoredPosition = (722, -47); AnchorData.SizeDelta = (7, 60) }
+        RectBlock StripeR2 : Stripe { AnchorData.AnchoredPosition = (716, -47); AnchorData.SizeDelta = (2, 60) }
+        HorizontalBox HeaderWords : TopLeft {
+            AnchorData.AnchoredPosition = (204, -40)
+            AnchorData.SizeDelta = (500, 74)
+            Spacing = 12
+            Text : HeaderText {
+                Font = @FontLight
+                Text = "FIND"
+            }
+            Text : HeaderText {
+                Font = @FontBold
+                Text = "DEVIANT"
+            }
+        }
+        RectBlock TabTop : FlatTopLeft {
+            AnchorData.AnchoredPosition = (410, -31)
+            AnchorData.SizeDelta = (80, 4)
+            BodyColor = @Paper
+        }
+        RectBlock TabBottom : FlatTopLeft {
+            AnchorData.AnchoredPosition = (410, -119)
+            AnchorData.SizeDelta = (80, 4)
+            BodyColor = @Paper
+        }
+        Widget HBrTL : HeaderBracket {
+            AnchorData.AnchoredPosition = (136, -26)
+            RectBlock : HeaderBracketLine { AnchorData.SizeDelta = (22, 2) }
+            RectBlock : HeaderBracketLine { AnchorData.SizeDelta = (2, 22) }
+        }
+        Widget HBrTR : HeaderBracket {
+            AnchorData.AnchoredPosition = (742, -26)
+            RectBlock : HeaderBracketLine { AnchorData.SizeDelta = (22, 2) }
+            RectBlock : HeaderBracketLine { AnchorData.AnchoredPosition = (20, 0); AnchorData.SizeDelta = (2, 22) }
+        }
+        Widget HBrBL : HeaderBracket {
+            AnchorData.AnchoredPosition = (136, -106)
+            RectBlock : HeaderBracketLine { AnchorData.AnchoredPosition = (0, -20); AnchorData.SizeDelta = (22, 2) }
+            RectBlock : HeaderBracketLine { AnchorData.SizeDelta = (2, 22) }
+        }
+        Widget HBrBR : HeaderBracket {
+            AnchorData.AnchoredPosition = (742, -106)
+            RectBlock : HeaderBracketLine { AnchorData.AnchoredPosition = (0, -20); AnchorData.SizeDelta = (22, 2) }
+            RectBlock : HeaderBracketLine { AnchorData.AnchoredPosition = (20, 0); AnchorData.SizeDelta = (2, 22) }
+        }
+
+        // The rule down from the header, and the objectives along it.
+        RectBlock Spine : FlatTopLeft {
+            AnchorData.AnchoredPosition = (200, -138)
+            AnchorData.SizeDelta = (2, 430)
+            RenderTransformPivot = (0.5, 1)
+            BodyColor = @WhiteFaint
+        }
+        VerticalBox Rows : TopLeft {
+            AnchorData.AnchoredPosition = (232, -150)
+            AnchorData.SizeDelta = (480, 440)
+            Spacing = 26
+            rows ObjectiveRow : ObjRow (Lead, LeadRest, Line2, State) {
+                "SEARCH",   "FOR",        "BLUE BLOOD TRACES",   Active
+                "ANALYZE",  "THE",        "CRIME SCENE",         Locked
+                "FIND",     "WHERE THE",  "DEVIANT WENT",        Locked
+            }
+        }
+    }
+}
+
+style Stripe : FlatTopLeft {
+    BodyColor = @Ink
+}
+style HeaderText : Label {
+    FontSize = 34
+    FontSpace = (2, 0)
+    Color = @Ink
+    @slot VerticalAlignment = Center
+}
+style HeaderBracket : TopLeft {
+    AnchorData.SizeDelta = (22, 22)
+}
+style HeaderBracketLine : FlatTopLeft {
+    BodyColor = @WhiteSoft
+}

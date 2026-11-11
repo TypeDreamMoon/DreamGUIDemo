@@ -1,0 +1,23 @@
+// M_DBH_HoloMesh.dss -- a hologram in the world: the reconstruction's weapon and the marks it left. Additive, bright at
+// the silhouette, with scan bands climbing through it and a slight flicker. The game fades it with Fade.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = Additive, TwoSided = true)
+
+/// @group Hologram|Look   @sort 10   @desc The hologram's colour (linear)
+uniform float4 HoloColor = float4(0.08, 0.50, 1.0, 1.0);
+/// @group Hologram|Look   @sort 20   @slider 0 20   @desc Overall brightness
+uniform float Intensity = 3.0;
+/// @group Hologram|Motion   @sort 30   @slider 0 1   @desc Fades the whole hologram in and out
+uniform float Fade = 1.0;
+/// @group Hologram|Look   @sort 40   @slider 0.1 10   @desc Scan bands: radians of the band wave per world unit of height
+uniform float BandDensity = 1.2;
+
+export void M_DBH_HoloMesh(inout material m)
+{
+    float3 N = normalize(UE.VertexNormalWS());
+    float3 V = UE.CameraVectorWS();
+    float Rim = pow(1.0 - abs(dot(N, V)), 2.0);
+    float3 W = UE.WorldPosition();
+    float Bands = pow(0.5 + 0.5 * sin(W.z * BandDensity - UE.Time() * 9.0), 10.0);
+    float Flicker = 0.88 + 0.12 * sin(UE.Time() * 41.0) * sin(UE.Time() * 13.0);
+    m.EmissiveColor = HoloColor.rgb * (0.10 + Rim * 1.4 + Bands * 0.45) * Intensity * Fade * Flicker;
+}

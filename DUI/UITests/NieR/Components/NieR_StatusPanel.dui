@@ -1,0 +1,74 @@
+// The system menu's status panel: the unit's numbers under an ink header.
+class /Game/UITests/NieR/UI/Components/NieR_StatusPanel
+use "UITests/NieR/NieR_Common.dui"
+
+VerticalBox Root : ComponentRoot {
+    RectBlock : Flat {
+        + Overlay { Padding = (20, 0, 20, 0) }
+        BodyColor = @Ink
+        @slot MinDesiredSize = (0, 48)
+        Text : Label {
+            Text = "Status"
+            FontSpace = (1, 0)
+            Color = @Paper
+        }
+    }
+    RectBlock : Flat {
+        + VerticalBox { Padding = (20, 10, 20, 0) }
+        BodyColor = @Panel
+        @fill
+
+        Stat : StatLine { Label = "2B"; Value = "Lv: 52" }
+        RectBlock : Rule { @slot Padding = (0, 4, 0, 0) }
+        rows Stat : StatLine (Label, Value) {
+            "Funds (G):", "682,847"       { @slot Padding = (0, 8, 0, 0) }
+            "EXP:",       "235,554"
+            "HP:",        "3,950/ 3,950"  { RectBlock HpBar : HpBar {} }
+        }
+        RectBlock : Rule { @slot Padding = (0, 6, 0, 0) }
+        rows Stat : StatLine (Label, Value) {
+            "Attack (Light):", "3,607" { @slot Padding = (0, 8, 0, 0) }
+            "Attack (Heavy):", "3,712"
+            "Ranged Attack:",  "150"
+            "Defense:",        "1,497"
+        }
+        HorizontalBox {
+            Padding = (4, 0, 0, 0)
+            Spacing = 18
+            @slot Padding = (0, 14, 0, 0)
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+            RectBlock : Chip {}
+        }
+        RectBlock : Rule { @slot Padding = (0, 20, 0, 0) }
+        Text : Label {
+            Text = "NO ERROR"
+            FontSize = 18
+            FontSpace = (2, 0)
+            HAlign = Center
+            @slot Padding = (0, 30, 0, 0)
+        }
+    }
+}
+
+style HpBar : FlatTopLeft {
+    bIgnoreLayout = true
+    AnchorData.AnchoredPosition = (60, -15)
+    AnchorData.SizeDelta = (200, 7)
+    BodyColor = #B9B39A
+}
+style Chip : Flat {
+    AnchorData.SizeDelta = (26, 26)
+    bEnableBody = false
+    bEnableBorder = true
+    BorderWidth = 2
+    BorderColor = @PanelEdge
+}

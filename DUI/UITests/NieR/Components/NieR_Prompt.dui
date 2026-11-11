@@ -1,0 +1,36 @@
+// A key prompt (UNieRPrompt): up to three key caps, then what they do. Sized by its content.
+class /Game/UITests/NieR/UI/Components/NieR_Prompt
+use "UITests/NieR/NieR_Common.dui"
+
+HorizontalBox Root : Fill {
+    Spacing = 5
+    RectBlock Key0 : KeyCap { Text KeyText0 : KeyCapText {} }
+    RectBlock Key1 : KeyCap { Text KeyText1 : KeyCapText {} }
+    RectBlock Key2 : KeyCap { Text KeyText2 : KeyCapText {} }
+    Text LabelText : Label {
+        FontSize = 22
+        FontSpace = (1, 0)
+        Color = @HintInk
+        @slot Padding = (5, 0, 0, 0)
+    }
+}
+
+// A cap is at least as wide as it is tall, and grows with the key's name.
+style KeyCap : Flat {
+    CornerRadius.X = 3
+    CornerRadius.Y = 3
+    CornerRadius.Z = 3
+    CornerRadius.W = 3
+    BodyColor = @Accent
+    @slot VerticalAlignment = Center
+    @slot MinDesiredSize = (24, 24)
+    @slot MaxDesiredSize = (0, 24)
+}
+// Inset 5 px on each side: the cap is the key's name and 10 px.
+style KeyCapText : FillLabel {
+    AnchorData.SizeDelta = (-10, 0)
+    Font = @FontMedium
+    FontSize = 13
+    Color = @Paper
+    HAlign = Center
+}

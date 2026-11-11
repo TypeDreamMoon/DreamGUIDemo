@@ -1,0 +1,144 @@
+// M_DBH_LoadingRing.dss -- the loading screen's ring, as the game draws it: a thick band cut into four or five blocks with
+// rounded corners, in two sheets one behind the other. The front sheet is steel blue, the one behind it pale and a
+// little smaller, and where they overlap they darken each other as tinted glass does (multiplied, not laid over). The
+// back sheet sits off the front one by the screen's parallax (Parallax, set by the screen as the ring drifts) and
+// follows it a beat late. The blocks hold still, then rearrange in a burst every Period seconds: every cut slides to a
+// new place, and some open or close. Red is drawn a touch smaller than green and blue, the lens's fringe, and a thin
+// pale-cyan light runs inside the front sheet's inner edge. For a square DreamGUI Image (see DBH_Common.dsh).
+//
+// The sheets multiply what is under them, which an image cannot read; they are drawn instead as the colour that
+// multiplying Paper (the loading screen's ground, sRGB) gives, over it, with the least alpha that colour needs. On the
+// ground that is exact; on the backdrop's lighter and darker panes it is within a shade of it. The sum is sRGB's, as
+// DreamGUI's renderer blends sRGB-encoded values (measured: worked in linear, the overlap came out teal).
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = AlphaComposite, TwoSided = true)
+#include "DBH_Common.dsh"
+
+/// @group DreamUI   @sort 0   @desc 1 while DreamGUI's own renderer draws this (it premultiplies by itself); 0 under UE's renderer.
+/// The canvas sets it per draw on a material that has one of DreamGUI's parameters; the default is the DreamUI renderer's,
+/// where every one of these is drawn.
+uniform float DreamUI_IsRenderByDreamUIRenderer = 1.0;
+
+/// @group Ring|Look   @sort 10   @desc What the front sheet multiplies the ground by (sRGB)
+uniform float4 FrontTint = float4(0.544, 0.641, 0.715, 1.0);
+/// @group Ring|Look   @sort 20   @desc What the back sheet multiplies the ground by (sRGB)
+uniform float4 BackTint = float4(0.865, 0.889, 0.908, 1.0);
+/// @group Ring|Look   @sort 30   @desc The ground the ring is drawn over (sRGB): what the multiplying is worked out on
+uniform float4 PaperColor = float4(0.929, 0.918, 0.937, 1.0);
+/// @group Ring|Look   @sort 40   @desc The light inside the front sheet's inner edge (sRGB; alpha is how much)
+uniform float4 RimColor = float4(0.86, 0.94, 1.0, 0.55);
+/// @group Ring|Motion   @sort 50   @desc Where the back sheet sits from the front one (xy, in half-widths of the image)
+uniform float4 Parallax = float4(-0.056, -0.056, 0.0, 0.0);
+/// @group Ring|Motion   @sort 60   @slider 0.5 4   @desc Seconds from one burst to the next
+uniform float Period = 1.7;
+/// @group Ring|Motion   @sort 70   @slider 0 3   @desc Time scale (1 = the game's pace)
+uniform float Speed = 1.0;
+
+/// @custom
+float4 DBH_LoadingRing(float2 UV, float Time, float Period, float4 Parallax, float4 Front, float4 Back, float4 Paper, float4 Rim)
+{
+    // A local struct is how a Custom node carries functions of its own.
+    struct FRing
+    {
+        float Burst;
+        float Cycle;
+
+        float Hash(float N)
+        {
+            return frac(sin(N * 91.3458 + 17.123) * 47453.5453);
+        }
+        float3 Lin(float3 C)
+        {
+            return lerp(C / 12.92, pow((C + 0.055) / 1.055, 2.4), step(0.04045, C));
+        }
+        // Signed distance from P (ring units: 1 = half the image) to the blocks at time T. The band, from 0.594 to
+        // 0.794, is cut by five gaps, each a pair of rounded corners either side of it, the cut's sides parallel. A gap
+        // of width -2 * Corner is closed and leaves no mark. Each gap holds its place through a cycle, then in the
+        // cycle's first Burst seconds eases to the next: a hashed angle a little further round, and a hashed width.
+        float Blocks(float2 P, float T)
+        {
+            const float PI = 3.14159265;
+            const float TAU = 6.28318531;
+            const float Mid = 0.694;
+            const float Half = 0.100;
+            const float Corner = 0.042;
+            float R = length(P);
+            float Theta = atan2(P.y, P.x);
+            float V = abs(R - Mid);
+            float Step = floor(T / Cycle);
+            float Into = T - Step * Cycle;
+            float D = V - Half;
+            for (int i = 0; i < 5; ++i)
+            {
+                float Fi = i;
+                // Not all at once: each cut starts its move a little after the last.
+                float X = saturate((Into - Hash(Fi * 3.1 + 0.7) * 0.14) / Burst);
+                X = 1.0 - (1.0 - X) * (1.0 - X);
+                float E = X * X * (3.0 - 2.0 * X);
+                // Clockwise on the whole, by its own pace, jittered either way.
+                float Pace = 0.45 + 0.55 * Hash(Fi * 5.3 + 1.9);
+                float A0 = Fi * 1.2566 + Step * Pace + 0.9 * (Hash(Fi * 13.7 + Step * 1.618) - 0.5);
+                float A1 = Fi * 1.2566 + (Step + 1.0) * Pace + 0.9 * (Hash(Fi * 13.7 + (Step + 1.0) * 1.618) - 0.5);
+                float Angle = lerp(A0, A1, E) + T * 0.025;
+                float G0 = Hash(Fi * 7.9 + Step * 2.414);
+                float G1 = Hash(Fi * 7.9 + (Step + 1.0) * 2.414);
+                float W0 = G0 < 0.15 ? -2.0 * Corner : 0.035 + 0.05 * Hash(G0 * 31.0);
+                float W1 = G1 < 0.15 ? -2.0 * Corner : 0.035 + 0.05 * Hash(G1 * 31.0);
+                float W = lerp(W0, W1, E);
+                float Delta = Theta - Angle;
+                Delta -= TAU * floor((Delta + PI) / TAU);
+                float2 Q = float2(0.5 * W + Corner - abs(Delta) * R, V - Half + Corner);
+                D = max(D, length(max(Q, 0.0)) + min(max(Q.x, Q.y), 0.0) - Corner);
+            }
+            return D;
+        }
+    };
+
+    FRing Ring;
+    Ring.Cycle = max(Period, 0.5);
+    Ring.Burst = min(0.62, Ring.Cycle * 0.8);
+    float2 P = UV * 2.0 - 1.0;
+    float Pixel = max(fwidth(length(P)), 1e-4);
+    // The back sheet: further away, so a little smaller, off by the parallax, and a beat behind.
+    const float Behind = 0.943;
+    // Red a touch smaller than green and blue.
+    const float Fringe = 1.003;
+    float2 PB = (P - Parallax.xy) / Behind;
+    float TB = Time - 0.08;
+    float DF = Ring.Blocks(P, Time);
+    float DFr = Ring.Blocks(P * Fringe, Time);
+    float DB = Ring.Blocks(PB, TB);
+    float DBr = Ring.Blocks(PB * Fringe, TB);
+    float CovF = saturate(0.5 - DF / Pixel);
+    float CovFr = saturate(0.5 - DFr / (Pixel * Fringe));
+    float CovB = saturate(0.5 - DB * Behind / Pixel);
+    float CovBr = saturate(0.5 - DBr * Behind / (Pixel * Fringe));
+    float3 CovFront = float3(CovFr, CovF, CovF);
+    float3 CovBack = float3(CovBr, CovB, CovB);
+    float3 Multiply = lerp(1.0, Front.rgb, CovFront * Front.a) * lerp(1.0, Back.rgb, CovBack * Back.a);
+
+    // The colour that multiplying gives on the paper, as the least alpha over the paper that reaches it. DreamGUI's
+    // renderer blends sRGB-encoded values, so the sum is done in sRGB and only the straight colour is made linear, for
+    // the emissive it is encoded from again.
+    float3 Target = Paper.rgb * Multiply;
+    float Keep = min(Multiply.r, min(Multiply.g, Multiply.b));
+    float A = 1.0 - Keep;
+    float3 Pm = Target - Paper.rgb * Keep;
+
+    // The light inside the front sheet's inner edge.
+    float RimMask = saturate(saturate(0.5 - (DF - 0.009) / Pixel) - CovF) * step(length(P), 0.694) * Rim.a;
+    Pm = Rim.rgb * RimMask + Pm * (1.0 - RimMask);
+    A = RimMask + A * (1.0 - RimMask);
+    float3 Straight = A > 1e-5 ? Ring.Lin(Pm / A) : float3(0.0, 0.0, 0.0);
+    return float4(Straight, A);
+}
+
+export void M_DBH_LoadingRing(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0);
+    float4 Ring = DBH_LoadingRing(UV, UE.Time() * Speed, Period, Parallax, FrontTint, BackTint, PaperColor, RimColor);
+    float4 VC = UE.VertexColor();
+    float3 Color = Ring.rgb * DBH_SRGBToLinear(VC.rgb);
+    float Alpha = Ring.a * VC.a;
+    m.EmissiveColor = DBH_UIEmissive(Color, Alpha, DreamUI_IsRenderByDreamUIRenderer);
+    m.Opacity = Alpha;
+}

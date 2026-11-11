@@ -1,0 +1,180 @@
+// The Detroit test's library: the component the objectives are made of, the palette, the fonts and materials, and the
+// styles. Screens and components start with `use "UITests/Detroit/Detroit_Common.dui"`. Coordinates are design pixels;
+// a box placed from its parent's top-left corner takes AnchoredPosition = (x, -y), since DreamGUI's +y is up.
+//
+// The look is Detroit: Become Human's: Roboto (Apache 2.0) in light and bold, white and blue on dark translucent plates
+// in the room, orange for what is still to analyze, a pale paper-and-steel loading screen.
+
+use "UITests/Detroit/Components/Detroit_ObjectiveRow.dui" as ObjectiveRow
+
+resources {
+    Asset FontLight = /Game/UITests/Detroit/Fonts/Detroit_Font_Light
+    Asset Font = /Game/UITests/Detroit/Fonts/Detroit_Font
+    Asset FontMedium = /Game/UITests/Detroit/Fonts/Detroit_Font_Medium
+    Asset FontBold = /Game/UITests/Detroit/Fonts/Detroit_Font_Bold
+
+    // DreamShader sources: DShader/UITests/Detroit/Materials.
+    Asset RingMaterial = /Game/UITests/Detroit/Materials/M_DBH_LoadingRing
+    Asset BackdropMaterial = /Game/UITests/Detroit/Materials/M_DBH_LoadingBackdrop
+    Asset HologramMaterial = /Game/UITests/Detroit/Materials/M_DBH_Hologram
+    Asset DashMaterial = /Game/UITests/Detroit/Materials/M_DBH_Dash
+
+    // In the room.
+    Color Cyan = #3AA8F0
+    Color CyanSoft = #3AA8F0A0
+    Color CyanFaint = #3AA8F055
+    Color Orange = #FF4A10
+    Color OrangeFaint = #FF4A1055
+    Color White = #F2F5F8
+    Color WhiteSoft = #F2F5F8B0
+    Color WhiteFaint = #F2F5F860
+    Color Dim = #96A0AC
+    Color Yellow = #F2B400
+    Color Plate = #10161EB8
+    Color PlateBack = #10161E5C
+    Color Ink = #1A1E24
+    Color Paper = #F4F6F8
+    Color Shadow = #000000A0
+    // The loading screen.
+    Color LoadInk = #2E3440
+    Color LoadNavy = #133A61
+    Color LoadSteel = #3D5A78
+    Color LoadGrey = #BCC0C8
+    Color LoadLine = #C9CBD2
+    Color LoadTrack = #B0BCC8
+    Color LoadFaint = #8A93A0
+    Color LoadNavyDeep = #0B2440
+    Color LoadRed = #E8501A
+    Color LoadFaintText = #CDD1D8
+}
+
+// ---- Placement
+
+style Fill {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style TopLeft {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style Centered {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+// A component's own root: it fills the instance, and leaves the instance's size to whoever placed it.
+style ComponentRoot : Fill {
+    bIgnoreLayout = true
+}
+
+// ---- Pieces
+
+style Flat {
+    CornerRadiusUnitMode = Value
+    CornerRadius.X = 0
+    CornerRadius.Y = 0
+    CornerRadius.Z = 0
+    CornerRadius.W = 0
+    bRaycastTarget = false
+}
+style FlatFill : Flat {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style FlatTopLeft : Flat {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style FlatCentered : Flat {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+// A line or a bar that grows from its left end.
+style Bar : FlatTopLeft {
+    RenderTransformPivot = (0, 0.5)
+}
+style Picture {
+    Brush.TintColor = #FFFFFF
+    bRaycastTarget = false
+}
+style FillPicture : Picture {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style TopLeftPicture : Picture {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+
+style Label {
+    Font = @Font
+    FontSize = 24
+    Color = @White
+    HAlign = Left
+    VAlign = Middle
+    bRaycastTarget = false
+}
+style TopLabel : Label {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style CenteredLabel : Label {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    HAlign = Center
+}
+// Text over the room: a soft shadow under it keeps it readable on anything.
+style Shadowed : TopLabel {
+    TextStyle.UnderlayColor = @Shadow
+    TextStyle.UnderlayOffset = (2, -2)
+    TextStyle.UnderlaySoftness = 0.5
+}
+style Tiny : TopLabel {
+    FontSize = 12
+    Color = @LoadFaint
+}
+
+// A key to press: a ring with its key in it.
+style KeyCap {
+    AnchorData.SizeDelta = (36, 36)
+    @slot { VerticalAlignment = Center  MinDesiredSize = (36, 36) }
+}
+style KeyCapWide : KeyCap {
+    AnchorData.SizeDelta = (58, 36)
+    @slot MinDesiredSize = (58, 36)
+}
+style KeyRing : FlatFill {
+    CornerRadius.X = 18
+    CornerRadius.Y = 18
+    CornerRadius.Z = 18
+    CornerRadius.W = 18
+    bEnableBody = true
+    BodyColor = #10161E80
+    bEnableBorder = true
+    BorderWidth = 2
+    BorderColor = @White
+}
+style KeyText : Label {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    Font = @FontBold
+    FontSize = 16
+    HAlign = Center
+}
+
+// ---- Component sizes, as their placers give them
+
+style ObjRow {
+    AnchorData.SizeDelta = (460, 92)
+}

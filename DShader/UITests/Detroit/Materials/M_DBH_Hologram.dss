@@ -1,0 +1,118 @@
+// M_DBH_Hologram.dss -- the HIT MARKS panel's reconstruction picture: the bruised casing as a bed of flickering orange
+// voxels along the diagonal, the weapon -- a baseball bat -- laid across it in brushed metal with a red/cyan fringe,
+// scanlines, and slices of the picture that jump sideways now and then. Reveal wipes it in from the left behind a cyan
+// scan edge. For a DreamGUI Image (see DBH_Common.dsh); Aspect is the image's width over its height.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = AlphaComposite, TwoSided = true)
+#include "DBH_Common.dsh"
+
+/// @group DreamUI   @sort 0   @desc 1 while DreamGUI's own renderer draws this (it premultiplies by itself); 0 under UE's renderer.
+/// The canvas sets it per draw only on a material that has one of DreamGUI's texture parameters, which these have none of, so
+/// the default is the DreamUI renderer's, where every one of these is drawn.
+uniform float DreamUI_IsRenderByDreamUIRenderer = 1.0;
+
+/// @group Hologram|Motion   @sort 10   @slider 0 1   @desc How much of the picture has been drawn, left to right
+uniform float Reveal = 1.0;
+/// @group Hologram|Shape   @sort 20   @slider 0.5 3   @desc Width over height of the image
+uniform float Aspect = 1.7333;
+/// @group Hologram|Look   @sort 30   @desc The dark voxels (linear colour)
+uniform float4 TissueDark = float4(0.10, 0.025, 0.010, 1.0);
+/// @group Hologram|Look   @sort 40   @desc The bright voxels (linear colour)
+uniform float4 TissueLight = float4(0.56, 0.16, 0.050, 1.0);
+/// @group Hologram|Look   @sort 50   @desc The bat's metal (linear colour)
+uniform float4 Metal = float4(0.72, 0.76, 0.80, 1.0);
+/// @group Hologram|Look   @sort 60   @desc The scan edge and the grid (linear colour)
+uniform float4 ScanColor = float4(0.05, 0.45, 1.0, 1.0);
+
+/// @custom
+float4 DBH_Hologram(float2 UV, float Time, float Reveal, float Aspect, float4 TissueA, float4 TissueB, float4 MetalColor, float4 Scan)
+{
+    // A burst of glitch every so often: horizontal slices of the picture jump sideways for a moment.
+    float BurstSeed = floor(Time * 0.9);
+    float Burst = step(0.55, frac(sin(BurstSeed * 91.7) * 4375.5)) * step(frac(Time * 0.9), 0.14);
+    float Slice = floor(UV.y * 22.0);
+    float Jitter = (frac(sin(Slice * 12.9898 + floor(Time * 18.0) * 78.233) * 43758.5453) - 0.5) * 0.09 * Burst;
+    float2 G = float2(UV.x + Jitter, UV.y);
+    float2 P = float2((G.x - 0.5) * Aspect, G.y - 0.5);
+
+    // The casing: voxels on a grid turned along the diagonal, thick in the middle of a wavy band, sparse at its edges.
+    float Cs = cos(-0.36);
+    float Sn = sin(-0.36);
+    float2 Q = float2(Cs * P.x - Sn * P.y, Sn * P.x + Cs * P.y);
+    const float Cell = 0.036;
+    float2 Id = floor(Q / Cell);
+    float H = frac(sin(dot(Id, float2(127.1, 311.7))) * 43758.5453);
+    float H2 = frac(sin(dot(Id, float2(269.5, 183.3))) * 43758.5453);
+    float Band = 1.0 - smoothstep(0.08, 0.30, abs(Q.y - 0.03 + 0.035 * sin(Q.x * 8.0)));
+    float Along = 1.0 - smoothstep(0.50, 0.82, abs(Q.x));
+    float On = step(0.42, H * Band * Along + 0.25 * Band * Along);
+    float Flicker = step(0.07, frac(sin(dot(Id, float2(3.1, 7.7)) + floor(Time * 7.0) * 1.37) * 951.3));
+    float2 InCell = frac(Q / Cell);
+    float Gaps = step(0.10, InCell.x) * step(InCell.x, 0.94) * step(0.10, InCell.y) * step(InCell.y, 0.94);
+    float TissueMask = On * Flicker * Gaps * 0.9;
+    float3 TissueCol = lerp(TissueA.rgb, TissueB.rgb, H2 * H2);
+
+    // The bat: a capsule that widens from the handle to the barrel, lit as a cylinder, with a fringe either side.
+    float2 A = float2(-0.66, -0.20);
+    float2 B = float2(0.70, 0.26);
+    float2 BA = B - A;
+    float BatMask = 0.0;
+    float Fringe[3];
+    float Shade = 0.0;
+    for (int k = 0; k < 3; ++k)
+    {
+        float2 PK = P + float2((k - 1) * 0.008, 0.0);
+        float2 PA = PK - A;
+        float h = saturate(dot(PA, BA) / dot(BA, BA));
+        float Rad = lerp(0.026, 0.082, smoothstep(0.12, 0.72, h)) + 0.012 * step(0.985, h);
+        float Axis = length(PA - BA * h);
+        float D = Axis - Rad;
+        Fringe[k] = saturate(0.5 - D / max(fwidth(D), 1e-5));
+        if (k == 1)
+        {
+            float Across = saturate(1.0 - Axis / max(Rad, 1e-4));
+            Shade = 0.30 + 0.70 * sqrt(Across) + 0.55 * pow(saturate(1.0 - abs(Axis / Rad - 0.38) * 5.0), 3.0);
+        }
+    }
+    BatMask = Fringe[1];
+    float3 BatCol = MetalColor.rgb * Shade;
+
+    float3 Col = TissueCol;
+    float Alpha = TissueMask;
+    Col = lerp(Col, BatCol, BatMask);
+    Alpha = max(Alpha, BatMask);
+    // The fringe: red where the left copy is and the middle is not, cyan on the other side.
+    float RedEdge = saturate(Fringe[0] - Fringe[1]);
+    float CyanEdge = saturate(Fringe[2] - Fringe[1]);
+    Col += float3(0.9, 0.08, 0.05) * RedEdge + float3(0.05, 0.6, 1.0) * CyanEdge;
+    Alpha = max(Alpha, max(RedEdge, CyanEdge) * 0.8);
+
+    // A faint grid under it all, and scanlines across.
+    float2 GridUV = frac(float2(UV.x * Aspect, UV.y) * 18.0);
+    float GridLine = max(step(GridUV.x, 0.04), step(GridUV.y, 0.04)) * 0.10;
+    Col = lerp(Col, Scan.rgb, GridLine * (1.0 - Alpha));
+    Alpha = max(Alpha, GridLine);
+    Col *= 0.80 + 0.20 * sin(UV.y * 360.0);
+
+    // Drawn in from the left behind a bright scan edge.
+    float Wipe = Reveal * 1.12 - 0.06;
+    float Shown = step(UV.x, Wipe);
+    float Edge = exp(-pow((UV.x - Wipe) * 45.0, 2.0)) * step(0.001, Reveal) * step(Reveal, 0.999);
+    Alpha *= Shown;
+    Col = Col * Shown + Scan.rgb * Edge * 2.0;
+    Alpha = max(Alpha, Edge * 0.85);
+
+    float2 Border = min(UV, 1.0 - UV);
+    Alpha *= smoothstep(0.0, 0.05, min(Border.x, Border.y));
+    return float4(Col, saturate(Alpha));
+}
+
+export void M_DBH_Hologram(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0);
+    float4 Picture = DBH_Hologram(UV, UE.Time(), Reveal, Aspect, TissueDark, TissueLight, Metal, ScanColor);
+    float4 VC = UE.VertexColor();
+    float3 Color = Picture.rgb * DBH_SRGBToLinear(VC.rgb);
+    float Alpha = Picture.a * VC.a;
+    m.EmissiveColor = DBH_UIEmissive(Color, Alpha, DreamUI_IsRenderByDreamUIRenderer);
+    m.Opacity = Alpha;
+}

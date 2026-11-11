@@ -1,0 +1,26 @@
+// The writing on the walls, 1600 x 800: the same word, over and over, in uneven lines -- a hierarchy laid on a wall and
+// drawn by UE's renderer, so it is in the room's light. No behaviour: the class is the base.
+class /Game/UITests/Detroit/UI/Components/Detroit_WallWriting
+use "UITests/Detroit/Detroit_Common.dui"
+
+Widget Root : ComponentRoot {
+    rows Text : Scrawl (AnchorData.AnchoredPosition, RenderRotation, FontSize, Text) {
+        (30, -20),    (0, 0, -2),    58,  "rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9"
+        (110, -92),   (0, 0, 3),     52,  "rA9  rA9 rA9 rA9  rA9 rA9 rA9 rA9 rA9"
+        (0, -170),    (0, 0, -1),    64,  "rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9"
+        (60, -250),   (0, 0, 2),     48,  "rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9"
+        (20, -322),   (0, 0, -4),    60,  "rA9 rA9 rA9  rA9 rA9 rA9 rA9 rA9 rA9"
+        (140, -400),  (0, 0, 1),     54,  "rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9"
+        (10, -476),   (0, 0, -3),    62,  "rA9 rA9 rA9 rA9 rA9  rA9 rA9 rA9 rA9 rA9"
+        (90, -556),   (0, 0, 2),     50,  "rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9"
+        (40, -630),   (0, 0, -1),    58,  "rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9 rA9"
+        (120, -706),  (0, 0, 3),     52,  "rA9 rA9 rA9  rA9 rA9 rA9 rA9 rA9"
+    }
+}
+
+style Scrawl : TopLabel {
+    AnchorData.SizeDelta = (1600, 80)
+    Font = @FontBold
+    FontSpace = (5, 0)
+    Color = #181818D0
+}

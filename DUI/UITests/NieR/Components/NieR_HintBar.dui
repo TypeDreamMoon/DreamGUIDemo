@@ -1,0 +1,59 @@
+// The description bar at the bottom (UNieRHintBar): two accent bars, the hint on the paler fill, the border under it
+// with its corner, and on the right the key prompts a screen writes inside the hint bar (its default slot, Prompts).
+class /Game/UITests/NieR/UI/Components/NieR_HintBar
+use "UITests/NieR/NieR_Common.dui"
+
+Widget Root : ComponentRoot {
+    RectBlock : FlatTopLeft {
+        AnchorData.SizeDelta = (9, 79)
+        BodyColor = @Accent
+    }
+    RectBlock : FlatTopLeft {
+        AnchorData.AnchoredPosition = (13, 0)
+        AnchorData.SizeDelta = (3, 79)
+        BodyColor = @PanelEdge
+    }
+    RectBlock : Flat {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (18, 0)
+        AnchorData.SizeDelta = (-18, 79)
+        BodyColor = @HintFill
+    }
+    RectBlock : Flat {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (0, -79)
+        AnchorData.SizeDelta = (0, 4)
+        BodyColor = @PanelEdge
+    }
+    RectBlock : Flat {
+        AnchorData.AnchorMin = (1, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (1, 1)
+        AnchorData.AnchoredPosition = (0, -83)
+        AnchorData.SizeDelta = (10, 10)
+        BodyColor = @Accent
+    }
+    // Over the fill: the hint on the left, the prompts right-aligned 22 px from its end.
+    HorizontalBox {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (18, 0)
+        AnchorData.SizeDelta = (-18, 79)
+        Padding = (8, 0, 22, 0)
+        Text HintText : Label {
+            FontSize = 22
+            FontSpace = (1, 0)
+            Color = @HintInk
+            @fill
+        }
+        slot Prompts default {
+            + HorizontalBox { Spacing = 34 }
+            @slot VerticalAlignment = Center
+        }
+    }
+}

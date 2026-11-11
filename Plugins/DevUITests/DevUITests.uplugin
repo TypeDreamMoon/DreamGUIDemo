@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "Dev UI Tests",
+	"Description": "AAA-style DreamGUI test screens (UITests/<Style>/). Kept out of the DevProject module so DevProject itself never imports DreamGUI: -DisablePlugins=DreamGUI,DevUITests disables both.",
+	"Category": "Dev",
+	"CreatedBy": "TypeDreamMoon",
+	"EnabledByDefault": true,
+	"CanContainContent": false,
+	"Modules": [
+		{
+			"Name": "DevUITests",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "DreamGUI",
+			"Enabled": true
+		}
+	]
+}

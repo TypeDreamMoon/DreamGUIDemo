@@ -1,0 +1,111 @@
+// The investigation's screen HUD (UDetroitHUD): the analysis mode's frame and label, "x/5 CLUES TO ANALYZE" over its bar
+// at the bottom -- orange while clues are left, blue once none are -- and the key prompts at the bottom right. The rest
+// of the investigation's UI is in the room, not on the screen.
+class /Game/UITests/Detroit/UI/Detroit_HUD
+use "UITests/Detroit/Detroit_Common.dui"
+
+Widget Root : Fill {
+    // Analysis mode: brackets in the screen's corners, and the mode's name at the top left.
+    Widget ModeFrame : Fill {
+        RectBlock : FrameLine { AnchorData.AnchoredPosition = (48, -48); AnchorData.SizeDelta = (64, 2) }
+        RectBlock : FrameLine { AnchorData.AnchoredPosition = (48, -48); AnchorData.SizeDelta = (2, 64) }
+        RectBlock : FrameLine { AnchorData.AnchoredPosition = (1808, -48); AnchorData.SizeDelta = (64, 2) }
+        RectBlock : FrameLine { AnchorData.AnchoredPosition = (1870, -48); AnchorData.SizeDelta = (2, 64) }
+        RectBlock : FrameLine { AnchorData.AnchoredPosition = (48, -1030); AnchorData.SizeDelta = (64, 2) }
+        RectBlock : FrameLine { AnchorData.AnchoredPosition = (48, -968); AnchorData.SizeDelta = (2, 64) }
+        RectBlock : FrameLine { AnchorData.AnchoredPosition = (1808, -1030); AnchorData.SizeDelta = (64, 2) }
+        RectBlock : FrameLine { AnchorData.AnchoredPosition = (1870, -968); AnchorData.SizeDelta = (2, 64) }
+        Text : Shadowed {
+            AnchorData.AnchoredPosition = (82, -66)
+            AnchorData.SizeDelta = (420, 30)
+            Font = @FontMedium
+            FontSize = 20
+            FontSpace = (3, 0)
+            Text = "ANALYSIS MODE"
+        }
+        Text : Shadowed {
+            AnchorData.AnchoredPosition = (82, -96)
+            AnchorData.SizeDelta = (420, 22)
+            Font = @FontLight
+            FontSize = 15
+            FontSpace = (1, 0)
+            Color = @Dim
+            Text = "RK800 // 313 248 317 - 51"
+        }
+        RectBlock : Bar { AnchorData.AnchoredPosition = (82, -124); AnchorData.SizeDelta = (260, 1); BodyColor = @CyanFaint }
+    }
+
+    // The clues left to analyze.
+    Widget Counter : TopLeft {
+        AnchorData.AnchoredPosition = (700, -872)
+        AnchorData.SizeDelta = (520, 120)
+        Text CounterNum : TopLabel {
+            AnchorData.AnchoredPosition = (10, 0)
+            AnchorData.SizeDelta = (180, 80)
+            RenderTransformPivot = (1, 0.5)
+            Font = @FontLight
+            FontSize = 72
+            Color = @Orange
+            HAlign = Right
+            Text = "0/5"
+        }
+        Text CounterLabelA : CounterLabel { AnchorData.AnchoredPosition = (204, -12); Text = "CLUES TO" }
+        Text CounterLabelB : CounterLabel { AnchorData.AnchoredPosition = (204, -40); Text = "ANALYZE" }
+        RectBlock CounterLineT : Bar { AnchorData.AnchoredPosition = (-20, -84); AnchorData.SizeDelta = (560, 1); BodyColor = @OrangeFaint }
+        RectBlock CounterTicks : Bar { AnchorData.AnchoredPosition = (-14, -92); AnchorData.SizeDelta = (5, 12); BodyColor = @Orange }
+        RectBlock CounterTrack : Bar { AnchorData.AnchoredPosition = (0, -92); AnchorData.SizeDelta = (520, 12); BodyColor = @OrangeFaint }
+        RectBlock CounterFill : Bar { AnchorData.AnchoredPosition = (0, -92); AnchorData.SizeDelta = (520, 12); BodyColor = @Orange }
+        RectBlock CounterTick : FlatTopLeft { AnchorData.AnchoredPosition = (0, -81); AnchorData.SizeDelta = (2, 9); BodyColor = @Orange }
+        RectBlock CounterLineB : Bar { AnchorData.AnchoredPosition = (-20, -114); AnchorData.SizeDelta = (560, 1); BodyColor = @OrangeFaint }
+    }
+
+    // What the keys do.
+    VerticalBox Prompts : TopLeft {
+        AnchorData.AnchoredPosition = (1580, -928)
+        AnchorData.SizeDelta = (320, 130)
+        Spacing = 8
+        HorizontalBox PromptAnalyze {
+            Spacing = 14
+            Widget : KeyCap {
+                RectBlock : KeyRing {}
+                Text : KeyText { Text = "E" }
+            }
+            Text : PromptText { Text = "ANALYZE" }
+        }
+        HorizontalBox PromptMode {
+            Spacing = 14
+            Widget : KeyCap {
+                RectBlock : KeyRing {}
+                Text : KeyText { Text = "Q" }
+            }
+            Text PromptModeText : PromptText { Text = "ANALYSIS MODE" }
+        }
+        HorizontalBox PromptObjectives {
+            Spacing = 14
+            Widget : KeyCapWide {
+                RectBlock : KeyRing {}
+                Text : KeyText { Text = "TAB"; FontSize = 13 }
+            }
+            Text : PromptText { Text = "OBJECTIVES" }
+        }
+    }
+}
+
+style FrameLine : FlatTopLeft {
+    BodyColor = @WhiteSoft
+}
+style CounterLabel : TopLabel {
+    AnchorData.SizeDelta = (300, 28)
+    Font = @FontMedium
+    FontSize = 22
+    FontSpace = (1, 0)
+}
+style PromptText : Label {
+    Font = @FontMedium
+    FontSize = 18
+    FontSpace = (2, 0)
+    TextStyle.UnderlayColor = @Shadow
+    TextStyle.UnderlayOffset = (2, -2)
+    TextStyle.UnderlaySoftness = 0.5
+    @slot VerticalAlignment = Center
+}

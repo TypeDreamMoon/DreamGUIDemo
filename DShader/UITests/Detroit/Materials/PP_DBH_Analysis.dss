@@ -1,0 +1,71 @@
+// PP_DBH_Analysis.dss -- Connor's analysis mode: the world drained to a cold blue-grey, a grid laid over every surface
+// (a plane of the grid parallel to a surface draws nothing on it), a scan ring that sweeps out from the player as the
+// mode comes on -- the mode is on behind it -- fine vertical scanlines and a darkened edge. A blendable on the player's
+// camera; the game drives Blend (0 off, 1 on), WaveCenter / WaveRadius (the ring, world units) and Spread (1 once the
+// ring has passed everything). Drawn after tonemapping, so every colour here is a display colour. DreamGUI draws after
+// the post-process chain, so the UI is never tinted.
+#pragma material(Backend = Graph, Domain = PostProcess, BlendableLocation = SceneColorAfterTonemapping)
+
+/// @group Analysis|Mode   @sort 10   @slider 0 1   @desc How much of the mode is on
+uniform float Blend = 0.0;
+/// @group Analysis|Mode   @sort 20   @slider 0 1   @desc 1 once the scan ring has passed everything: the mode is on everywhere
+uniform float Spread = 0.0;
+/// @group Analysis|Scan   @sort 30   @desc Where the scan ring starts (world position, xyz)
+uniform float4 WaveCenter = float4(0.0, 0.0, 0.0, 0.0);
+/// @group Analysis|Scan   @sort 40   @slider 0 4000   @desc The scan ring's radius, world units
+uniform float WaveRadius = 0.0;
+/// @group Analysis|Grid   @sort 50   @slider 10 400   @desc The grid's cell, world units
+uniform float GridSize = 100.0;
+/// @group Analysis|Grid   @sort 60   @slider 100 10000   @desc How far the grid reaches before it fades out
+uniform float GridFadeDistance = 2200.0;
+/// @group Analysis|Look   @sort 70   @desc The grid and the scan ring
+uniform float4 GridColor = float4(0.36, 0.70, 1.0, 1.0);
+/// @group Analysis|Look   @sort 80   @desc The cold tint the scene is drained to
+uniform float4 TintColor = float4(0.62, 0.74, 0.92, 1.0);
+
+/// @custom
+float3 DBH_Analysis(float3 Scene, float3 WorldPos, float3 Normal, float Depth, float2 ScreenUV, float2 PixelPos,
+    float Blend, float Spread, float3 WaveCenter, float WaveRadius, float GridSize, float FadeDistance, float3 GridCol, float3 Tint)
+{
+    float Lum = dot(Scene, float3(0.299, 0.587, 0.114));
+    // Darker and colder than the scene: the shadows sink, the lit tiles keep a steel-blue sheen.
+    float3 Cold = Tint * (0.035 + pow(saturate(Lum), 1.1) * 1.0);
+
+    // The grid: how far, in world units, the pixel is from the nearest grid plane on each axis -- and none of the axis
+    // the surface faces along, whose plane would light the whole surface.
+    float3 Facing = 1.0 - smoothstep(0.55, 0.85, abs(Normal));
+    float Width = 0.7 + Depth * 0.0011;
+    float3 Coarse = abs(frac(WorldPos / GridSize + 0.5) - 0.5) * GridSize;
+    float3 CoarseL = (1.0 - smoothstep(0.0, Width, Coarse)) * Facing;
+    float Fine = GridSize * 0.25;
+    float3 FineD = abs(frac(WorldPos / Fine + 0.5) - 0.5) * Fine;
+    float3 FineL = (1.0 - smoothstep(0.0, Width * 0.6, FineD)) * Facing;
+    float Grid = saturate(max(CoarseL.x, max(CoarseL.y, CoarseL.z)) + 0.22 * max(FineL.x, max(FineL.y, FineL.z)));
+    Grid *= exp(-Depth / FadeDistance) * step(Depth, 50000.0);
+
+    // The scan ring, and the mode switched on behind it.
+    float Dist = length(WorldPos - WaveCenter);
+    float Ring = exp(-pow((Dist - WaveRadius) / 30.0, 2.0)) * saturate(1.0 - WaveRadius / 3500.0) * step(1.0, WaveRadius);
+    float Behind = max(step(Dist, WaveRadius), saturate(Spread));
+
+    float Scan = 0.92 + 0.08 * sin(PixelPos.x * 3.14159265 * 0.5);
+    float2 V = ScreenUV - 0.5;
+    float Vignette = saturate(1.0 - dot(V, V) * 1.25);
+    float3 Mode = Cold * Scan * lerp(0.35, 1.0, Vignette) + GridCol * Grid * 0.42;
+    float On = saturate(Blend) * Behind;
+    float3 Result = lerp(Scene, Mode, On);
+    // The ring is drawn whatever is behind it, while it travels.
+    return Result + GridCol * Ring * 0.85 * saturate(Blend);
+}
+
+export void PP_DBH_Analysis(inout material m)
+{
+    float2 UV = UE.ScreenPosition().ViewportUV;
+    float3 Scene = UE.SceneTexture(SceneTextureId = PostProcessInput0, Coordinates = UV).Color.rgb;
+    float3 Normal = UE.SceneTexture(SceneTextureId = WorldNormal, Coordinates = UV).Color.rgb;
+    float Depth = UE.SceneTexture(SceneTextureId = SceneDepth, Coordinates = UV).Color.r;
+    float2 Pixel = UE.ScreenPosition().PixelPosition;
+    float3 WorldPos = UE.WorldPosition();
+    m.EmissiveColor = DBH_Analysis(Scene, WorldPos, Normal, Depth, UV, Pixel, Blend, Spread, WaveCenter.xyz, WaveRadius,
+        GridSize, GridFadeDistance, GridColor.rgb, TintColor.rgb);
+}

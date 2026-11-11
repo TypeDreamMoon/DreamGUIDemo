@@ -1,0 +1,138 @@
+// The system menu (UNieRMenuScreen): the nav bar of seven tabs over one list page each, the title, the status panel.
+use "UITests/NieR/NieR_Common.dui"
+
+Widget Root : Fill {
+    + NieRScreenScope { InputMode = Menu  bCloseOnBack = false }
+
+    Image : FillPicture { Brush.ResourceObject = @MenuBackground }
+    Image : Band { AnchorData.AnchoredPosition = (0, -106) }
+    Image : Band { AnchorData.AnchoredPosition = (0, -1011) }
+
+    // Seven 215 px tabs, 253.5 px apart from x 121.
+    HorizontalBox Tabs : TopLeft {
+        AnchorData.AnchoredPosition = (121, -36)
+        AnchorData.SizeDelta = (1736, 48)
+        Spacing = 38.5
+        rows Tab : NavTab (Label, Icon) {
+            "MAP",     @IconMap
+            "QUESTS",  @IconQuests
+            "ITEMS",   @IconItems
+            "WEAPONS", @IconWeapons
+            "SKILLS",  @IconSkills
+            "INTEL",   @IconIntel
+            "SYSTEM",  @IconSystem
+        }
+    }
+
+    Header Header : PageHeader {
+        AnchorData.AnchoredPosition = (67, -150)
+        Title = "ITEMS"
+        Subtitle = "-All Items"
+    }
+
+    // The open tab's page, and the status panel beside it.
+    HorizontalBox : TopLeft {
+        AnchorData.AnchoredPosition = (128, -272)
+        AnchorData.SizeDelta = (1728, 618)
+        Spacing = 72
+        Overlay {
+            @slot { MinDesiredSize = (1120, 0)  MaxDesiredSize = (1120, 0) }
+
+            ListPage Page_0 : PageSize {
+                Icon = @IconMap
+                rows Row : ListRow (Label, Description) {
+                    "City Ruins",       "The overgrown remains of a city. The Resistance camp lies to the east."
+                    "Desert Zone",      "Sand and wind as far as the eye can see. Machines gather near the old housing complex."
+                    "Forest Zone",      "A dense forest around an old castle held by machines that call themselves knights."
+                    "Amusement Park",   "A park where the machines still hold their endless festival."
+                    "Flooded City",     "A district swallowed by the sea. Beware of large machines below the surface."
+                    "Resistance Camp",  "A safe place to rest, trade and take on requests."
+                    "Factory",          "An abandoned factory, still running somewhere deep inside."
+                }
+            }
+            ListPage Page_1 : PageSize {
+                Icon = @IconQuests
+                rows Row : ListRow (Label, Description) {
+                    "Recover the Data",     "Recover the data a scout left behind in the ruins and bring it back to the camp."
+                    "Supply Run",           "Deliver the medical supplies to the camp in the desert before nightfall."
+                    "The Machine Village",  "Visit the village of peaceful machines in the forest and hear out their leader."
+                    "Missing Scout",        "A scout has not reported in. Search the flooded district."
+                    "Signal in the Ruins",  "An unknown signal repeats every hour from the old tower. Find its source."
+                    "Old Friend",           "Someone at the camp claims to know you. Talk to them again."
+                    "Final Report",         "File the final report from any access point."
+                }
+            }
+            // The items come from the game (UNieRMenuScreen::GetItems): one row per item, made where the `for` is written.
+            ListPage Page_2 : PageSize {
+                Icon = @IconItems
+                bShowCount = true
+                for Item in GetItems() {
+                    Row : Counted { Label <- Item.Label  Count <- Item.Count  Description <- Item.Description }
+                }
+            }
+            ListPage Page_3 : PageSize {
+                Icon = @IconWeapons
+                rows Row : Counted (Label, Count, Description) {
+                    "Type-40 Sword",  "Lv4",  "A standard-issue sword. Light and balanced."
+                    "Type-40 Blade",  "Lv4",  "A large blade that is slow to swing but hits hard."
+                    "Type-40 Lance",  "Lv3",  "A spear with a long reach."
+                    "Type-40 Fists",  "Lv2",  "Gauntlets for fast close combat."
+                    "Iron Pipe",      "Lv1",  "A plain metal pipe. Better than nothing."
+                    "Engine Blade",   "Lv2",  "A blade made from a machine's engine."
+                }
+            }
+            ListPage Page_4 : PageSize {
+                Icon = @IconSkills
+                rows Row : Counted (Label, Count, Description) {
+                    "Weapon Attack Up",  "+3",  "Raises the damage of melee attacks."
+                    "Down-Attack Up",    "+2",  "Raises the damage of attacks on downed enemies."
+                    "Critical Up",       "+2",  "Raises the chance of critical hits."
+                    "Ranged Attack Up",  "+4",  "Raises the damage of the pod's fire."
+                    "Evade Range Up",    "+1",  "Lengthens the distance of an evade."
+                    "Moving Speed Up",   "+2",  "Raises running speed."
+                    "Auto-Heal",         "+3",  "Slowly restores health when not hit."
+                }
+            }
+            ListPage Page_5 : PageSize {
+                Icon = @IconIntel
+                rows Row : ListRow (Label, Description) {
+                    "Unit Data",       "Records of the units met so far."
+                    "Enemy Data",      "Records of the machines fought so far."
+                    "Weapon Stories",  "The stories behind each weapon, as far as they are known."
+                    "Novels",          "Short texts found in terminals around the world."
+                    "Tutorials",       "Every tutorial shown so far."
+                    "Archives",        "Pictures and records unlocked along the way."
+                }
+            }
+            ListPage Page_6 : PageSize {
+                Icon = @IconSystem
+                rows Row : ListRow (Label, Action, Description) {
+                    "Save",            "save",     "Save your progress."
+                    "Load",            "load",     "Load a saved game."
+                    "Settings",        "settings", "Change the game's settings."
+                    "Controls",        "controls", "View the controls."
+                    "Return to Title", "title",    "Go back to the title screen."
+                    "Exit Game",       "exit",     "Quit to the desktop."
+                }
+            }
+        }
+        StatusPanel Status {
+            AnchorData.SizeDelta = (536, 614)
+            @slot Padding = (0, 4, 0, 0)
+        }
+    }
+
+    HintBar Hint : BottomHint {
+        Hint = "A length of wire bent out of shape."
+        rows Prompt (Keys, Label) {
+            "Q E",   "Switch"
+            "W S",   "Select"
+            "Enter", "Confirm"
+            "Esc",   "Back"
+        }
+    }
+}
+
+style Counted : ListRow {
+    Kind = Count
+}

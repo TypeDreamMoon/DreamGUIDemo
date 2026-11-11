@@ -1,0 +1,246 @@
+// The loading screen (UDetroitLoadingScreen), after the game's: pale panes sliding behind (M_DBH_LoadingBackdrop), the
+// two-sheet ring of blocks (M_DBH_LoadingRing) a little left of centre, hairline rules along the top and the bottom
+// with their marks and tags, the percentage under a short line at the bottom left, and everything else small and grey
+// until the class brings it in: a process label growing out of the ring's left edge, LOADING glitching in at its lower
+// right, a second label at its right edge, a strip of triangles flipping at the left and then the right, and blocks of
+// tiny text. The ring and what hangs on it drift together (RingGroup), the rest a fifth as far (Drift). The class runs
+// every part from the clock; the materials run the ring and the panes. Places are the game's at 1280 x 720, times 1.5.
+class /Game/UITests/Detroit/UI/Detroit_Loading
+use "UITests/Detroit/Detroit_Common.dui"
+
+Widget Root : Fill {
+    Widget Content : Fill {
+        // The ground under the panes, for the moment before their material is ready: never the room through it.
+        RectBlock : FlatFill { BodyColor = #EEEAEE }
+        Image Backdrop : FillPicture {
+            Brush.ResourceObject = @BackdropMaterial
+        }
+
+        // ---- The rules, their marks and their tags.
+        RectBlock : Rule { AnchorData.AnchoredPosition = (0, -60); AnchorData.SizeDelta = (1920, 1) }
+        rows RectBlock : RuleMark (AnchorData.AnchoredPosition, AnchorData.SizeDelta) {
+            (0, -58),     (27, 3)
+            (123, -58),   (180, 3)
+            (480, -58),   (50, 3)
+            (622, -60),   (8, 1)
+            (648, -60),   (12, 1)
+            (672, -60),   (12, 1)
+            (690, -60),   (86, 1)
+            (1389, -58),  (176, 3)
+            (1603, -58),  (14, 3)
+            (1764, -58),  (156, 3)
+        }
+        RectBlock : Rule { AnchorData.AnchoredPosition = (0, -960); AnchorData.SizeDelta = (1920, 1); BodyColor = #E0DDE2 }
+        rows RectBlock : RuleMark (AnchorData.AnchoredPosition, AnchorData.SizeDelta) {
+            (37, -959),   (5, 2)
+            (1377, -959), (8, 2)
+            (1621, -959), (106, 2)
+            (1788, -959), (17, 2)
+        }
+        rows Text : Micro (AnchorData.AnchoredPosition, Text) {
+            (33, -68),    "1.19"
+            (123, -68),   "LOADING SEQUENCE"
+            (480, -68),   "1.19"
+            (1389, -68),  "1.20"
+            (1605, -68),  "1.4"
+            (33, -968),   "1.19"
+            (697, -968),  "SYS.MEM"
+            (832, -968),  "0.12"
+            (1380, -968), "1.20"
+            (1620, -968), "BUF 04"
+            (772, -144),  "DSKD 3"
+            (1310, -184), "NODE 4"
+            (346, -176),  "00 2"
+            (124, -876),  "08 / 141"
+            (1153, -874), "1088.3"
+        }
+        RectBlock : FlatTopLeft { AnchorData.AnchoredPosition = (336, -188); AnchorData.SizeDelta = (4, 4); BodyColor = #8F72C8 }
+
+        // ---- Blocks of tiny text; the class fills them and shows each for a while.
+        Text BlockA : Block { AnchorData.AnchoredPosition = (285, -508); AnchorData.SizeDelta = (70, 96) }
+        Text BlockR1 : Block { AnchorData.AnchoredPosition = (1572, -292); AnchorData.SizeDelta = (150, 190) }
+        Text BlockL : Block { AnchorData.AnchoredPosition = (320, -393); AnchorData.SizeDelta = (190, 210) }
+        Text BlockR2 : Block { AnchorData.AnchoredPosition = (1432, -390); AnchorData.SizeDelta = (150, 290) }
+        Text BlockR3 : Block { AnchorData.AnchoredPosition = (1608, -525); AnchorData.SizeDelta = (115, 165) }
+
+        // ---- The triangle strips: five slots each, pointing up and down by turns, painted by the class.
+        Polygon LogoL0 : TriUp { AnchorData.AnchoredPosition = (220, -393) }
+        Polygon LogoL1 : TriDown { AnchorData.AnchoredPosition = (253, -374) }
+        Polygon LogoL2 : TriUp { AnchorData.AnchoredPosition = (286, -393) }
+        Polygon LogoL3 : TriDown { AnchorData.AnchoredPosition = (319, -374) }
+        Polygon LogoL4 : TriUp { AnchorData.AnchoredPosition = (352, -393) }
+        Polygon LogoR0 : TriDown { AnchorData.AnchoredPosition = (1315, -311); AnchorData.SizeDelta = (83, 83) }
+        Polygon LogoR1 : TriUp { AnchorData.AnchoredPosition = (1351, -332); AnchorData.SizeDelta = (83, 83) }
+        Polygon LogoR2 : TriDown { AnchorData.AnchoredPosition = (1387, -311); AnchorData.SizeDelta = (83, 83) }
+        Polygon LogoR3 : TriUp { AnchorData.AnchoredPosition = (1423, -332); AnchorData.SizeDelta = (83, 83) }
+        Polygon LogoR4 : TriDown { AnchorData.AnchoredPosition = (1459, -311); AnchorData.SizeDelta = (83, 83) }
+
+        // ---- What drifts a fifth as far as the ring: the second label, LOADING and its glitch, the red marks.
+        Widget Drift : Fill {
+            RectBlock RedMarkA : FlatTopLeft { AnchorData.AnchoredPosition = (1452, -565); AnchorData.SizeDelta = (10, 3); BodyColor = @LoadRed }
+            RectBlock RedMarkB : FlatTopLeft { AnchorData.AnchoredPosition = (1457, -571); AnchorData.SizeDelta = (6, 2); BodyColor = @LoadRed }
+
+            Widget LabelB : Fill {
+                RectBlock BTop : Hairline { AnchorData.AnchoredPosition = (1199, -560); AnchorData.SizeDelta = (280, 1) }
+                RectBlock BTopMark : Bar { AnchorData.AnchoredPosition = (1200, -558); AnchorData.SizeDelta = (30, 3); BodyColor = @LoadNavyDeep }
+                Text BSmall : MicroBold { AnchorData.AnchoredPosition = (1200, -587) }
+                Text BGhost : Code { AnchorData.AnchoredPosition = (1272, -584); FontSize = 14; Color = #C9CED6; Text = "CHK" }
+                Text BCode : Code { AnchorData.AnchoredPosition = (1200, -596); FontSize = 17 }
+                Text BCount : Code { AnchorData.AnchoredPosition = (1322, -596); FontSize = 16; Color = #C0C6CF; Text = "2" }
+                RectBlock BUnder : Hairline { AnchorData.AnchoredPosition = (1200, -620); AnchorData.SizeDelta = (312, 1); BodyColor = #B8BCC4 }
+                RectBlock BBar : Bar { AnchorData.AnchoredPosition = (1200, -634); AnchorData.SizeDelta = (336, 3); BodyColor = @LoadNavy }
+                RectBlock BBarHead : Bar { AnchorData.AnchoredPosition = (1200, -632); AnchorData.SizeDelta = (89, 6); BodyColor = @LoadNavyDeep }
+            }
+
+            // LOADING: a faint ghost behind, a red and a cyan copy either side of it, the newest letters in cyan under
+            // the settled ones, and the flash box with its own copy.
+            Text LoadingGhost : Loading { AnchorData.AnchoredPosition = (1179, -731); Color = #CDD2D9 }
+            Text LoadingRed : Loading { AnchorData.AnchoredPosition = (1192, -749); Color = #E27A72 }
+            Text LoadingCyan : Loading { AnchorData.AnchoredPosition = (1197, -749); Color = #6CC0EC }
+            Text LoadingTail : Loading { Color = #82C6EA }
+            Text LoadingText : Loading { Color = @LoadFaintText }
+            RectBlock LoadingBoxGhost : FlatTopLeft { AnchorData.AnchoredPosition = (1178, -736); AnchorData.SizeDelta = (294, 21); BodyColor = #D5DAE2 }
+            RectBlock LoadingBox : FlatTopLeft { AnchorData.AnchoredPosition = (1185, -759); AnchorData.SizeDelta = (306, 50); BodyColor = #123E62 }
+            Text LoadingBoxText : Loading { Color = #C8D8E8 }
+            RectBlock GlitchBox : FlatTopLeft { AnchorData.AnchoredPosition = (1168, -733); AnchorData.SizeDelta = (290, 12); BodyColor = #D9DDE4 }
+            RectBlock GlitchBarA : FlatTopLeft { AnchorData.AnchoredPosition = (1144, -744); AnchorData.SizeDelta = (334, 30); BodyColor = #123E62 }
+            RectBlock GlitchBarB : FlatTopLeft { AnchorData.AnchoredPosition = (1144, -786); AnchorData.SizeDelta = (334, 27); BodyColor = #123E62 }
+            RectBlock GlitchPink : FlatTopLeft { AnchorData.AnchoredPosition = (1152, -756); AnchorData.SizeDelta = (290, 2); BodyColor = #F2BDB4 }
+            RectBlock GlitchLine : FlatTopLeft { AnchorData.AnchoredPosition = (1144, -777); AnchorData.SizeDelta = (331, 5); BodyColor = @LoadRed }
+            RectBlock GlitchDashA : FlatTopLeft { AnchorData.AnchoredPosition = (1101, -752); AnchorData.SizeDelta = (16, 4); BodyColor = @LoadRed }
+            RectBlock GlitchDashB : FlatTopLeft { AnchorData.AnchoredPosition = (1101, -803); AnchorData.SizeDelta = (16, 5); BodyColor = @LoadRed }
+            RectBlock GlitchDashC : FlatTopLeft { AnchorData.AnchoredPosition = (1491, -752); AnchorData.SizeDelta = (22, 4); BodyColor = @LoadRed }
+            RectBlock GlitchDashD : FlatTopLeft { AnchorData.AnchoredPosition = (1491, -803); AnchorData.SizeDelta = (22, 5); BodyColor = @LoadRed }
+        }
+
+        // ---- The ring and what hangs on it: the first label behind it, its own small tags, GRID INDEX.
+        Widget RingGroup : Fill {
+            Widget LabelA : Fill {
+                Polygon ALogo : TopLeftPicture {
+                    AnchorData.AnchoredPosition = (307, -607)
+                    AnchorData.SizeDelta = (35, 35)
+                    Sides = 3
+                    StartAngle = 90
+                    Color = #1F4A76
+                }
+                Polygon ALogoHi : TopLeftPicture {
+                    AnchorData.AnchoredPosition = (304, -613)
+                    AnchorData.SizeDelta = (24, 24)
+                    Sides = 3
+                    StartAngle = 90
+                    Color = #9DBCD8
+                }
+                Text ALogoText : Block {
+                    AnchorData.AnchoredPosition = (285, -642)
+                    AnchorData.SizeDelta = (90, 30)
+                    FontSize = 7
+                    Color = #8FB2D0
+                    Text = ""
+                }
+                RectBlock ATopSmall : Hairline { AnchorData.AnchoredPosition = (363, -566); AnchorData.SizeDelta = (70, 1); BodyColor = #B6BAC2 }
+                RectBlock ATop : Hairline { AnchorData.AnchoredPosition = (357, -576); AnchorData.SizeDelta = (303, 1) }
+                RectBlock ATopMark : Bar { AnchorData.AnchoredPosition = (357, -578); AnchorData.SizeDelta = (43, 3); BodyColor = @LoadNavyDeep }
+                Text ASmall : MicroBold { AnchorData.AnchoredPosition = (357, -607) }
+                Text AGhost : Code { AnchorData.AnchoredPosition = (452, -603); FontSize = 14; Color = #C9CED6; Text = "CHK" }
+                // DSTRM CHK in cyan under DSTRM in steel: CHK shows cyan, with no measuring of where it starts.
+                Text ACodeTail : Code { AnchorData.AnchoredPosition = (357, -616); Color = #3C98D6 }
+                Text ACode : Code { AnchorData.AnchoredPosition = (357, -616) }
+                Text ACount : Code { AnchorData.AnchoredPosition = (590, -616); FontSize = 14; Color = #C0C6CF; Text = "1" }
+                RectBlock AUnder : Bar { AnchorData.AnchoredPosition = (357, -640); AnchorData.SizeDelta = (198, 4); BodyColor = #D6D9DF }
+                RectBlock ABar : Bar { AnchorData.AnchoredPosition = (357, -655); AnchorData.SizeDelta = (300, 5); BodyColor = @LoadNavy }
+                RectBlock ABarHead : Bar { AnchorData.AnchoredPosition = (357, -654); AnchorData.SizeDelta = (50, 7); BodyColor = @LoadNavyDeep }
+            }
+
+            Image Ring : TopLeftPicture {
+                AnchorData.AnchoredPosition = (583, -238)
+                AnchorData.SizeDelta = (640, 640)
+                Brush.ResourceObject = @RingMaterial
+            }
+            Polygon : TopLeftPicture {
+                AnchorData.AnchoredPosition = (809, -431)
+                AnchorData.SizeDelta = (10, 10)
+                Sides = 3
+                StartAngle = 90
+                Color = #8F99A6
+            }
+            Text : Micro { AnchorData.AnchoredPosition = (824, -424); Text = "SFTW 2.0.1" }
+            Text : Micro { AnchorData.AnchoredPosition = (824, -436); Text = "09.25" }
+            Widget GridIndex : Fill {
+                RectBlock : FlatTopLeft { AnchorData.AnchoredPosition = (1207, -675); AnchorData.SizeDelta = (3, 3); BodyColor = #7D8490 }
+                Text : MicroBold { AnchorData.AnchoredPosition = (1219, -666); Color = #8C929C; Text = "GRID INDEX" }
+                Text GridCode : MicroBold { AnchorData.AnchoredPosition = (1219, -680); Color = #8C929C; Text = "A 01" }
+            }
+        }
+
+        // ---- The percentage, under its line at the bottom left.
+        RectBlock : Bar { AnchorData.AnchoredPosition = (108, -954); AnchorData.SizeDelta = (500, 6); BodyColor = #CFCCD0 }
+        RectBlock PercentFill : Bar { AnchorData.AnchoredPosition = (108, -954); AnchorData.SizeDelta = (500, 6); BodyColor = #33363D }
+        Text Percent : TopLabel {
+            AnchorData.AnchoredPosition = (108, -968)
+            AnchorData.SizeDelta = (160, 30)
+            Font = @FontBold
+            FontSize = 23
+            Color = #2A2D33
+            Text = "0%"
+        }
+        RectBlock : FlatTopLeft { AnchorData.AnchoredPosition = (108, -1004); AnchorData.SizeDelta = (3, 3); BodyColor = #8E929A }
+        RectBlock : FlatTopLeft { AnchorData.AnchoredPosition = (108, -1021); AnchorData.SizeDelta = (3, 3); BodyColor = #8E929A }
+        Text PercentCode : Micro { AnchorData.AnchoredPosition = (123, -1000); Text = "2.4567 7464" }
+        Text : Micro { AnchorData.AnchoredPosition = (123, -1012); Text = "01" }
+    }
+}
+
+style Rule : FlatTopLeft {
+    BodyColor = #D0CED4
+}
+style RuleMark : FlatTopLeft {
+    BodyColor = #8E9099
+}
+style Hairline : Bar {
+    BodyColor = #A6ABB3
+}
+// The smallest grey tags.
+style Micro : TopLabel {
+    Font = @FontMedium
+    FontSize = 10
+    Color = #9DA2AB
+    AnchorData.SizeDelta = (300, 14)
+}
+style MicroBold : Micro {
+    Font = @FontBold
+    Color = #3E5268
+}
+// A process code: DSTRM CHK.
+style Code : TopLabel {
+    Font = @FontMedium
+    FontSize = 19
+    FontSpace = (1, 0)
+    Color = #52697F
+    AnchorData.SizeDelta = (300, 26)
+}
+// LOADING, and its copies: all of them where the word sits unless a copy says otherwise.
+style Loading : TopLabel {
+    AnchorData.AnchoredPosition = (1194, -749)
+    AnchorData.SizeDelta = (360, 60)
+    Font = @FontLight
+    FontSize = 52
+    FontSpace = (3, 0)
+    Text = ""
+}
+style Block : TopLabel {
+    Font = @FontMedium
+    FontSize = 9
+    VAlign = Top
+    Color = #CDD0D6
+    Text = ""
+}
+// A strip's slot: a triangle of side 66 in a square, pointing up, or down.
+style TriUp : TopLeftPicture {
+    AnchorData.SizeDelta = (76, 76)
+    Sides = 3
+    StartAngle = 90
+    Color = #C9D1DC
+}
+style TriDown : TriUp {
+    StartAngle = 270
+}
