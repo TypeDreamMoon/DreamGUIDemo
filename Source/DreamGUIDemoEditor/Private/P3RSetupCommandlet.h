@@ -12,7 +12,7 @@
  *     UnrealEditor-Cmd.exe DreamGUIDemo.uproject -run=P3RSetup [-Textures] [-Fonts] [-Map]   (none = all three)
  *
  *   -Textures  every PNG in Art/P3R/Final becomes /Game/P3R/Textures/<name>, set up for UI (UI group, uncompressed, mips).
- *   -Fonts     the DreamGUI distance-field fonts /Game/P3R/Fonts/F_P3R_*: the Bahnschrift cuts in Art/P3R/Fonts for Latin,
+ *   -Fonts     the DreamGUI distance-field fonts /Game/P3R/Fonts/F_P3R_*: the narrowed Roboto cuts in Art/P3R/Fonts for Latin,
  *              each with a Source Han Sans weight as its CJK fallback. The font files are read from beside the project.
  *   -Map       /Game/P3R/Maps/P3R_Demo, an empty level whose game mode is AP3RGameMode.
  *
