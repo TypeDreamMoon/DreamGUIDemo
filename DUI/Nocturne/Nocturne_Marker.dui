@@ -1,0 +1,59 @@
+// An AR marker for the world-space shot (ANocturneDeck): a diamond, a stem and a label, on a world panel whose canvas is
+// drawn over the scene's depth, so it shows through the wall in front of it. Design size 360 x 140.
+class /Game/Nocturne/UI/WBP_Nocturne_Marker
+use "Nocturne/Nocturne_Common.dui"
+
+Widget Root {
+    AnchorData.SizeDelta = (360, 140)
+    Raycastable = Disabled
+
+    RectBlock MarkerBack : PlateBody {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (52, -6)
+        AnchorData.SizeDelta = (300, 64)
+        BodyColor = #070A0ED8
+        BorderColor = #8FE3FF88
+    }
+    Text MarkerTitle : Label {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (68, -12)
+        AnchorData.SizeDelta = (270, 30)
+        FontSize = 22
+        Text = "补给舱   SUPPLY POD"
+    }
+    Text MarkerMeta : Tag {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (68, -44)
+        AnchorData.SizeDelta = (270, 18)
+        FontSize = 12
+        Text = "BEHIND WALL   ·   12 M" @noloc
+    }
+    RectBlock MarkerStem : AccentBar {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0.5, 1)
+        AnchorData.AnchoredPosition = (26, -24)
+        AnchorData.SizeDelta = (2, 100)
+        BodyColor = #8FE3FFAA
+    }
+    Polygon MarkerDiamond : MarkDiamond {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.AnchoredPosition = (26, -20)
+        AnchorData.SizeDelta = (26, 26)
+        Color = @Amber
+    }
+    PolygonLine MarkerRing : HexSigil {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.AnchoredPosition = (26, -20)
+        AnchorData.SizeDelta = (44, 44)
+        Color = #FFB454AA
+    }
+}

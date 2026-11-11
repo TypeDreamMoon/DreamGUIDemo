@@ -1,0 +1,28 @@
+// M_Nocturne_StarGlow.dss -- the glow around a NOCTURNE//OS star, on a camera-facing sprite: a soft round halo, a
+// brighter inner bloom and four thin spikes, added over whatever is behind. Glow scales it; the game raises it on hover.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = Additive, TwoSided = true)
+
+/// @group Glow|Look   @sort 10   @desc The halo's colour (linear)
+uniform float4 GlowColor = float4(0.25, 0.62, 1.0, 1.0);
+/// @group Glow|Look   @sort 20   @desc The spikes' and inner bloom's colour (linear)
+uniform float4 SpikeColor = float4(0.85, 0.95, 1.0, 1.0);
+/// @group Glow|Look   @sort 30   @slider 0 20   @desc Overall brightness
+uniform float Glow = 2.0;
+/// @group Glow|Look   @sort 40   @slider 0 2   @desc How strong the four spikes are
+uniform float Spikes = 0.7;
+/// @group Glow|Motion   @sort 50   @slider 0 6   @desc How fast the glow breathes
+uniform float BreathSpeed = 1.4;
+
+export void M_Nocturne_StarGlow(inout material m)
+{
+    float2 UV = UE.TexCoord(Index = 0) - 0.5;
+    float R = length(UV) * 2.0;
+    float Edge = 1.0 - smoothstep(0.75, 1.0, R);
+    float Halo = exp(-R * 7.5) * Edge;
+    float Bloom = exp(-R * 18.0);
+    float SpikeX = exp(-abs(UV.y) * 220.0) * exp(-abs(UV.x) * 7.0);
+    float SpikeY = exp(-abs(UV.x) * 220.0) * exp(-abs(UV.y) * 7.0);
+    float Spike = (SpikeX + SpikeY) * Spikes * Edge;
+    float Pulse = 0.88 + 0.12 * sin(UE.Time() * BreathSpeed);
+    m.EmissiveColor = (GlowColor.rgb * Halo + SpikeColor.rgb * (Bloom + Spike)) * Glow * Pulse;
+}

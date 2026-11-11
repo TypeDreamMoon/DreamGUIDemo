@@ -1,0 +1,115 @@
+// M_Nocturne_Sky.dss -- NOCTURNE//OS's sky, for the inside of a sky sphere. A deep blue-black night that lifts a little
+// toward the horizon, a faint teal band of nebula across it, three layers of stars that twinkle slowly, and a crescent
+// moon with a soft halo. Everything is a function of the view direction, so the sky sits at infinity however far the
+// camera flies.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = Opaque, TwoSided = true)
+
+/// @group Sky|Colour   @sort 10   @desc The sky straight up (linear)
+uniform float4 ZenithColor = float4(0.0022, 0.0040, 0.0100, 1.0);
+/// @group Sky|Colour   @sort 20   @desc The sky at the horizon (linear)
+uniform float4 HorizonColor = float4(0.0090, 0.0180, 0.0340, 1.0);
+/// @group Sky|Colour   @sort 30   @desc The nebula band's colour (linear)
+uniform float4 NebulaColor = float4(0.0100, 0.0420, 0.0720, 1.0);
+/// @group Sky|Stars   @sort 40   @slider 10 200   @desc Stars across a radian, in the densest layer's grid
+uniform float StarDensity = 70.0;
+/// @group Sky|Stars   @sort 50   @slider 0 40   @desc How bright the brightest stars are
+uniform float StarBrightness = 9.0;
+/// @group Sky|Stars   @sort 60   @slider 0 1   @desc The share of grid cells that hold a star
+uniform float StarCoverage = 0.22;
+/// @group Sky|Stars   @sort 70   @slider 0 6   @desc Twinkle speed
+uniform float TwinkleSpeed = 1.6;
+/// @group Sky|Moon   @sort 80   @desc Where the moon is (world direction, need not be unit length)
+uniform float4 MoonDirection = float4(0.82, -0.40, 0.42, 0.0);
+/// @group Sky|Moon   @sort 90   @slider 0.005 0.2   @desc The moon's angular radius, radians
+uniform float MoonSize = 0.045;
+/// @group Sky|Moon   @sort 100   @desc The moon's light (linear)
+uniform float4 MoonColor = float4(1.0, 0.94, 0.86, 1.0);
+/// @group Sky|Moon   @sort 110   @slider 0 3   @desc How strong the halo around the moon is
+uniform float MoonHalo = 0.35;
+/// @group Sky|Moon   @sort 120   @slider 0 1   @desc 0 a full moon, toward 1 a thinner crescent
+uniform float Crescent = 0.62;
+
+/// @custom
+float3 NOC_Sky(float3 Dir, float Time, float4 Zenith, float4 Horizon, float4 Nebula, float Density, float Brightness,
+    float Coverage, float Twinkle, float4 MoonDir, float MoonRadius, float4 MoonTint, float Halo, float CrescentAmount)
+{
+    // A local struct is how a Custom node carries functions of its own.
+    struct FSky
+    {
+        float3 Hash33(float3 P)
+        {
+            P = frac(P * float3(0.1031, 0.1030, 0.0973));
+            P += dot(P, P.yxz + 33.33);
+            return frac((P.xxy + P.yxx) * P.zyx);
+        }
+        float Noise(float3 P)
+        {
+            float3 I = floor(P);
+            float3 F = frac(P);
+            F = F * F * (3.0 - 2.0 * F);
+            float N000 = Hash33(I).x;
+            float N100 = Hash33(I + float3(1, 0, 0)).x;
+            float N010 = Hash33(I + float3(0, 1, 0)).x;
+            float N110 = Hash33(I + float3(1, 1, 0)).x;
+            float N001 = Hash33(I + float3(0, 0, 1)).x;
+            float N101 = Hash33(I + float3(1, 0, 1)).x;
+            float N011 = Hash33(I + float3(0, 1, 1)).x;
+            float N111 = Hash33(I + float3(1, 1, 1)).x;
+            return lerp(lerp(lerp(N000, N100, F.x), lerp(N010, N110, F.x), F.y),
+                        lerp(lerp(N001, N101, F.x), lerp(N011, N111, F.x), F.y), F.z);
+        }
+    };
+    FSky S;
+
+    float3 D = normalize(Dir);
+    float Up = D.z;
+
+    // Ground: the horizon colour rising to the zenith; below the horizon it darkens again.
+    float3 Col = lerp(Horizon.rgb, Zenith.rgb, pow(saturate(Up), 0.55));
+    Col = lerp(Col, Zenith.rgb * 0.6, saturate(-Up * 3.0));
+
+    // A band of nebula along a tilted great circle, broken up by a little noise.
+    float3 BandNormal = normalize(float3(0.28, 0.62, 0.73));
+    float Band = exp(-pow(dot(D, BandNormal) / 0.22, 2.0));
+    float Cloud = S.Noise(D * 3.0) * 0.6 + S.Noise(D * 7.0) * 0.3 + S.Noise(D * 15.0) * 0.1;
+    Col += Nebula.rgb * Band * smoothstep(0.25, 0.85, Cloud) * 1.6;
+
+    // Stars: three layers, each a grid in direction space with at most one star per cell.
+    for (int L = 0; L < 3; ++L)
+    {
+        float Scale = Density * (1.0 + L * 1.6);
+        float3 P = D * Scale;
+        float3 Cell = floor(P);
+        float3 R = S.Hash33(Cell + L * 17.31);
+        float Present = step(1.0 - Coverage, R.x);
+        float3 Centre = Cell + 0.3 + 0.4 * S.Hash33(Cell * 1.7 + 4.1);
+        float Dist = length(P - Centre);
+        float Size = (0.13 - L * 0.03) * (0.45 + R.y);
+        float Core = saturate(1.0 - Dist / Size);
+        Core = Core * Core * Core;
+        float Glint = 0.7 + 0.3 * sin(Time * Twinkle * (0.6 + R.z * 1.8) + R.y * 6.2831);
+        float3 Tint = lerp(float3(0.80, 0.92, 1.00), float3(1.00, 0.93, 0.82), R.z);
+        Col += Tint * Core * Present * Glint * Brightness * (1.0 - L * 0.28) * (0.35 + 0.65 * R.y);
+    }
+
+    // The moon: a disc, a second disc offset sideways eats the crescent out of it, and a halo around it.
+    float3 M = normalize(MoonDir.xyz);
+    float Angle = acos(clamp(dot(D, M), -1.0, 1.0));
+    float Disc = smoothstep(MoonRadius, MoonRadius * 0.93, Angle);
+    float3 Side = normalize(cross(M, float3(0, 0, 1)));
+    float3 Shadow = normalize(M + Side * MoonRadius * 1.25 * CrescentAmount + float3(0, 0, MoonRadius * 0.35 * CrescentAmount));
+    float ShadowAngle = acos(clamp(dot(D, Shadow), -1.0, 1.0));
+    float Lit = Disc * (1.0 - smoothstep(MoonRadius * 1.02, MoonRadius * 0.92, ShadowAngle) * 0.94);
+    float Glow = exp(-Angle / (MoonRadius * 2.5)) * Halo + exp(-Angle / (MoonRadius * 14.0)) * Halo * 0.2;
+    Col += MoonTint.rgb * (Lit * 5.0 + Glow);
+
+    return Col;
+}
+
+export void M_Nocturne_Sky(inout material m)
+{
+    // The camera vector points from the pixel to the camera; the sky is looked up along the opposite way.
+    float3 Dir = -UE.CameraVectorWS();
+    m.EmissiveColor = NOC_Sky(Dir, UE.Time(), ZenithColor, HorizonColor, NebulaColor, StarDensity, StarBrightness,
+        StarCoverage, TwinkleSpeed, MoonDirection, MoonSize, MoonColor, MoonHalo, Crescent);
+}

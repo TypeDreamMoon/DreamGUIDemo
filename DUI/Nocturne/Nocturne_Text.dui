@@ -1,0 +1,318 @@
+// NOCTURNE//OS's text screen (UNocturneTextScreen), the video's text shot. One line of 12 px text grows to fill the
+// stage and turns away in 3D with its edges still sharp (distance-field glyphs); then a line of Chinese, Japanese and
+// English, a line with colour emoji, and a large gradient title with a shimmer running over it. The left panel reads
+// out what is shown. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_Text
+use "Nocturne/Nocturne_Common.dui"
+
+// The text font with a colour emoji face behind it (Noto Color Emoji, OFL), made by make_nocturne_widgets.py EMOJI_FONT:
+// the plugin's default font has no colour emoji on purpose.
+resources {
+    Asset EmojiFont = /Game/Nocturne/Fonts/F_Nocturne_Emoji
+}
+
+style AtCentre {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+style SpecRow {
+    AnchorData.SizeDelta = (252, 58)
+}
+style SpecKey : TabText {
+    FontSize = 17
+}
+style SpecValue : Readout {
+    AnchorData.AnchorMin = (1, 0.5)
+    AnchorData.AnchorMax = (1, 0.5)
+    AnchorData.Pivot = (1, 0.5)
+    AnchorData.AnchoredPosition = (-14, -14)
+    AnchorData.SizeDelta = (190, 20)
+    FontSize = 13
+    Color = @InkDim
+}
+style Sample : AtCentre {
+    Font = @Font
+    Color = @Ink
+    HAlign = Center
+    VAlign = Middle
+    OverflowType = HorizontalOverflow
+    RenderOpacity = 0
+}
+
+Widget Root : Fill {
+    RectBlock Dim : ScreenDim {}
+
+    Widget Rig : Fill {
+
+        // ---- Left: what the text is drawn with. Turned in on its right edge.
+        Widget LeftPanel : Middle {
+            AnchorData.AnchoredPosition = (-720, 8)
+            AnchorData.SizeDelta = (300, 680)
+            RenderTransformPivot = (1, 0.5)
+            RenderRotation = (0, -14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock LeftPlate : PanelPlate {}
+            RectBlock LeftFrame : PanelFrame {}
+            Polygon TrimLeftTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimLeftTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimLeftBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimLeftBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock LeftTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget LeftHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-48, 80)
+                Text SysTag : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 22)
+                    Text = "TEXT" @noloc
+                }
+                Text Breadcrumb : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -28)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                    Text = "文字   /   距离场"
+                }
+                RectBlock LeftRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -66)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+            }
+            VerticalBox SpecList : TopBand {
+                AnchorData.AnchoredPosition = (0, -118)
+                AnchorData.SizeDelta = (-40, 390)
+                Spacing = 8
+                Widget Spec0 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec0Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec0Num : TabNum { Text = "01" @noloc }
+                    Text Spec0Key : SpecKey { Text = "渲染" }
+                    Text Spec0En : TabEn { Text = "RENDER" @noloc }
+                    Text Spec0Value : SpecValue { Text = "DISTANCE FIELD" @noloc }
+                }
+                Widget Spec1 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec1Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec1Num : TabNum { Text = "02" @noloc }
+                    Text Spec1Key : SpecKey { Text = "缩放" }
+                    Text Spec1En : TabEn { Text = "SCALE" @noloc }
+                    Text Spec1Value : SpecValue { Text = "12 PX  ×1.0" @noloc }
+                }
+                Widget Spec2 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec2Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec2Num : TabNum { Text = "03" @noloc }
+                    Text Spec2Key : SpecKey { Text = "角度" }
+                    Text Spec2En : TabEn { Text = "ANGLE" @noloc }
+                    Text Spec2Value : SpecValue { Text = "0°" @noloc }
+                }
+                Widget Spec3 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec3Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec3Num : TabNum { Text = "04" @noloc }
+                    Text Spec3Key : SpecKey { Text = "混排" }
+                    Text Spec3En : TabEn { Text = "SCRIPTS" @noloc }
+                    Text Spec3Value : SpecValue { Text = "中 · 日 · EN" }
+                }
+                Widget Spec4 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec4Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec4Num : TabNum { Text = "05" @noloc }
+                    Text Spec4Key : SpecKey { Text = "表情" }
+                    Text Spec4En : TabEn { Text = "EMOJI" @noloc }
+                    Text Spec4Value : SpecValue { Text = "COLOUR" @noloc }
+                }
+                Widget Spec5 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec5Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec5Num : TabNum { Text = "06" @noloc }
+                    Text Spec5Key : SpecKey { Text = "渐变" }
+                    Text Spec5En : TabEn { Text = "PAINT" @noloc }
+                    Text Spec5Value : SpecValue { Text = "LINEAR + SHIMMER" @noloc }
+                }
+            }
+            Text LeftFoot : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 22)
+                AnchorData.SizeDelta = (-48, 18)
+                FontSize = 11
+                Text = "MSDF   ·   ONE ATLAS, ANY SIZE" @noloc
+            }
+            PixelSort LeftSort : FillSort {}
+        }
+
+        // ---- Middle: the stage.
+        Widget CenterPanel : Middle {
+            AnchorData.AnchoredPosition = (170, 8)
+            AnchorData.SizeDelta = (1300, 680)
+
+            RectBlock CenterPlate : PanelPlate {}
+            RectBlock CenterFrame : PanelFrame {}
+            Polygon TrimCenterTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimCenterTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimCenterBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimCenterBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock CenterTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget CenterHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -22)
+                AnchorData.SizeDelta = (-48, 52)
+                Text StageTag : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 22)
+                    Text = "TYPE SPECIMEN" @noloc
+                }
+                Text StageMeta : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -26)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                    Text = "字样   /   12 px 起"
+                }
+                PolygonLine SigilStage : HexSigil {
+                    AnchorData.AnchorMin = (1, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.AnchoredPosition = (-10, -12)
+                }
+            }
+
+            // A faint baseline grid behind the type.
+            Widget Grid : Fill {
+                Raycastable = Disabled
+                RectBlock GridH0 : Bar { AnchorData.AnchorMin = (0, 0.5)  AnchorData.AnchorMax = (1, 0.5)  AnchorData.SizeDelta = (-48, 1)  BodyColor = #8FE3FF14 }
+                RectBlock GridV0 : Bar { AnchorData.AnchorMin = (0.5, 0)  AnchorData.AnchorMax = (0.5, 1)  AnchorData.SizeDelta = (1, -120)  BodyColor = #8FE3FF14 }
+            }
+
+            // The line that grows and turns.
+            Text Hero : Sample {
+                AnchorData.AnchoredPosition = (0, -20)
+                AnchorData.SizeDelta = (260, 24)
+                FontSize = 12
+                Color = #FFFFFF
+                Text = "夜曲 NOCTURNE 0123" @noloc
+            }
+
+            // The three lines that follow it.
+            Text LineScripts : Sample {
+                AnchorData.AnchoredPosition = (0, 40)
+                AnchorData.SizeDelta = (1100, 56)
+                FontSize = 40
+                Text = "夜曲系统 · ナイトシステム · NOCTURNE//OS"
+            }
+            Text LineEmoji : Sample {
+                AnchorData.AnchoredPosition = (0, -40)
+                AnchorData.SizeDelta = (1100, 56)
+                FontSize = 40
+                Font = @EmojiFont
+                bRichText = true
+                Text = "今晚的星图 🌙 ✨ 🛰️ 🔭 已就绪"
+            }
+            Text LineGradient : Sample {
+                AnchorData.AnchoredPosition = (0, -168)
+                AnchorData.SizeDelta = (1200, 110)
+                FontSize = 92
+                FontSpace = (4, 0)
+                Color = #FFFFFF
+                Text = "GRADIENT 渐变文字" @noloc
+                TextStyle.FacePaint.bEnabled = true
+                TextStyle.FacePaint.Gradient = "linear-gradient(90deg, #8FE3FF 0%, #FFFFFF 50%, #FFB454 100%)"
+                TextStyle.OverlayPaint.bEnabled = true
+                TextStyle.OverlayPaint.Gradient = "linear-gradient(105deg, transparent 42%, #FFFFFFE0 50%, transparent 58%)"
+                TextStyle.OverlayBlend = Add
+            }
+
+            Text CenterFoot : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 16)
+                AnchorData.SizeDelta = (-48, 18)
+                FontSize = 11
+                Text = "DREAMGUI   ·   TEXT" @noloc
+            }
+            PixelSort CenterSort : FillSort {}
+        }
+    }
+
+    // ---- The key hints.
+    Widget KeyBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 60)
+
+        RectBlock KeyBarBack : Bar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BodyColor = #05080CCC
+        }
+        RectBlock KeyBarRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 1)
+        }
+        HorizontalBox Hints {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (80, 0)
+            AnchorData.SizeDelta = (1100, 30)
+            Spacing = 26
+
+            Widget HintZoom : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "WHEEL" @noloc }
+                Text : HintLabel { Text = "缩放" }
+            }
+            Widget HintTurn : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "DRAG" @noloc }
+                Text : HintLabel { Text = "转动" }
+            }
+            Widget HintBack : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                + UIButton { TransitionType = None }
+                RectBlock HintBackHit : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.SizeDelta = (16, 12)
+                    BodyColor = @Clear
+                    bRaycastTarget = true
+                }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "ESC" @noloc }
+                Text HintBackLabel : HintLabel { Text = "返回" }
+            }
+        }
+    }
+}

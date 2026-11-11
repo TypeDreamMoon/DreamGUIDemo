@@ -1,0 +1,78 @@
+// The video's end card (UNocturneCardScreen): the word, then where to find DreamGUI, a line at a time, and the
+// administrator on the right. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_CardEnd
+use "Nocturne/Nocturne_Common.dui"
+
+resources {
+    Asset AdminArt = /Game/Nocturne/Textures/T_Nocturne_Admin
+}
+
+style Letter {
+    Font = @Font
+    FontSize = 128
+    HAlign = Left
+    VAlign = Middle
+    OverflowType = HorizontalOverflow
+}
+style CardLine : Label {
+    AnchorData.SizeDelta = (1000, 44)
+    OverflowType = HorizontalOverflow
+}
+
+style LinkMark : MarkDiamond {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+}
+
+Widget Root : Fill {
+    RectBlock Dim : ScreenDim { BodyColor = #03060A88 }
+    Widget Rig : Fill {
+        Image Art {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0.5, 0.5)
+            AnchorData.AnchoredPosition = (600, -40)
+            AnchorData.SizeDelta = (540, 720)
+            Brush.ResourceObject = @AdminArt
+            bRaycastTarget = false
+        }
+        HorizontalBox Word {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (-840, 170)
+            AnchorData.SizeDelta = (1000, 148)
+            Spacing = 2
+            Text Letter0 : Letter { Text = "D" @noloc  Color = @Ink }
+            Text Letter1 : Letter { Text = "r" @noloc  Color = @Ink }
+            Text Letter2 : Letter { Text = "e" @noloc  Color = @Ink }
+            Text Letter3 : Letter { Text = "a" @noloc  Color = @Ink }
+            Text Letter4 : Letter { Text = "m" @noloc  Color = @Ink }
+            Text Letter5 : Letter { Text = "G" @noloc  Color = @Cyan }
+            Text Letter6 : Letter { Text = "U" @noloc  Color = @Cyan }
+            Text Letter7 : Letter { Text = "I" @noloc  Color = @Cyan }
+        }
+        RectBlock Rule : AccentBar {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (-836, 80)
+            AnchorData.SizeDelta = (640, 2)
+            RenderTransformPivot = (0, 0.5)
+        }
+        VerticalBox Lines {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (-836, 50)
+            AnchorData.SizeDelta = (1000, 300)
+            Spacing = 10
+            Text Line0 : CardLine { FontSize = 30  Text = "MIT 开源   ·   OPEN SOURCE" }
+            Text Line1 : CardLine { FontSize = 22  Color = @Cyan  FontSpace = (1, 0)  Text = "github.com/TypeDreamMoon/DreamGUI" @noloc }
+            Text Line2 : CardLine { FontSize = 22  Color = @Cyan  FontSpace = (1, 0)  Text = "gui.toolchain.64hz.cn" @noloc }
+            Text Line3 : CardLine { FontSize = 18  Color = @InkDim  Text = "VS Code 扩展   DreamUI   ·   补全 / 诊断 / 预览" }
+            Text Line4 : CardLine { FontSize = 14  Color = @InkFaint  FontSpace = (3, 0)  Text = "UNREAL ENGINE 5.8   ·   DREAMSHADER   ·   DREAMFX" @noloc }
+        }
+    }
+    PixelSort CenterSort : FillSort {}
+}

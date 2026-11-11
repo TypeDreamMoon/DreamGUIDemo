@@ -1,0 +1,483 @@
+// NOCTURNE//OS's departure (UNocturneDepartScreen), behind the star 启明: three voyages to go on with -- save cards in
+// a shallow arc, the side ones turned in -- and the button that sets off. Hovering a card lifts it, clicking picks it,
+// Depart launches the chosen one: the camera dives past the star and the game begins. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_Depart
+use "Nocturne/Nocturne_Common.dui"
+
+resources {
+    Asset Save1 = /Game/Nocturne/Textures/Saves/T_Save_01
+    Asset Save2 = /Game/Nocturne/Textures/Saves/T_Save_02
+    Asset Save3 = /Game/Nocturne/Textures/Saves/T_Save_03
+}
+
+style CardStyle : Middle {
+    AnchorData.SizeDelta = (420, 540)
+    + UIButton { TransitionType = None }
+}
+style CardBack : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    BodyColor = @Clear
+    bRaycastTarget = true
+}
+style CardTag : Tag {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+    AnchorData.AnchoredPosition = (24, -22)
+    AnchorData.SizeDelta = (160, 20)
+    FontSize = 13
+}
+style CardDate : Meta {
+    AnchorData.AnchorMin = (1, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (1, 1)
+    AnchorData.AnchoredPosition = (-24, -23)
+    AnchorData.SizeDelta = (220, 20)
+    FontSize = 11
+    HAlign = Right
+}
+style MapBox {
+    AnchorData.AnchorMin = (0.5, 1)
+    AnchorData.AnchorMax = (0.5, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.AnchoredPosition = (0, -58)
+    AnchorData.SizeDelta = (372, 200)
+}
+// Over the save's picture: only a frame and a faint darkening, so the text below reads against the card.
+style MapBack : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    BodyColor = #03060A30
+    bEnableBorder = true
+    BorderWidth = 1
+    BorderColor = #D7E2EA33
+}
+style MapArt {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    Brush.TintColor = #FFFFFF
+    bRaycastTarget = false
+}
+// The empty slot's picture fills the card.
+style SaveArt {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (-2, -2)
+    Brush.TintColor = #FFFFFF
+    bRaycastTarget = false
+}
+// Where the voyage was last seen: an amber diamond ring round a dot; the screen turns the ring.
+style MapHere {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (18, 18)
+    Sides = 4
+    LineWidth = 1.5
+    Color = @Amber
+    bRaycastTarget = false
+}
+style MapHereDot {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (6, 6)
+    Sides = 4
+    Color = @Amber
+    bRaycastTarget = false
+}
+style MapTag : Meta {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (0, 0)
+    AnchorData.Pivot = (0, 0)
+    AnchorData.AnchoredPosition = (12, 8)
+    AnchorData.SizeDelta = (160, 16)
+    FontSize = 10
+}
+style CardChapter : Meta {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.AnchoredPosition = (0, -280)
+    AnchorData.SizeDelta = (-48, 18)
+    FontSize = 12
+    Color = @Cyan
+}
+style CardTitle : Heading {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.AnchoredPosition = (0, -304)
+    AnchorData.SizeDelta = (-48, 40)
+    FontSize = 28
+}
+style CardPlace : Label {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.AnchoredPosition = (0, -348)
+    AnchorData.SizeDelta = (-48, 22)
+    FontSize = 15
+    Color = @InkDim
+}
+style CardRule : Bar {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.AnchoredPosition = (0, -384)
+    AnchorData.SizeDelta = (-48, 1)
+}
+style StatLabel : Meta {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+    AnchorData.SizeDelta = (200, 20)
+    FontSize = 12
+}
+style StatValue : Readout {
+    AnchorData.AnchorMin = (1, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (1, 1)
+    AnchorData.SizeDelta = (160, 24)
+    FontSize = 18
+}
+style CardBar {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.AnchoredPosition = (0, -470)
+    AnchorData.SizeDelta = (-48, 6)
+    Style.bOverride_Height = true
+    Style.Height = 6
+    Style.bOverride_TrackColor = true
+    Style.TrackColor = #FFFFFF1C
+    Style.bOverride_FillColor = true
+    Style.FillColor = #8FE3FF
+    Style.bOverride_CornerRadius = true
+    Style.CornerRadius = 0
+}
+
+Widget Root : Fill {
+    RectBlock Dim : ScreenDim {}
+
+    Widget Rig : Fill {
+
+        Widget Header : TopBand {
+            AnchorData.AnchoredPosition = (0, -96)
+            AnchorData.SizeDelta = (-480, 80)
+
+            Text HeaderTitle : Heading {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.SizeDelta = (240, 50)
+                FontSize = 36
+                Text = "启明  出发"
+            }
+            Text HeaderEn : Tag {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (250, -16)
+                AnchorData.SizeDelta = (420, 22)
+                Text = "SELECT A VOYAGE" @noloc
+            }
+            Text Breadcrumb : Meta {
+                AnchorData.AnchorMin = (1, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (1, 1)
+                AnchorData.AnchoredPosition = (0, -18)
+                AnchorData.SizeDelta = (320, 20)
+                FontSize = 13
+                HAlign = Right
+                Text = "NOCTURNE//OS   /   星图   /   启明"
+            }
+            RectBlock HeaderRule : Bar {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.SizeDelta = (0, 1)
+            }
+            RectBlock HeaderTab : AccentBar {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (0, 0)
+                AnchorData.Pivot = (0, 0)
+                AnchorData.SizeDelta = (96, 3)
+            }
+        }
+
+        Widget Card0 : CardStyle {
+            AnchorData.AnchoredPosition = (-480, 20)
+            RenderTransformPivot = (1, 0.5)
+            RenderRotation = (0, -16, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock Card0Back : CardBack {}
+            // Leans toward the pointer inside the turned card (DreamGUI's TiltCard), so the arc stays.
+            Widget Card0Tilt : Fill {
+            + TiltCard { MaxAngle = 7  HoverScale = 1.0  Stiffness = 180  Damping = 18 }
+            RectBlock Card0Plate : PanelPlate {}
+            RectBlock Card0Frame : PanelFrame {}
+            Polygon TrimCard0TL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimCard0TR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimCard0BL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimCard0BR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock Card0Tab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (72, 3)
+            }
+            Text Card0Slot : CardTag { Text = "SLOT 01" @noloc }
+            Text Card0Date : CardDate { Text = "2026.11.09   23:12" @noloc }
+            Widget Card0Body : Fill {
+                Raycastable = Disabled
+
+                Widget Card0Map : MapBox {
+                    Image Card0Art : MapArt { Brush.ResourceObject = @Save1 }
+                    RectBlock Card0MapBack : MapBack {}
+                    PolygonLine SigilCard0Here : MapHere { AnchorData.AnchoredPosition = (96, -128) }
+                    Polygon Card0HereDot : MapHereDot { AnchorData.AnchoredPosition = (96, -128) }
+                    Text Card0MapTag : MapTag { Text = "LAST SEEN" @noloc }
+                }
+                Text Card0Chapter : CardChapter { Text = "CHAPTER 03" @noloc }
+                Text Card0Title : CardTitle { Text = "弦上的港口" }
+                Text Card0Place : CardPlace { Text = "旧港  ·  第六象限" }
+                RectBlock Card0Rule : CardRule {}
+                Text Card0TimeLabel : StatLabel { AnchorData.AnchoredPosition = (24, -400)  Text = "游戏时间   PLAYTIME" }
+                Text Card0Time : StatValue { AnchorData.AnchoredPosition = (-24, -398)  Text = "12:41:07" @noloc }
+                Text Card0ProgressLabel : StatLabel { AnchorData.AnchoredPosition = (24, -436)  Text = "进度   PROGRESS" }
+                Text Card0Progress : StatValue { AnchorData.AnchoredPosition = (-24, -434)  Text = "38%" @noloc }
+                Native.ProgressBar Card0Bar : CardBar { Percent = 0.38 }
+            }
+            }
+        }
+        Widget Card1 : CardStyle {
+            AnchorData.AnchoredPosition = (0, 20)
+            RenderTransformPivot = (0.5, 0.5)
+            RenderRotation = (0, 0, 0)
+            RenderTranslation = (0, 0, 0)
+
+            RectBlock Card1Back : CardBack {}
+            // Leans toward the pointer inside the turned card (DreamGUI's TiltCard), so the arc stays.
+            Widget Card1Tilt : Fill {
+            + TiltCard { MaxAngle = 7  HoverScale = 1.0  Stiffness = 180  Damping = 18 }
+            RectBlock Card1Plate : PanelPlate {}
+            RectBlock Card1Frame : PanelFrame {}
+            Polygon TrimCard1TL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimCard1TR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimCard1BL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimCard1BR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock Card1Tab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (72, 3)
+            }
+            Text Card1Slot : CardTag { Text = "SLOT 02" @noloc }
+            Text Card1Date : CardDate { Text = "2026.11.02   01:47" @noloc }
+            Widget Card1Body : Fill {
+                Raycastable = Disabled
+
+                Widget Card1Map : MapBox {
+                    Image Card1Art : MapArt { Brush.ResourceObject = @Save2 }
+                    RectBlock Card1MapBack : MapBack {}
+                    PolygonLine SigilCard1Here : MapHere { AnchorData.AnchoredPosition = (230, -112) }
+                    Polygon Card1HereDot : MapHereDot { AnchorData.AnchoredPosition = (230, -112) }
+                    Text Card1MapTag : MapTag { Text = "LAST SEEN" @noloc }
+                }
+                Text Card1Chapter : CardChapter { Text = "CHAPTER 02" @noloc }
+                Text Card1Title : CardTitle { Text = "没有名字的星" }
+                Text Card1Place : CardPlace { Text = "启明  ·  补给站" }
+                RectBlock Card1Rule : CardRule {}
+                Text Card1TimeLabel : StatLabel { AnchorData.AnchoredPosition = (24, -400)  Text = "游戏时间   PLAYTIME" }
+                Text Card1Time : StatValue { AnchorData.AnchoredPosition = (-24, -398)  Text = "07:15:32" @noloc }
+                Text Card1ProgressLabel : StatLabel { AnchorData.AnchoredPosition = (24, -436)  Text = "进度   PROGRESS" }
+                Text Card1Progress : StatValue { AnchorData.AnchoredPosition = (-24, -434)  Text = "21%" @noloc }
+                Native.ProgressBar Card1Bar : CardBar { Percent = 0.21 }
+            }
+            }
+        }
+        Widget Card2 : CardStyle {
+            AnchorData.AnchoredPosition = (480, 20)
+            RenderTransformPivot = (0, 0.5)
+            RenderRotation = (0, 16, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock Card2Back : CardBack {}
+            // Leans toward the pointer inside the turned card (DreamGUI's TiltCard), so the arc stays.
+            Widget Card2Tilt : Fill {
+            + TiltCard { MaxAngle = 7  HoverScale = 1.0  Stiffness = 180  Damping = 18 }
+            RectBlock Card2Plate : PanelPlate {}
+            RectBlock Card2Frame : PanelFrame {}
+            Polygon TrimCard2TL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimCard2TR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimCard2BL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimCard2BR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock Card2Tab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (72, 3)
+            }
+            Text Card2Slot : CardTag { Text = "SLOT 03" @noloc }
+            Widget Card2Body : Fill {
+                Raycastable = Disabled
+                Image Card2Art : SaveArt { Brush.ResourceObject = @Save3  RenderOpacity = 0.75 }
+                Text Card2Empty : Heading {
+                    AnchorData.AnchorMin = (0.5, 0.5)
+                    AnchorData.AnchorMax = (0.5, 0.5)
+                    AnchorData.Pivot = (0.5, 0.5)
+                    AnchorData.AnchoredPosition = (0, 24)
+                    AnchorData.SizeDelta = (360, 44)
+                    FontSize = 30
+                    HAlign = Center
+                    Color = @InkDim
+                    Text = "新的旅程"
+                }
+                Text Card2EmptyEn : Tag {
+                    AnchorData.AnchorMin = (0.5, 0.5)
+                    AnchorData.AnchorMax = (0.5, 0.5)
+                    AnchorData.Pivot = (0.5, 0.5)
+                    AnchorData.AnchoredPosition = (0, -16)
+                    AnchorData.SizeDelta = (360, 20)
+                    FontSize = 12
+                    HAlign = Center
+                    Text = "NEW VOYAGE" @noloc
+                }
+                Text Card2EmptyNote : Meta {
+                    AnchorData.AnchorMin = (0.5, 0.5)
+                    AnchorData.AnchorMax = (0.5, 0.5)
+                    AnchorData.Pivot = (0.5, 0.5)
+                    AnchorData.AnchoredPosition = (0, -52)
+                    AnchorData.SizeDelta = (360, 20)
+                    FontSize = 12
+                    HAlign = Center
+                    Text = "空存档   ·   EMPTY SLOT"
+                }
+            }
+            }
+        }
+
+        // ---- Set off.
+        Widget Launch {
+            AnchorData.AnchorMin = (0.5, 0)
+            AnchorData.AnchorMax = (0.5, 0)
+            AnchorData.Pivot = (0.5, 0)
+            AnchorData.AnchoredPosition = (0, 112)
+            AnchorData.SizeDelta = (380, 64)
+            + UIButton { TransitionType = None }
+
+            RectBlock LaunchBack : Bar {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.SizeDelta = (0, 0)
+                BodyColor = #8FE3FF14
+                bEnableBorder = true
+                BorderWidth = 1
+                BorderColor = @Cyan
+                bRaycastTarget = true
+                // A soft cyan glow round the plate (DreamGUI's layer style); the label stays sharp over it.
+                + LayerStyle {
+                    Style.bEnabled = true
+                    Style.OuterGlow.bEnabled = true
+                    Style.OuterGlow.Color = #8FE3FF
+                    Style.OuterGlow.Opacity = 0.45
+                    Style.OuterGlow.Size = 18
+                    Style.OuterGlow.Spread = 0.05
+                }
+            }
+            Text LaunchText : Heading {
+                AnchorData.AnchorMin = (0, 0.5)
+                AnchorData.AnchorMax = (0, 0.5)
+                AnchorData.Pivot = (0, 0.5)
+                AnchorData.AnchoredPosition = (40, 1)
+                AnchorData.SizeDelta = (100, 40)
+                FontSize = 26
+                Text = "出发"
+            }
+            Text LaunchEn : Tag {
+                AnchorData.AnchorMin = (0, 0.5)
+                AnchorData.AnchorMax = (0, 0.5)
+                AnchorData.Pivot = (0, 0.5)
+                AnchorData.AnchoredPosition = (130, 0)
+                AnchorData.SizeDelta = (110, 20)
+                FontSize = 13
+                Text = "DEPART" @noloc
+            }
+            Text LaunchSlot : Meta {
+                AnchorData.AnchorMin = (1, 0.5)
+                AnchorData.AnchorMax = (1, 0.5)
+                AnchorData.Pivot = (1, 0.5)
+                AnchorData.AnchoredPosition = (-28, 0)
+                AnchorData.SizeDelta = (110, 20)
+                FontSize = 12
+                HAlign = Right
+            }
+        }
+        PixelSort CenterSort : FillSort {}
+    }
+
+    // ---- The key hints.
+    Widget KeyBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 60)
+
+        RectBlock KeyBarBack : Bar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BodyColor = #05080CCC
+        }
+        RectBlock KeyBarRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 1)
+        }
+        HorizontalBox Hints {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (80, 0)
+            AnchorData.SizeDelta = (1100, 30)
+            Spacing = 26
+
+            Widget HintPick : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "A  D" @noloc }
+                Text : HintLabel { Text = "选择存档" }
+            }
+            Widget HintGo : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "ENTER" @noloc }
+                Text : HintLabel { Text = "出发" }
+            }
+            Widget HintBack : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                + UIButton { TransitionType = None }
+                RectBlock HintBackHit : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.SizeDelta = (16, 12)
+                    BodyColor = @Clear
+                    bRaycastTarget = true
+                }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "ESC" @noloc }
+                Text HintBackLabel : HintLabel { Text = "返回" }
+            }
+        }
+    }
+}

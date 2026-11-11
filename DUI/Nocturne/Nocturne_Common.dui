@@ -1,0 +1,274 @@
+// NOCTURNE//OS -- the library every Nocturne screen and component starts with: the palette, the font and the styles.
+//
+// The look: hard sci-fi system terminal. Large areas stay neutral -- a near-black blue plate, grey-white hairlines and
+// text -- and only what can be touched or what matters takes the cool cyan-white accent; amber is kept for the odd
+// warning or selection mark. Sharp corners, hairlines, corner brackets, small bilingual labels and data readouts.
+// Coordinates follow DreamGUI: +y is up.
+
+resources {
+    Asset Font = /DreamGUI/DefaultFont_DistanceField_CJK
+
+    Color Plate = #0B0F14D0
+    Color PlateDeep = #070A0EE8
+    Color Line = #D7E2EA30
+    Color LineStrong = #D7E2EA66
+    Color Ink = #D7E2EA
+    Color InkDim = #8A98A6
+    Color InkFaint = #56636F
+    Color Cyan = #8FE3FF
+    Color CyanSoft = #8FE3FF33
+    Color CyanFaint = #8FE3FF14
+    Color Amber = #FFB454
+    Color Track = #FFFFFF1C
+    Color Clear = #00000000
+}
+
+// ---- Placement
+
+style Fill {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+
+// ---- Text
+
+style Heading {
+    Font = @Font
+    FontSize = 44
+    Color = @Ink
+    HAlign = Left
+    VAlign = Middle
+}
+// Upper-case English with wide tracking: section names and meta labels.
+style Tag {
+    Font = @Font
+    FontSize = 14
+    FontSpace = (4, 0)
+    Color = @Cyan
+    HAlign = Left
+    VAlign = Middle
+}
+style Meta {
+    Font = @Font
+    FontSize = 12
+    FontSpace = (3, 0)
+    Color = @InkFaint
+    HAlign = Left
+    VAlign = Middle
+}
+style Label {
+    Font = @Font
+    FontSize = 22
+    Color = @Ink
+    HAlign = Left
+    VAlign = Middle
+}
+style SubLabel {
+    Font = @Font
+    FontSize = 11
+    FontSpace = (3, 0)
+    Color = @InkFaint
+    HAlign = Left
+    VAlign = Middle
+}
+// Numbers: a fixed width each, so a counter that runs does not jitter.
+style Readout {
+    Font = @Font
+    FontSize = 22
+    FontSpace = (2, 0)
+    Color = @Cyan
+    HAlign = Right
+    VAlign = Middle
+}
+
+// ---- Surfaces
+
+style PlateBody {
+    CornerRadiusUnitMode = Value
+    CornerRadius.X = 0
+    CornerRadius.Y = 0
+    CornerRadius.Z = 0
+    CornerRadius.W = 0
+    BodyColor = @Plate
+    bEnableBorder = true
+    BorderWidth = 1
+    BorderColor = @Line
+    bRaycastTarget = false
+}
+
+// A sharp hairline or bar: a rect block with square corners that never takes a click.
+style Bar {
+    CornerRadiusUnitMode = Value
+    CornerRadius.X = 0
+    CornerRadius.Y = 0
+    CornerRadius.Z = 0
+    CornerRadius.W = 0
+    BodyColor = @Line
+    bRaycastTarget = false
+}
+style AccentBar : Bar {
+    BodyColor = @Cyan
+}
+
+// ---- Panels: a star's screen is panels over the dimmed star map (see UNocturneStarScreen).
+
+style Middle {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+// Across the top of its parent, placed from the top.
+style TopBand {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+}
+style PanelPlate : PlateBody {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+style PanelFrame : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    bEnableBody = false
+    bEnableBorder = true
+    BorderWidth = 1
+    BorderColor = @LineStrong
+}
+// A pixel sort over a whole panel, off until the screen bursts it.
+style FillSort {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    SortAxis = Horizontal
+    IntervalMode = Random
+    IntervalLength = 56
+    Randomness = 0.25
+    SortKey = Luminance
+    SortStrength = 0
+    MaxSortPasses = 200
+    bRaycastTarget = false
+}
+// The star map behind a screen, dimmed rather than blurred: still alive, no longer in front.
+style ScreenDim : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    BodyColor = #03060A99
+}
+
+// ---- Tab rails and key hints, shared by the star screens.
+
+style TabItem {
+    AnchorData.SizeDelta = (300, 66)
+    + UIButton { TransitionType = None }
+}
+style TabBack : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, -6)
+    BodyColor = @Clear
+    bRaycastTarget = true
+}
+style TabBar : AccentBar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (3, -18)
+}
+style TabNum : Meta {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (20, 0)
+    AnchorData.SizeDelta = (36, 30)
+    FontSize = 12
+}
+style TabText : Label {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (62, 8)
+    AnchorData.SizeDelta = (220, 28)
+    FontSize = 20
+}
+style TabEn : SubLabel {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (62, -14)
+    AnchorData.SizeDelta = (220, 16)
+}
+
+// ---- Key hints
+
+style HintItem {
+    AnchorData.SizeDelta = (150, 30)
+}
+style HintCap : Bar {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (52, 24)
+    bEnableBody = false
+    bEnableBorder = true
+    BorderWidth = 1
+    BorderColor = #8FE3FF88
+}
+style HintKey : Tag {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (52, 24)
+    FontSize = 12
+    FontSpace = (1, 0)
+    HAlign = Center
+}
+style HintLabel : Label {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (62, 0)
+    AnchorData.SizeDelta = (100, 30)
+    FontSize = 15
+    Color = @InkDim
+}
+
+// ---- Polygon trim: small shapes that mark corners, states and centres (never take the pointer).
+
+// A diamond at a panel's corner, sitting on the frame; the screen pops them in as the panel arrives.
+style TrimDiamond {
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (9, 9)
+    Sides = 4
+    Color = #8FE3FFAA
+    bRaycastTarget = false
+}
+// A hexagon outline that turns slowly: a sign that the system is alive.
+style HexSigil {
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (16, 16)
+    Sides = 6
+    LineWidth = 1.2
+    Color = #8FE3FFCC
+    bRaycastTarget = false
+}
+// A diamond marker (filled) and its outline, for selections and checklists.
+style MarkDiamond {
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (10, 10)
+    Sides = 4
+    Color = @Cyan
+    bRaycastTarget = false
+}
+style MarkDiamondLine {
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (10, 10)
+    Sides = 4
+    LineWidth = 1.2
+    Color = #8FE3FFAA
+    bRaycastTarget = false
+}

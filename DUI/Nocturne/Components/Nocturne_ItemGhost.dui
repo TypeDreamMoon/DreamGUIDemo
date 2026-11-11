@@ -1,0 +1,30 @@
+// What follows the pointer while an archive item is dragged (UNocturneItemGhost): the item's glyph in a lit frame,
+// a little transparent. DreamGUI's drag-drop service creates it; it finds its item through the drag in progress.
+class /Game/Nocturne/UI/Components/WBP_Nocturne_ItemGhost
+use "Nocturne/Nocturne_Common.dui"
+
+Widget Root {
+    AnchorData.SizeDelta = (92, 92)
+    Raycastable = Disabled
+    RenderOpacity = 0.85
+
+    RectBlock GhostBack : Bar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        BodyColor = #0B0F14E0
+        bEnableBorder = true
+        BorderWidth = 2
+        BorderColor = @Cyan
+    }
+    Text GhostGlyph : Heading {
+        AnchorData.AnchorMin = (0.5, 0.5)
+        AnchorData.AnchorMax = (0.5, 0.5)
+        AnchorData.Pivot = (0.5, 0.5)
+        AnchorData.AnchoredPosition = (0, 2)
+        AnchorData.SizeDelta = (80, 56)
+        FontSize = 38
+        HAlign = Center
+        Color = @Cyan
+    }
+}

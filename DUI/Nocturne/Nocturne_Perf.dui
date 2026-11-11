@@ -1,0 +1,274 @@
+// NOCTURNE//OS's performance screen (UNocturnePerfScreen), the video's performance shot. Behind everything a wall of
+// 5000 buttons (made by the screen in C++). First a band sweeps across it and only the buttons in the band move --
+// only what changed is updated, in a handful of batches; then every button turns at once. The left panel reads out
+// DreamGUI's own per-frame figures live (DreamUIRenderStats) and the frame rate measured in a real-time run; the right
+// panel counts the automation test suite and runs down its names. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_Perf
+use "Nocturne/Nocturne_Common.dui"
+
+style SpecRow {
+    AnchorData.SizeDelta = (252, 58)
+}
+style SpecKey : TabText {
+    FontSize = 17
+}
+style SpecValue : Readout {
+    AnchorData.AnchorMin = (1, 0.5)
+    AnchorData.AnchorMax = (1, 0.5)
+    AnchorData.Pivot = (1, 0.5)
+    AnchorData.AnchoredPosition = (-14, -14)
+    AnchorData.SizeDelta = (190, 20)
+    FontSize = 13
+    Color = @InkDim
+}
+style TestRow : Meta {
+    AnchorData.SizeDelta = (280, 22)
+    FontSize = 11
+    FontSpace = (1, 0)
+    Color = @InkDim
+    OverflowType = HorizontalOverflow
+}
+
+Widget Root : Fill {
+    RectBlock Dim : ScreenDim { BodyColor = #03060A88 }
+
+    // The wall: the screen fills it with 5000 buttons.
+    Widget Wall {
+        AnchorData.AnchorMin = (0.5, 0.5)
+        AnchorData.AnchorMax = (0.5, 0.5)
+        AnchorData.Pivot = (0.5, 0.5)
+        AnchorData.AnchoredPosition = (0, 24)
+        AnchorData.SizeDelta = (1880, 840)
+        Raycastable = Disabled
+    }
+
+    Widget Rig : Fill {
+
+        // ---- Left: DreamGUI's own figures, per frame. Turned in on its right edge.
+        Widget LeftPanel : Middle {
+            AnchorData.AnchoredPosition = (-720, 8)
+            AnchorData.SizeDelta = (300, 680)
+            RenderTransformPivot = (1, 0.5)
+            RenderRotation = (0, -14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock LeftPlate : PanelPlate { BodyColor = #070A0EF0 }
+            RectBlock LeftFrame : PanelFrame {}
+            Polygon TrimLeftTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimLeftTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimLeftBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimLeftBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock LeftTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget LeftHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-48, 80)
+                Text SysTag : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 22)
+                    Text = "PERFORMANCE" @noloc
+                }
+                Text Breadcrumb : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -28)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                    Text = "性能   /   每帧"
+                }
+                RectBlock LeftRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -66)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+            }
+            VerticalBox SpecList : TopBand {
+                AnchorData.AnchoredPosition = (0, -118)
+                AnchorData.SizeDelta = (-40, 330)
+                Spacing = 8
+                Widget Spec0 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec0Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec0Num : TabNum { Text = "01" @noloc }
+                    Text Spec0Key : SpecKey { Text = "按钮" }
+                    Text Spec0En : TabEn { Text = "BUTTONS" @noloc }
+                    Text Spec0Value : SpecValue { Text = "5000" @noloc }
+                }
+                Widget Spec1 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec1Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec1Num : TabNum { Text = "02" @noloc }
+                    Text Spec1Key : SpecKey { Text = "更新" }
+                    Text Spec1En : TabEn { Text = "UPDATED" @noloc }
+                    Text Spec1Value : SpecValue { Text = "0 / FRAME" @noloc }
+                }
+                Widget Spec2 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec2Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec2Num : TabNum { Text = "03" @noloc }
+                    Text Spec2Key : SpecKey { Text = "批次" }
+                    Text Spec2En : TabEn { Text = "BATCHES" @noloc }
+                    Text Spec2Value : SpecValue { Text = "0 / FRAME" @noloc }
+                }
+                Widget Spec3 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec3Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec3Num : TabNum { Text = "04" @noloc }
+                    Text Spec3Key : SpecKey { Text = "画布" }
+                    Text Spec3En : TabEn { Text = "CANVAS" @noloc }
+                    Text Spec3Value : SpecValue { Text = "0.00 MS" @noloc }
+                }
+                Widget Spec4 : SpecRow {
+                    @slot { MinDesiredSize = (252, 58)  MaxDesiredSize = (252, 58) }
+                    RectBlock Spec4Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Spec4Num : TabNum { Text = "05" @noloc }
+                    Text Spec4Key : SpecKey { Text = "帧率" }
+                    Text Spec4En : TabEn { Text = "FRAME" @noloc }
+                    Text Spec4Value : SpecValue { Text = "—" @noloc }
+                }
+            }
+            Text FrameNote : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 48)
+                AnchorData.SizeDelta = (-48, 18)
+                FontSize = 10
+                Text = "FRAME: REAL-TIME RUN, 1920 × 1080" @noloc
+            }
+            Text LeftFoot : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 22)
+                AnchorData.SizeDelta = (-48, 18)
+                FontSize = 11
+                Text = "DREAMUI.STATS" @noloc
+            }
+            PixelSort LeftSort : FillSort {}
+        }
+
+        // ---- Right: the test suite.
+        Widget RightPanel : Middle {
+            AnchorData.AnchoredPosition = (712, 8)
+            AnchorData.SizeDelta = (340, 680)
+            RenderTransformPivot = (0, 0.5)
+            RenderRotation = (0, 14, 0)
+            RenderTranslation = (24, 0, 0)
+            RenderOpacity = 0
+
+            RectBlock RightPlate : PanelPlate { BodyColor = #070A0EF0 }
+            RectBlock RightFrame : PanelFrame {}
+            Polygon TrimRightTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimRightTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimRightBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimRightBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock RightTab : AccentBar {
+                AnchorData.AnchorMin = (1, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (1, 1)
+                AnchorData.AnchoredPosition = (-24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget TestHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-56, 150)
+                Text TestTag : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 18)
+                    Text = "AUTOMATION TESTS   自动化测试"
+                }
+                Text TestCount : Readout {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -30)
+                    AnchorData.SizeDelta = (0, 64)
+                    FontSize = 56
+                    HAlign = Left
+                    Text = "0000" @noloc
+                }
+                Text TestNote : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -100)
+                    AnchorData.SizeDelta = (0, 18)
+                    FontSize = 11
+                    Text = "ON EVERY CHANGE" @noloc
+                }
+                RectBlock TestRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -132)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+            }
+            // The names run up through a window.
+            Widget TestWindow : TopBand {
+                AnchorData.AnchoredPosition = (0, -190)
+                AnchorData.SizeDelta = (-56, 420)
+                Clipping = ClipToBounds
+                Raycastable = Disabled
+                VerticalBox TestRows {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 1400)
+                    Spacing = 4
+                    Text TestRow0 : TestRow { Text = "Builder.TwoBranchesMayUseTheSameName" @noloc }
+                    Text TestRow1 : TestRow { Text = "Designer.ADesignerEditReachesTheTextFile" @noloc }
+                    Text TestRow2 : TestRow { Text = "Designer.CopyingTwoSameNamedWidgetsPastesTwo" @noloc }
+                    Text TestRow3 : TestRow { Text = "Designer.RHI.TheLayerStyleDialogDraws" @noloc }
+                    Text TestRow4 : TestRow { Text = "DragDrop.SourceWritesTheOperationOntoTheDrag" @noloc }
+                    Text TestRow5 : TestRow { Text = "Editor.HierarchyRows.NoWidgetLandsOnTwoRows" @noloc }
+                    Text TestRow6 : TestRow { Text = "Glass.APointOutsideItsRoundedCornerIsNotOnIt" @noloc }
+                    Text TestRow7 : TestRow { Text = "LayerStyle.TheRecordsLayoutIsTheShadersOwn" @noloc }
+                    Text TestRow8 : TestRow { Text = "Layout.EachWorldKeepsItsOwnLayoutPassState" @noloc }
+                    Text TestRow9 : TestRow { Text = "Lifecycle.HierarchyMutationDuringTeardown" @noloc }
+                    Text TestRow10 : TestRow { Text = "Niagara.WhatIsNotDrawnIsReportedWithWhy" @noloc }
+                    Text TestRow11 : TestRow { Text = "Palette.EveryEntrysIconResolvesToARealBrush" @noloc }
+                    Text TestRow12 : TestRow { Text = "Psd.EffectsAndAdjustmentsReadIntoTheirModels" @noloc }
+                    Text TestRow13 : TestRow { Text = "Psd.TheMergedImageIsReadWithItsTransparency" @noloc }
+                    Text TestRow14 : TestRow { Text = "RHI.MeshWarp.TextWarpsMatchTheirGoldenImage" @noloc }
+                    Text TestRow15 : TestRow { Text = "RingMenu.ClickingInsideTheHubChoosesNothing" @noloc }
+                    Text TestRow16 : TestRow { Text = "Text.ABareNameWritesTheWidgetsOwnProperty" @noloc }
+                    Text TestRow17 : TestRow { Text = "Text.ASavedSourceRebuildsItsClass" @noloc }
+                    Text TestRow18 : TestRow { Text = "Text.Breaker.CJKPunctuationNeverStartsALine" @noloc }
+                    Text TestRow19 : TestRow { Text = "Text.FaceResolver.TheStyledFaceIsTriedFirst" @noloc }
+                    Text TestRow20 : TestRow { Text = "Text.Margin.EachEdgeIsInsetByItsOwnValue" @noloc }
+                    Text TestRow21 : TestRow { Text = "Text.Pipeline.BestFitRemembersItsAnswer" @noloc }
+                    Text TestRow22 : TestRow { Text = "Text.Shaper.ArabicJoinsAndRunsRightToLeft" @noloc }
+                    Text TestRow23 : TestRow { Text = "Text.TheBridgeAnswersEveryRequestItTakes" @noloc }
+                    Text TestRow24 : TestRow { Text = "Text.WhatWasWrittenIsWhatTheFileParsesBackTo" @noloc }
+                    Text TestRow25 : TestRow { Text = "UMGParity.TheTablesShipWithThePlugin" @noloc }
+                    Text TestRow26 : TestRow { Text = "Widget.Pending.AddedWidgetsAreNeverSwept" @noloc }
+                    Text TestRow27 : TestRow { Text = "WorldWidget.MeshIsOwnedByHostActor" @noloc }
+                }
+            }
+            Text RightFoot : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 22)
+                AnchorData.SizeDelta = (-56, 18)
+                FontSize = 11
+                Text = "DREAMGUITESTS" @noloc
+            }
+            PixelSort RightSort : FillSort {}
+        }
+    }
+}

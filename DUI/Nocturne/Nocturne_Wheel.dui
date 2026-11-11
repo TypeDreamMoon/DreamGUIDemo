@@ -1,0 +1,459 @@
+// NOCTURNE//OS's item wheel (UNocturneWheelScreen), behind the star 轮, which sits in the middle of the frame. A ring
+// menu round the star -- DreamGUI's: the wedges, their hit sectors, the highlight and the click are the control's --
+// with each item's glyph on its wedge and its name outside. The item under the pointer is described on the left; on
+// the right, the four quick slots it can be put in. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_Wheel
+use "Nocturne/Nocturne_Common.dui"
+
+style AtCentre {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+style WheelGlyph : Heading {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (64, 52)
+    FontSize = 36
+    HAlign = Center
+}
+style WheelName : Label {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (160, 24)
+    FontSize = 15
+    HAlign = Center
+    Color = @InkDim
+}
+style QuickRow {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.SizeDelta = (0, 72)
+    + UIButton { TransitionType = None }
+}
+style QuickBack : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, -8)
+    BodyColor = #FFFFFF06
+    bRaycastTarget = true
+}
+style QuickBar : AccentBar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (3, -20)
+}
+style QuickKey : Meta {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (16, 0)
+    AnchorData.SizeDelta = (40, 20)
+    FontSize = 12
+}
+style QuickBox : Bar {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (58, 0)
+    AnchorData.SizeDelta = (48, 48)
+    BodyColor = #FFFFFF0A
+    bEnableBorder = true
+    BorderWidth = 1
+    BorderColor = #D7E2EA30
+}
+style QuickGlyph : Heading {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.AnchoredPosition = (82, 1)
+    AnchorData.SizeDelta = (48, 40)
+    FontSize = 26
+    HAlign = Center
+}
+style QuickName : Label {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (122, 8)
+    AnchorData.SizeDelta = (160, 24)
+    FontSize = 16
+}
+style QuickDir : SubLabel {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (122, -13)
+    AnchorData.SizeDelta = (160, 16)
+}
+
+Widget Root : Fill {
+    // Lighter than the other screens: the star is the middle of this one.
+    RectBlock Dim : ScreenDim { BodyColor = #03060A55 }
+
+    Widget Rig : Fill {
+
+        // ---- The wheel round the star.
+        Widget WheelHolder : AtCentre {
+            AnchorData.SizeDelta = (760, 760)
+
+            Ring WheelTrack : AtCentre {
+                AnchorData.SizeDelta = (724, 724)
+                StartAngle = 0
+                EndAngle = 360
+                LineWidth = 1
+                Segment = 128
+                Color = #8FE3FF26
+            }
+            Ring WheelSweep : AtCentre {
+                AnchorData.SizeDelta = (744, 744)
+                StartAngle = 0
+                EndAngle = 38
+                LineWidth = 2
+                Segment = 32
+                Color = #8FE3FF88
+            }
+            PolygonLine SigilWheel : HexSigil {
+                AnchorData.AnchorMin = (0.5, 0.5)
+                AnchorData.AnchorMax = (0.5, 0.5)
+                AnchorData.SizeDelta = (806, 806)
+                Sides = 8
+                LineWidth = 1
+                Color = #8FE3FF22
+            }
+            PolygonLine SigilHub : HexSigil {
+                AnchorData.AnchorMin = (0.5, 0.5)
+                AnchorData.AnchorMax = (0.5, 0.5)
+                AnchorData.SizeDelta = (318, 318)
+                LineWidth = 1
+                Color = #8FE3FF2E
+            }
+            Native.RingMenu Wheel : AtCentre {
+                AnchorData.SizeDelta = (640, 640)
+                HitArea = Ring
+                bShowLabels = false
+                bSelectOnHighlight = false
+                bAllowDeselect = false
+                bHubFollowsHighlight = false
+                HubText = ""
+                Style.bOverride_OuterRadius = true
+                Style.OuterRadius = 300
+                Style.bOverride_InnerRadius = true
+                Style.InnerRadius = 170
+                Style.bOverride_StartAngle = true
+                Style.StartAngle = -22.5
+                Style.bOverride_ItemGapAngle = true
+                Style.ItemGapAngle = 1.5
+                Style.bOverride_HighlightGrowth = true
+                Style.HighlightGrowth = 12
+                Style.bOverride_WedgeNormal = true
+                Style.WedgeNormal = #0B0F14B8
+                Style.bOverride_WedgeHovered = true
+                Style.WedgeHovered = #16303CE6
+                Style.bOverride_WedgePressed = true
+                Style.WedgePressed = #8FE3FF55
+                Style.bOverride_WedgeSelected = true
+                Style.WedgeSelected = #10242ED8
+                Style.bOverride_WedgeFocused = true
+                Style.WedgeFocused = #16303CE6
+                Style.bOverride_HubColor = true
+                Style.HubColor = #00000000
+                Style.bOverride_BackdropColor = true
+                Style.BackdropColor = #00000000
+            }
+            // The glyphs and names, placed by the screen at each item's angle; they never take the pointer.
+            Widget WheelMarks : AtCentre {
+                AnchorData.SizeDelta = (760, 760)
+                Raycastable = Disabled
+
+                Text WheelGlyph0 : WheelGlyph {}
+                Text WheelGlyph1 : WheelGlyph {}
+                Text WheelGlyph2 : WheelGlyph {}
+                Text WheelGlyph3 : WheelGlyph {}
+                Text WheelGlyph4 : WheelGlyph {}
+                Text WheelGlyph5 : WheelGlyph {}
+                Text WheelGlyph6 : WheelGlyph {}
+                Text WheelGlyph7 : WheelGlyph {}
+                Text WheelName0 : WheelName {}
+                Text WheelName1 : WheelName {}
+                Text WheelName2 : WheelName {}
+                Text WheelName3 : WheelName {}
+                Text WheelName4 : WheelName {}
+                Text WheelName5 : WheelName {}
+                Text WheelName6 : WheelName {}
+                Text WheelName7 : WheelName {}
+            }
+            PixelSort CenterSort : FillSort {}
+        }
+
+        // ---- Left: the item under the pointer. Turned in on its right edge.
+        Widget LeftPanel : Middle {
+            AnchorData.AnchoredPosition = (-700, 0)
+            AnchorData.SizeDelta = (340, 560)
+            RenderTransformPivot = (1, 0.5)
+            RenderRotation = (0, -14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock LeftPlate : PanelPlate {}
+            RectBlock LeftFrame : PanelFrame {}
+            Polygon TrimLeftTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimLeftTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimLeftBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimLeftBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock LeftTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget ItemBody : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-48, 500)
+
+                Text SysTag : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 22)
+                    Text = "NOCTURNE//OS" @noloc
+                }
+                Text Breadcrumb : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -28)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                    Text = "星图   /   轮 · 道具轮盘"
+                }
+                RectBlock LeftRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -66)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+                Text ItemGlyph : Heading {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (0, 1)
+                    AnchorData.Pivot = (0, 1)
+                    AnchorData.AnchoredPosition = (0, -90)
+                    AnchorData.SizeDelta = (120, 100)
+                    FontSize = 80
+                }
+                Text ItemCount : Readout {
+                    AnchorData.AnchorMin = (1, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (1, 1)
+                    AnchorData.AnchoredPosition = (0, -150)
+                    AnchorData.SizeDelta = (120, 30)
+                    FontSize = 22
+                }
+                Text ItemName : Heading {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -206)
+                    AnchorData.SizeDelta = (0, 40)
+                    FontSize = 28
+                }
+                Text ItemEn : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -250)
+                    AnchorData.SizeDelta = (0, 18)
+                    FontSize = 11
+                }
+                Text ItemKind : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -276)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                }
+                RectBlock ItemRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -314)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+                Text ItemText : Label {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -330)
+                    AnchorData.SizeDelta = (0, 90)
+                    FontSize = 15
+                    Color = @InkDim
+                    VAlign = Top
+                }
+            }
+            PixelSort LeftSort : FillSort {}
+        }
+
+        // ---- Right: the quick slots. Turned in on its left edge.
+        Widget RightPanel : Middle {
+            AnchorData.AnchoredPosition = (700, 0)
+            AnchorData.SizeDelta = (340, 560)
+            RenderTransformPivot = (0, 0.5)
+            RenderRotation = (0, 14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock RightPlate : PanelPlate {}
+            RectBlock RightFrame : PanelFrame {}
+            Polygon TrimRightTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimRightTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimRightBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimRightBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock RightTab : AccentBar {
+                AnchorData.AnchorMin = (1, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (1, 1)
+                AnchorData.AnchoredPosition = (-24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget QuickBody : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-40, 500)
+
+                Text QuickTag : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (-8, 18)
+                    Text = "QUICK SLOTS  ·  快捷槽"
+                }
+                Text QuickNote : Label {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -28)
+                    AnchorData.SizeDelta = (-8, 22)
+                    FontSize = 14
+                    Color = @InkDim
+                    Text = "点选轮盘上的道具，放进亮起的槽位。"
+                }
+                Widget Quick0 : QuickRow {
+                    AnchorData.AnchoredPosition = (0, -70)
+                    RectBlock Quick0Back : QuickBack {}
+                    RectBlock Quick0Bar : QuickBar {}
+                    Text Quick0Key : QuickKey { Text = "01" @noloc }
+                    RectBlock Quick0Box : QuickBox {}
+                    Text Quick0Glyph : QuickGlyph {}
+                    Text Quick0Name : QuickName {}
+                    Text Quick0Dir : QuickDir { Text = "UP  ·  上" }
+                }
+                Widget Quick1 : QuickRow {
+                    AnchorData.AnchoredPosition = (0, -146)
+                    RectBlock Quick1Back : QuickBack {}
+                    RectBlock Quick1Bar : QuickBar {}
+                    Text Quick1Key : QuickKey { Text = "02" @noloc }
+                    RectBlock Quick1Box : QuickBox {}
+                    Text Quick1Glyph : QuickGlyph {}
+                    Text Quick1Name : QuickName {}
+                    Text Quick1Dir : QuickDir { Text = "RIGHT  ·  右" }
+                }
+                Widget Quick2 : QuickRow {
+                    AnchorData.AnchoredPosition = (0, -222)
+                    RectBlock Quick2Back : QuickBack {}
+                    RectBlock Quick2Bar : QuickBar {}
+                    Text Quick2Key : QuickKey { Text = "03" @noloc }
+                    RectBlock Quick2Box : QuickBox {}
+                    Text Quick2Glyph : QuickGlyph {}
+                    Text Quick2Name : QuickName {}
+                    Text Quick2Dir : QuickDir { Text = "DOWN  ·  下" }
+                }
+                Widget Quick3 : QuickRow {
+                    AnchorData.AnchoredPosition = (0, -298)
+                    RectBlock Quick3Back : QuickBack {}
+                    RectBlock Quick3Bar : QuickBar {}
+                    Text Quick3Key : QuickKey { Text = "04" @noloc }
+                    RectBlock Quick3Box : QuickBox {}
+                    Text Quick3Glyph : QuickGlyph {}
+                    Text Quick3Name : QuickName {}
+                    Text Quick3Dir : QuickDir { Text = "LEFT  ·  左" }
+                }
+                Text QuickFoot : Meta {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 0)
+                    AnchorData.Pivot = (0.5, 0)
+                    AnchorData.AnchoredPosition = (0, 0)
+                    AnchorData.SizeDelta = (-8, 18)
+                    FontSize = 11
+                    Text = "左摇杆指向  ·  A 放入  ·  LB RB 换槽" @noloc
+                }
+            }
+            PixelSort RightSort : FillSort {}
+        }
+    }
+
+    // ---- The key hints.
+    Widget KeyBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 60)
+
+        RectBlock KeyBarBack : Bar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BodyColor = #05080CCC
+        }
+        RectBlock KeyBarRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 1)
+        }
+        HorizontalBox Hints {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (80, 0)
+            AnchorData.SizeDelta = (1100, 30)
+            Spacing = 26
+
+            Widget HintPoint : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "POINT" @noloc }
+                Text : HintLabel { Text = "选择" }
+            }
+            Widget HintClick : HintItem {
+                @slot { MinDesiredSize = (170, 30)  MaxDesiredSize = (170, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "CLICK" @noloc }
+                Text : HintLabel { Text = "放入槽位" }
+            }
+            Widget HintSlot : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "1 - 4" @noloc }
+                Text : HintLabel { Text = "换槽" }
+            }
+            Widget HintBack : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                + UIButton { TransitionType = None }
+                RectBlock HintBackHit : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.SizeDelta = (16, 12)
+                    BodyColor = @Clear
+                    bRaycastTarget = true
+                }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "ESC" @noloc }
+                Text HintBackLabel : HintLabel { Text = "返回" }
+            }
+        }
+    }
+}

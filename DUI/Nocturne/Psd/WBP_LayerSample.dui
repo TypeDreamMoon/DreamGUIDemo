@@ -1,0 +1,126 @@
+// Imported from LayerSample.psd by the DreamGUI layered-document importer.
+// A node whose id ends in _psd<n> was made from layer <n>: importing the document again rewrites the lines
+// the importer writes on it and keeps everything else -- the nodes, lines and components you add.
+class /Game/Nocturne/Psd/WBP_LayerSample
+
+Widget Root {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (512, 320)
+    Image Background_psd1 {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (0, 0)
+        AnchorData.SizeDelta = (512, 320)
+        Brush.ResourceObject = "/Game/Nocturne/Psd/LayerSample/T_LayerSample_Background_1.T_LayerSample_Background_1"
+    }
+    Widget Card_psd7 {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (0.5, 0.5)
+        AnchorData.AnchoredPosition = (0, 0)
+        AnchorData.SizeDelta = (0, 0)
+        + DreamLayerGroup {
+            Isolation = Isolated
+            GroupOpacity = 0.902
+        }
+        RectBlock Panel_psd3 {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (32, -32)
+            AnchorData.SizeDelta = (448, 256)
+            CornerRadius.X = 16
+            CornerRadius.Y = 16
+            CornerRadius.Z = 16
+            CornerRadius.W = 16
+            CornerRadiusUnitMode = Value
+            BodyColor = #282C3CFF
+            bEnableBorder = true
+            BorderWidth = 2
+            BorderColor = #5A648CFF
+        }
+        Text Title_psd4 {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (64, -52)
+            AnchorData.SizeDelta = (156, 32)
+            Text = "Settings"
+            Font = "/DreamGUI/DefaultFont_DistanceField_CJK.DefaultFont_DistanceField_CJK"
+            FontSize = 28
+            Color = #FFFFFFFF
+            HAlign = Left
+            VAlign = Middle
+            OverflowType = HorizontalOverflow
+        }
+        Image Icon_psd5 {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (64, -112)
+            AnchorData.SizeDelta = (48, 48)
+            Brush.ResourceObject = "/Game/Nocturne/Psd/LayerSample/T_LayerSample_Icon_5.T_LayerSample_Icon_5"
+        }
+        Image Shine_psd6 {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (60, -108)
+            AnchorData.SizeDelta = (56, 56)
+            Brush.ResourceObject = "/Game/Nocturne/Psd/LayerSample/T_LayerSample_Shine_6.T_LayerSample_Shine_6"
+            bClipToBelow = true
+        }
+    }
+    Image Play_psd8 {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (64, -200)
+        AnchorData.SizeDelta = (160, 48)
+        Brush.ResourceObject = "/Game/Nocturne/Psd/LayerSample/T_LayerSample_Play_8.T_LayerSample_Play_8"
+        Brush.DrawAs = Box
+        Brush.Margin = (0.05, 0.167, 0.05, 0.167)
+        + UIButton {}
+    }
+    Image Avatar_psd9 {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (300, -110)
+        AnchorData.SizeDelta = (120, 120)
+        Brush.ResourceObject = "/Game/Nocturne/Psd/LayerSample/T_LayerSample_Avatar_9.T_LayerSample_Avatar_9"
+        Clipping = ClipToBounds
+        ClipMask.Source = Texture
+        ClipMask.Texture = "/Game/Nocturne/Psd/LayerSample/TM_LayerSample_Avatar_9.TM_LayerSample_Avatar_9"
+        ClipMask.Channel = Red
+    }
+    Image Glow_psd10 {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (362, -42)
+        AnchorData.SizeDelta = (76, 76)
+        Brush.ResourceObject = "/Game/Nocturne/Psd/LayerSample/T_LayerSample_Glow_10.T_LayerSample_Glow_10"
+        BlendMode = Screen
+    }
+    Image Badge_psd12 {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (252, -202)
+        AnchorData.SizeDelta = (36, 36)
+        Brush.ResourceObject = "/Game/Nocturne/Psd/LayerSample/T_LayerSample_Badge_12.T_LayerSample_Badge_12"
+    }
+    Image Pressed_state_psd13 {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (64, -200)
+        AnchorData.SizeDelta = (160, 48)
+        Brush.ResourceObject = "/Game/Nocturne/Psd/LayerSample/T_LayerSample_Pressed_state_13.T_LayerSample_Pressed_state_13"
+        Visibility = Hidden
+    }
+}

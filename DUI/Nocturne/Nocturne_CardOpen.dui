@@ -1,0 +1,71 @@
+// The video's opening card (UNocturneCardScreen): the word drops in letter by letter, a line draws out under it, what
+// DreamGUI is runs in below, and the administrator slides in on the right. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_CardOpen
+use "Nocturne/Nocturne_Common.dui"
+
+resources {
+    Asset AdminArt = /Game/Nocturne/Textures/T_Nocturne_Admin
+}
+
+style Letter {
+    Font = @Font
+    FontSize = 150
+    HAlign = Left
+    VAlign = Middle
+    OverflowType = HorizontalOverflow
+}
+style CardLine : Label {
+    AnchorData.SizeDelta = (1000, 44)
+    OverflowType = HorizontalOverflow
+}
+
+Widget Root : Fill {
+    RectBlock Dim : ScreenDim { BodyColor = #03060A66 }
+    Widget Rig : Fill {
+        Image Art {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0.5, 0.5)
+            AnchorData.AnchoredPosition = (560, -30)
+            AnchorData.SizeDelta = (600, 800)
+            Brush.ResourceObject = @AdminArt
+            bRaycastTarget = false
+        }
+        HorizontalBox Word {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (-840, 110)
+            AnchorData.SizeDelta = (1000, 170)
+            Spacing = 2
+            Text Letter0 : Letter { Text = "D" @noloc  Color = @Ink }
+            Text Letter1 : Letter { Text = "r" @noloc  Color = @Ink }
+            Text Letter2 : Letter { Text = "e" @noloc  Color = @Ink }
+            Text Letter3 : Letter { Text = "a" @noloc  Color = @Ink }
+            Text Letter4 : Letter { Text = "m" @noloc  Color = @Ink }
+            Text Letter5 : Letter { Text = "G" @noloc  Color = @Cyan }
+            Text Letter6 : Letter { Text = "U" @noloc  Color = @Cyan }
+            Text Letter7 : Letter { Text = "I" @noloc  Color = @Cyan }
+        }
+        RectBlock Rule : AccentBar {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (-836, 2)
+            AnchorData.SizeDelta = (640, 2)
+            RenderTransformPivot = (0, 0.5)
+        }
+        VerticalBox Lines {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (-836, -26)
+            AnchorData.SizeDelta = (1000, 170)
+            Spacing = 10
+            Text Line0 : CardLine { FontSize = 34  Text = "给虚幻引擎 5.8 做的三维 UI 系统" }
+            Text Line1 : CardLine { FontSize = 16  Color = @Cyan  FontSpace = (4, 0)  Text = "3D UI FOR UNREAL ENGINE 5.8" @noloc }
+            Text Line2 : CardLine { FontSize = 15  Color = @InkDim  FontSpace = (2, 0)  Text = "文本   ·   设计器   ·   控件   ·   文字   ·   世界空间   ·   动画   ·   图层效果" }
+        }
+    }
+    PixelSort CenterSort : FillSort {}
+}

@@ -1,0 +1,83 @@
+// A slot of the NOCTURNE//OS archive's grid (UNocturneItemSlot): a 92 x 92 cell holding one item drawn as its glyph,
+// a rarity stripe along the bottom, its code and its count. It can be picked up and dropped on another slot (the two
+// swap), it shows the item's tooltip, and it lights when hovered, selected or under a drag.
+class /Game/Nocturne/UI/Components/WBP_Nocturne_ItemSlot
+use "Nocturne/Nocturne_Common.dui"
+
+style FillBar : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+}
+
+Widget Root {
+    AnchorData.SizeDelta = (92, 92)
+    + UIButton { TransitionType = None }
+    + UIDragSource { Tag = Item }
+    + UIDropTarget { RequiredTag = Item }
+
+    RectBlock SlotBack : FillBar {
+        BodyColor = #FFFFFF0A
+        bRaycastTarget = true
+    }
+    RectBlock SlotFrame : FillBar {
+        bEnableBody = false
+        bEnableBorder = true
+        BorderWidth = 1
+        BorderColor = #D7E2EA22
+    }
+    RectBlock SlotRarity : Bar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (-12, 2)
+        AnchorData.AnchoredPosition = (0, 5)
+    }
+    Text SlotGlyph : Heading {
+        AnchorData.AnchorMin = (0.5, 0.5)
+        AnchorData.AnchorMax = (0.5, 0.5)
+        AnchorData.Pivot = (0.5, 0.5)
+        AnchorData.AnchoredPosition = (0, 2)
+        AnchorData.SizeDelta = (80, 56)
+        FontSize = 38
+        HAlign = Center
+    }
+    Text SlotCode : Meta {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 1)
+        AnchorData.AnchoredPosition = (6, -4)
+        AnchorData.SizeDelta = (60, 14)
+        FontSize = 9
+        FontSpace = (1, 0)
+    }
+    Text SlotCount : Meta {
+        AnchorData.AnchorMin = (1, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (1, 0)
+        AnchorData.AnchoredPosition = (-6, 9)
+        AnchorData.SizeDelta = (60, 16)
+        FontSize = 11
+        FontSpace = (1, 0)
+        HAlign = Right
+        Color = @Ink
+    }
+    // Where a dragged item would land.
+    RectBlock SlotDrop : FillBar {
+        BodyColor = #8FE3FF26
+        bEnableBorder = true
+        BorderWidth = 1
+        BorderColor = #8FE3FFAA
+    }
+    Polygon SlotMark : MarkDiamond {
+        AnchorData.AnchorMin = (1, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (11, 11)
+    }
+    RectBlock SlotSelect : FillBar {
+        bEnableBody = false
+        bEnableBorder = true
+        BorderWidth = 2
+        BorderColor = @Cyan
+    }
+}

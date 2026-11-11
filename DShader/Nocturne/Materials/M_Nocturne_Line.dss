@@ -1,0 +1,21 @@
+// M_Nocturne_Line.dss -- a line of the NOCTURNE//OS constellation, on a thin cylinder between two stars: a faint cyan
+// light added over the sky, with a pulse of brighter light running along it now and then.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = Additive, TwoSided = true)
+
+/// @group Line|Look   @sort 10   @desc The line's colour (linear)
+uniform float4 LineColor = float4(0.25, 0.70, 1.0, 1.0);
+/// @group Line|Look   @sort 20   @slider 0 10   @desc Brightness
+uniform float Strength = 0.6;
+/// @group Line|Motion   @sort 30   @slider 0 4   @desc How fast the pulse runs along the line
+uniform float PulseSpeed = 0.45;
+/// @group Line|Motion   @sort 40   @slider 0 1   @desc Where along its cycle this line's pulse starts
+uniform float PulseOffset = 0.0;
+
+export void M_Nocturne_Line(inout material m)
+{
+    // The engine cylinder's second texture coordinate runs along its length.
+    float Along = UE.TexCoord(Index = 0).y;
+    float Phase = frac(UE.Time() * PulseSpeed + PulseOffset);
+    float Pulse = exp(-abs(Along - Phase) * 18.0);
+    m.EmissiveColor = LineColor.rgb * Strength * (1.0 + Pulse * 3.0);
+}

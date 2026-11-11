@@ -1,0 +1,205 @@
+// One row of the NOCTURNE//OS settings screen (UNocturneOptionRow): the Chinese label and English tag on the left, one
+// of five controls on the right -- which one shows is the row's Kind -- and the accent bar and lit background its C++
+// turns on while the row is highlighted. The instance's size is its placer's; everything here is placed against it.
+class /Game/Nocturne/UI/Components/WBP_Nocturne_OptionRow
+use "Nocturne/Nocturne_Common.dui"
+
+// The control's area: 380 wide on the right edge.
+style ValueArea {
+    AnchorData.AnchorMin = (1, 0.5)
+    AnchorData.AnchorMax = (1, 0.5)
+    AnchorData.Pivot = (1, 0.5)
+    AnchorData.AnchoredPosition = (-18, 0)
+    AnchorData.SizeDelta = (380, 40)
+}
+style Arrow {
+    Font = @Font
+    FontSize = 20
+    Color = @InkFaint
+    HAlign = Center
+    VAlign = Middle
+}
+style SegmentBox : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    BodyColor = #FFFFFF0E
+    bRaycastTarget = true
+}
+style SegmentText : Label {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    FontSize = 15
+    Color = @InkDim
+    HAlign = Center
+}
+style Segment {
+    AnchorData.SizeDelta = (72, 30)
+    bIsFocusable = false
+}
+
+Widget Root : Fill {
+    bIgnoreLayout = true
+    + UIButton { TransitionType = None }
+
+    RectBlock Back : Bar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        BodyColor = @Clear
+        bRaycastTarget = true
+    }
+    RectBlock Accent : AccentBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (0, 1)
+        AnchorData.Pivot = (0, 0.5)
+        AnchorData.SizeDelta = (3, -12)
+    }
+    RectBlock Rule : Bar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 1)
+        BodyColor = #D7E2EA12
+    }
+
+    Text LabelText : Label {
+        AnchorData.AnchorMin = (0, 0.5)
+        AnchorData.AnchorMax = (0, 0.5)
+        AnchorData.Pivot = (0, 0.5)
+        AnchorData.AnchoredPosition = (22, 0)
+        AnchorData.SizeDelta = (170, 40)
+        FontSize = 19
+    }
+    Text EnText : SubLabel {
+        AnchorData.AnchorMin = (0, 0.5)
+        AnchorData.AnchorMax = (0, 0.5)
+        AnchorData.Pivot = (0, 0.5)
+        AnchorData.AnchoredPosition = (196, -1)
+        AnchorData.SizeDelta = (236, 40)
+    }
+
+    Widget Selector : ValueArea {
+        Text ArrowL : Arrow {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.SizeDelta = (40, 40)
+            Text = "<" @noloc
+        }
+        Text SelValue : Label {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (-80, 0)
+            FontSize = 18
+            HAlign = Center
+        }
+        Text ArrowR : Arrow {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.Pivot = (1, 0.5)
+            AnchorData.SizeDelta = (40, 40)
+            Text = ">" @noloc
+        }
+    }
+
+    Widget SliderBox : ValueArea {
+        Native.Slider SliderCtl {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.SizeDelta = (270, 40)
+            bIsFocusable = false
+            Style.bOverride_TrackThickness = true
+            Style.TrackThickness = 2
+            Style.bOverride_TrackColor = true
+            Style.TrackColor = @Track
+            Style.bOverride_FillColor = true
+            Style.FillColor = @Cyan
+            Style.bOverride_HandleSize = true
+            Style.HandleSize = (6, 22)
+            Style.bOverride_HandleNormal = true
+            Style.HandleNormal = @Ink
+            Style.bOverride_HandleHovered = true
+            Style.HandleHovered = #FFFFFF
+            Style.bOverride_HandlePressed = true
+            Style.HandlePressed = @Cyan
+        }
+        Text SliderValue : Readout {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.Pivot = (1, 0.5)
+            AnchorData.SizeDelta = (100, 40)
+            FontSize = 18
+        }
+    }
+
+    HorizontalBox Segments : ValueArea {
+        Spacing = 4
+
+        Widget Seg0 : Segment {
+            + UIButton { TransitionType = None }
+            @slot { VerticalAlignment = Center  MinDesiredSize = (72, 30)  MaxDesiredSize = (72, 30) }
+            RectBlock Seg0Box : SegmentBox {}
+            Text Seg0Text : SegmentText {}
+        }
+        Widget Seg1 : Segment {
+            + UIButton { TransitionType = None }
+            @slot { VerticalAlignment = Center  MinDesiredSize = (72, 30)  MaxDesiredSize = (72, 30) }
+            RectBlock Seg1Box : SegmentBox {}
+            Text Seg1Text : SegmentText {}
+        }
+        Widget Seg2 : Segment {
+            + UIButton { TransitionType = None }
+            @slot { VerticalAlignment = Center  MinDesiredSize = (72, 30)  MaxDesiredSize = (72, 30) }
+            RectBlock Seg2Box : SegmentBox {}
+            Text Seg2Text : SegmentText {}
+        }
+        Widget Seg3 : Segment {
+            + UIButton { TransitionType = None }
+            @slot { VerticalAlignment = Center  MinDesiredSize = (72, 30)  MaxDesiredSize = (72, 30) }
+            RectBlock Seg3Box : SegmentBox {}
+            Text Seg3Text : SegmentText {}
+        }
+        Widget Seg4 : Segment {
+            + UIButton { TransitionType = None }
+            @slot { VerticalAlignment = Center  MinDesiredSize = (72, 30)  MaxDesiredSize = (72, 30) }
+            RectBlock Seg4Box : SegmentBox {}
+            Text Seg4Text : SegmentText {}
+        }
+    }
+
+    Widget KeyBox : ValueArea {
+        RectBlock KeyCap : Bar {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.Pivot = (1, 0.5)
+            AnchorData.SizeDelta = (150, 32)
+            BodyColor = #FFFFFF12
+            bEnableBorder = true
+            BorderWidth = 1
+            BorderColor = #8FE3FF55
+        }
+        Text KeyText : Label {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.Pivot = (1, 0.5)
+            AnchorData.SizeDelta = (150, 32)
+            FontSize = 16
+            FontSpace = (2, 0)
+            HAlign = Center
+        }
+    }
+
+    Text ActionText : Label {
+        AnchorData.AnchorMin = (1, 0.5)
+        AnchorData.AnchorMax = (1, 0.5)
+        AnchorData.Pivot = (1, 0.5)
+        AnchorData.AnchoredPosition = (-18, 0)
+        AnchorData.SizeDelta = (380, 40)
+        FontSize = 17
+        HAlign = Right
+        Color = @InkDim
+    }
+}

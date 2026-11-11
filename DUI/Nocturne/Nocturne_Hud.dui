@@ -1,0 +1,627 @@
+// NOCTURNE//OS in flight (UNocturneHud): the game's heads-up display once a voyage has set off. A heading strip along
+// the top, the objective in the top left, hull and energy in the bottom left, speed and position in the bottom right,
+// the reticle in the middle; brackets that follow the beacons in the world (placed every frame by the voyage), toasts
+// for what is picked up, and numbers that float off the reticle when the hull is hit. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_Hud
+use "Nocturne/Nocturne_Common.dui"
+
+style FromTopLeft {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style FromTopRight {
+    AnchorData.AnchorMin = (1, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (1, 1)
+}
+style FromBottomLeft {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (0, 0)
+    AnchorData.Pivot = (0, 0)
+}
+style FromBottomRight {
+    AnchorData.AnchorMin = (1, 0)
+    AnchorData.AnchorMax = (1, 0)
+    AnchorData.Pivot = (1, 0)
+}
+style AtCentre {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+style HudBar {
+    Style.bOverride_Height = true
+    Style.Height = 6
+    Style.bOverride_TrackColor = true
+    Style.TrackColor = #FFFFFF1C
+    Style.bOverride_FillColor = true
+    Style.FillColor = #8FE3FF
+    Style.bOverride_CornerRadius = true
+    Style.CornerRadius = 0
+}
+style CompassTick : Bar {
+    AnchorData.AnchorMin = (0.5, 1)
+    AnchorData.AnchorMax = (0.5, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.SizeDelta = (1, 8)
+    BodyColor = #D7E2EA66
+}
+style CompassLetter : Meta {
+    AnchorData.AnchorMin = (0.5, 1)
+    AnchorData.AnchorMax = (0.5, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.AnchoredPosition = (0, -14)
+    AnchorData.SizeDelta = (40, 18)
+    FontSize = 12
+    HAlign = Center
+    Color = @Ink
+}
+style MarkerBox : AtCentre {
+    AnchorData.SizeDelta = (56, 56)
+}
+style Corner : Bar {
+    BodyColor = #8FE3FFCC
+}
+style MarkerName : Label {
+    AnchorData.AnchorMin = (0.5, 1)
+    AnchorData.AnchorMax = (0.5, 1)
+    AnchorData.Pivot = (0.5, 0)
+    AnchorData.AnchoredPosition = (0, 8)
+    AnchorData.SizeDelta = (220, 22)
+    FontSize = 15
+    HAlign = Center
+}
+style MarkerDist : Meta {
+    AnchorData.AnchorMin = (0.5, 0)
+    AnchorData.AnchorMax = (0.5, 0)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.AnchoredPosition = (0, -6)
+    AnchorData.SizeDelta = (160, 18)
+    FontSize = 12
+    HAlign = Center
+    Color = @Cyan
+}
+style ToastBox : FromTopRight {
+    AnchorData.SizeDelta = (360, 60)
+}
+style ToastBack : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    BodyColor = #070A0ED8
+    bEnableBorder = true
+    BorderWidth = 1
+    BorderColor = @Line
+}
+style ToastBar : AccentBar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (3, 0)
+}
+style ToastTag : Meta {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+    AnchorData.AnchoredPosition = (72, -8)
+    AnchorData.SizeDelta = (200, 16)
+    FontSize = 10
+}
+style ToastGlyph : Heading {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.AnchoredPosition = (38, 1)
+    AnchorData.SizeDelta = (48, 44)
+    FontSize = 30
+    HAlign = Center
+}
+style ToastName : Label {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (0, 0)
+    AnchorData.Pivot = (0, 0)
+    AnchorData.AnchoredPosition = (72, 8)
+    AnchorData.SizeDelta = (200, 24)
+    FontSize = 17
+}
+style ToastCount : Readout {
+    AnchorData.AnchorMin = (1, 0.5)
+    AnchorData.AnchorMax = (1, 0.5)
+    AnchorData.Pivot = (1, 0.5)
+    AnchorData.AnchoredPosition = (-18, 0)
+    AnchorData.SizeDelta = (80, 28)
+    FontSize = 20
+}
+style DamageNumber : Heading {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (160, 44)
+    FontSize = 34
+    HAlign = Center
+    Color = @Amber
+}
+style ReadLabel : Meta {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+    AnchorData.SizeDelta = (200, 18)
+    FontSize = 12
+}
+style ReadValue : Readout {
+    AnchorData.AnchorMin = (1, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (1, 1)
+    AnchorData.SizeDelta = (120, 24)
+    FontSize = 18
+}
+
+Widget Root : Fill {
+    Raycastable = Disabled
+
+    // A hit: the edges of the screen flash amber.
+    RectBlock HitFlash : Bar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        BodyColor = #00000000
+        bEnableBorder = true
+        BorderWidth = 26
+        BorderColor = #FFB45455
+        RenderOpacity = 0
+    }
+
+    // ---- Brackets on the beacons, placed by the voyage every frame.
+    Widget Markers : Fill {
+        Widget Marker0 : MarkerBox {
+            RectBlock Marker0TL1 : Corner { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker0TL2 : Corner { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker0TR1 : Corner { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker0TR2 : Corner { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker0BL1 : Corner { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker0BL2 : Corner { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker0BR1 : Corner { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker0BR2 : Corner { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.SizeDelta = (2, 14) }
+            Polygon Marker0Dot : MarkDiamond { AnchorData.AnchorMin = (0.5, 0.5)  AnchorData.AnchorMax = (0.5, 0.5)  AnchorData.SizeDelta = (6, 6) }
+            Text Marker0Name : MarkerName {}
+            Text Marker0Dist : MarkerDist {}
+        }
+        Widget Marker1 : MarkerBox {
+            RectBlock Marker1TL1 : Corner { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker1TL2 : Corner { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker1TR1 : Corner { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker1TR2 : Corner { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker1BL1 : Corner { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker1BL2 : Corner { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker1BR1 : Corner { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker1BR2 : Corner { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.SizeDelta = (2, 14) }
+            Polygon Marker1Dot : MarkDiamond { AnchorData.AnchorMin = (0.5, 0.5)  AnchorData.AnchorMax = (0.5, 0.5)  AnchorData.SizeDelta = (6, 6) }
+            Text Marker1Name : MarkerName {}
+            Text Marker1Dist : MarkerDist {}
+        }
+        Widget Marker2 : MarkerBox {
+            RectBlock Marker2TL1 : Corner { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker2TL2 : Corner { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker2TR1 : Corner { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker2TR2 : Corner { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker2BL1 : Corner { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker2BL2 : Corner { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker2BR1 : Corner { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker2BR2 : Corner { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.SizeDelta = (2, 14) }
+            Polygon Marker2Dot : MarkDiamond { AnchorData.AnchorMin = (0.5, 0.5)  AnchorData.AnchorMax = (0.5, 0.5)  AnchorData.SizeDelta = (6, 6) }
+            Text Marker2Name : MarkerName {}
+            Text Marker2Dist : MarkerDist {}
+        }
+        Widget Marker3 : MarkerBox {
+            RectBlock Marker3TL1 : Corner { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker3TL2 : Corner { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker3TR1 : Corner { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker3TR2 : Corner { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker3BL1 : Corner { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker3BL2 : Corner { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.SizeDelta = (2, 14) }
+            RectBlock Marker3BR1 : Corner { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.SizeDelta = (14, 2) }
+            RectBlock Marker3BR2 : Corner { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.SizeDelta = (2, 14) }
+            Polygon Marker3Dot : MarkDiamond { AnchorData.AnchorMin = (0.5, 0.5)  AnchorData.AnchorMax = (0.5, 0.5)  AnchorData.SizeDelta = (6, 6) }
+            Text Marker3Name : MarkerName {}
+            Text Marker3Dist : MarkerDist {}
+        }
+    }
+
+    // ---- Everything but the brackets (which follow the world) sits in one rig: it drifts a little and jolts in 3D
+    //      when the hull is hit.
+    Widget Rig : Fill {
+    Raycastable = Disabled
+
+    // ---- The reticle.
+    Widget Reticle : AtCentre {
+        AnchorData.SizeDelta = (120, 120)
+
+        PolygonLine SigilReticle : HexSigil {
+            AnchorData.AnchorMin = (0.5, 0.5)
+            AnchorData.AnchorMax = (0.5, 0.5)
+            AnchorData.SizeDelta = (98, 98)
+            LineWidth = 1
+            Color = #8FE3FF44
+        }
+        Ring ReticleRing : AtCentre {
+            AnchorData.SizeDelta = (64, 64)
+            StartAngle = 0
+            EndAngle = 360
+            LineWidth = 1.5
+            Segment = 64
+            Color = #8FE3FFAA
+        }
+        RectBlock ReticleL : Bar { AnchorData.AnchorMin = (0.5, 0.5)  AnchorData.AnchorMax = (0.5, 0.5)  AnchorData.Pivot = (1, 0.5)  AnchorData.AnchoredPosition = (-40, 0)  AnchorData.SizeDelta = (14, 2)  BodyColor = #8FE3FFCC }
+        RectBlock ReticleR : Bar { AnchorData.AnchorMin = (0.5, 0.5)  AnchorData.AnchorMax = (0.5, 0.5)  AnchorData.Pivot = (0, 0.5)  AnchorData.AnchoredPosition = (40, 0)  AnchorData.SizeDelta = (14, 2)  BodyColor = #8FE3FFCC }
+        RectBlock ReticleT : Bar { AnchorData.AnchorMin = (0.5, 0.5)  AnchorData.AnchorMax = (0.5, 0.5)  AnchorData.Pivot = (0.5, 0)  AnchorData.AnchoredPosition = (0, 40)  AnchorData.SizeDelta = (2, 14)  BodyColor = #8FE3FFCC }
+        RectBlock ReticleB : Bar { AnchorData.AnchorMin = (0.5, 0.5)  AnchorData.AnchorMax = (0.5, 0.5)  AnchorData.Pivot = (0.5, 1)  AnchorData.AnchoredPosition = (0, -40)  AnchorData.SizeDelta = (2, 14)  BodyColor = #8FE3FFCC }
+        RectBlock ReticleDot : Bar { AnchorData.AnchorMin = (0.5, 0.5)  AnchorData.AnchorMax = (0.5, 0.5)  AnchorData.Pivot = (0.5, 0.5)  AnchorData.SizeDelta = (3, 3)  BodyColor = @Amber }
+    }
+        Text Dmg0 : DamageNumber {}
+        Text Dmg1 : DamageNumber {}
+        Text Dmg2 : DamageNumber {}
+
+    // ---- The heading, along the top.
+    Widget Compass {
+        AnchorData.AnchorMin = (0.5, 1)
+        AnchorData.AnchorMax = (0.5, 1)
+        AnchorData.Pivot = (0.5, 1)
+        AnchorData.AnchoredPosition = (0, -40)
+        AnchorData.SizeDelta = (640, 70)
+        // Tipped down from its top edge, as the top of a visor faces the eye.
+        RenderTransformPivot = (0.5, 1)
+        RenderRotation = (10, 0, 0)
+
+        Widget CompassStrip {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 36)
+            Clipping = ClipToBounds
+            RectBlock Tick0 : CompassTick {}
+            RectBlock Tick1 : CompassTick {}
+            RectBlock Tick2 : CompassTick {}
+            RectBlock Tick3 : CompassTick {}
+            RectBlock Tick4 : CompassTick {}
+            RectBlock Tick5 : CompassTick {}
+            RectBlock Tick6 : CompassTick {}
+            RectBlock Tick7 : CompassTick {}
+            RectBlock Tick8 : CompassTick {}
+            RectBlock Tick9 : CompassTick {}
+            RectBlock Tick10 : CompassTick {}
+            RectBlock Tick11 : CompassTick {}
+            RectBlock Tick12 : CompassTick {}
+            RectBlock Tick13 : CompassTick {}
+            RectBlock Tick14 : CompassTick {}
+            RectBlock Tick15 : CompassTick {}
+            RectBlock Tick16 : CompassTick {}
+            RectBlock Tick17 : CompassTick {}
+            RectBlock Tick18 : CompassTick {}
+            RectBlock Tick19 : CompassTick {}
+            RectBlock Tick20 : CompassTick {}
+            RectBlock Tick21 : CompassTick {}
+            RectBlock Tick22 : CompassTick {}
+            RectBlock Tick23 : CompassTick {}
+            RectBlock Tick24 : CompassTick {}
+            RectBlock Tick25 : CompassTick {}
+            RectBlock Tick26 : CompassTick {}
+            RectBlock Tick27 : CompassTick {}
+            RectBlock Tick28 : CompassTick {}
+            RectBlock Tick29 : CompassTick {}
+            RectBlock Tick30 : CompassTick {}
+            RectBlock Tick31 : CompassTick {}
+            RectBlock Tick32 : CompassTick {}
+            RectBlock Tick33 : CompassTick {}
+            RectBlock Tick34 : CompassTick {}
+            RectBlock Tick35 : CompassTick {}
+            Text Head0 : CompassLetter { Text = "N" @noloc }
+            Text Head1 : CompassLetter { Text = "NE" @noloc }
+            Text Head2 : CompassLetter { Text = "E" @noloc }
+            Text Head3 : CompassLetter { Text = "SE" @noloc }
+            Text Head4 : CompassLetter { Text = "S" @noloc }
+            Text Head5 : CompassLetter { Text = "SW" @noloc }
+            Text Head6 : CompassLetter { Text = "W" @noloc }
+            Text Head7 : CompassLetter { Text = "NW" @noloc }
+        }
+        RectBlock CompassRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -36)
+            AnchorData.SizeDelta = (0, 1)
+        }
+        Polygon CompassCaret : MarkDiamond {
+            AnchorData.AnchorMin = (0.5, 1)
+            AnchorData.AnchorMax = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -40)
+            AnchorData.SizeDelta = (9, 9)
+            Color = @Amber
+        }
+        Text HeadingValue : Readout {
+            AnchorData.AnchorMin = (0.5, 0)
+            AnchorData.AnchorMax = (0.5, 0)
+            AnchorData.Pivot = (0.5, 0)
+            AnchorData.SizeDelta = (160, 22)
+            FontSize = 15
+            HAlign = Center
+        }
+    }
+
+    // ---- The objective, top left.
+    Widget Objective : FromTopLeft {
+        AnchorData.AnchoredPosition = (60, -56)
+        AnchorData.SizeDelta = (440, 150)
+        // The side clusters curve round the eye: turned on their outer edges, the inner edges further away.
+        RenderTransformPivot = (0, 0.5)
+        RenderRotation = (0, -12, 0)
+
+        RectBlock ObjectiveTab : AccentBar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.SizeDelta = (3, 60)
+        }
+        Text ObjectiveTag : Meta {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (16, 0)
+            AnchorData.SizeDelta = (300, 18)
+            Text = "当前任务   ·   OBJECTIVE"
+        }
+        Text ObjectiveTitle : Heading {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (16, -24)
+            AnchorData.SizeDelta = (300, 36)
+            FontSize = 26
+            Text = "旧港的灯"
+        }
+        Text ObjectiveDist : Readout {
+            AnchorData.AnchorMin = (1, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (1, 1)
+            AnchorData.AnchoredPosition = (0, -30)
+            AnchorData.SizeDelta = (140, 24)
+            FontSize = 16
+        }
+        RectBlock Obj0Box : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (16, -89)
+            AnchorData.SizeDelta = (10, 10)
+            BodyColor = @Clear
+            bEnableBorder = true
+            BorderWidth = 1
+            BorderColor = #8FE3FFAA
+        }
+        Text Obj0Text : Label {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (36, -80)
+            AnchorData.SizeDelta = (300, 20)
+            FontSize = 14
+            Text = "取得航标灯芯"
+        }
+        Text Obj0Count : Meta {
+            AnchorData.AnchorMin = (1, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (1, 1)
+            AnchorData.AnchoredPosition = (0, -80)
+            AnchorData.SizeDelta = (100, 20)
+            FontSize = 12
+            HAlign = Right
+            Color = @Cyan
+            Text = "0 / 1" @noloc
+        }
+        RectBlock Obj1Box : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (16, -117)
+            AnchorData.SizeDelta = (10, 10)
+            BodyColor = @Clear
+            bEnableBorder = true
+            BorderWidth = 1
+            BorderColor = #8FE3FFAA
+        }
+        Text Obj1Text : Label {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (36, -108)
+            AnchorData.SizeDelta = (300, 20)
+            FontSize = 14
+            Color = @InkDim
+            Text = "点亮旧港灯塔"
+        }
+        // The sweep over a line that changes: a faint cyan block with a bright leading edge (placed by the HUD).
+        RectBlock ObjSweep : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (16, -79)
+            AnchorData.SizeDelta = (0, 22)
+            BodyColor = #8FE3FF2A
+            Visibility = Collapsed
+
+            RectBlock ObjSweepEdge : Bar {
+                AnchorData.AnchorMin = (1, 0)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (1, 0.5)
+                AnchorData.SizeDelta = (2, 0)
+                BodyColor = @Cyan
+            }
+        }
+    }
+
+    // ---- Hull and energy, bottom left.
+    Widget Status : FromBottomLeft {
+        AnchorData.AnchoredPosition = (60, 56)
+        AnchorData.SizeDelta = (420, 132)
+        RenderTransformPivot = (0, 0.5)
+        RenderRotation = (0, -12, 0)
+
+        Text HullLabel : ReadLabel { AnchorData.AnchoredPosition = (0, 0)  Text = "船体   HULL" }
+        Text HullValue : ReadValue { AnchorData.AnchoredPosition = (0, 4) }
+        Native.ProgressBar HullBar : HudBar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -28)
+            AnchorData.SizeDelta = (0, 6)
+            Percent = 1
+        }
+        Text EnergyLabel : ReadLabel { AnchorData.AnchoredPosition = (0, -50)  Text = "能量   ENERGY" }
+        Text EnergyValue : ReadValue { AnchorData.AnchoredPosition = (0, -46) }
+        Native.ProgressBar EnergyBar : HudBar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -78)
+            AnchorData.SizeDelta = (0, 6)
+            Percent = 0.64
+        }
+        Text ShieldLine : Meta {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 0)
+            AnchorData.Pivot = (0.5, 0)
+            AnchorData.SizeDelta = (0, 18)
+            FontSize = 11
+            Text = "护盾 SHIELD   ONLINE        导航 NAV   LOCKED" @noloc
+        }
+    }
+
+    // ---- Speed and position, bottom right.
+    Widget Flight : FromBottomRight {
+        AnchorData.AnchoredPosition = (-60, 56)
+        AnchorData.SizeDelta = (380, 132)
+        RenderTransformPivot = (1, 0.5)
+        RenderRotation = (0, 12, 0)
+
+        Text SpeedValue : Readout {
+            AnchorData.AnchorMin = (1, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (1, 1)
+            AnchorData.AnchoredPosition = (-64, 6)
+            AnchorData.SizeDelta = (220, 60)
+            FontSize = 50
+        }
+        Text SpeedUnit : Tag {
+            AnchorData.AnchorMin = (1, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (1, 1)
+            AnchorData.AnchoredPosition = (0, -24)
+            AnchorData.SizeDelta = (56, 20)
+            FontSize = 12
+            Text = "M/S" @noloc
+        }
+        Text SpeedLabel : ReadLabel {
+            AnchorData.AnchoredPosition = (0, -14)
+            Text = "速度   SPEED"
+        }
+        Text ThrustLabel : ReadLabel { AnchorData.AnchoredPosition = (0, -66)  Text = "推力   THRUST" }
+        Native.ProgressBar ThrustBar : HudBar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -90)
+            AnchorData.SizeDelta = (0, 6)
+            Percent = 0.5
+        }
+        Text Coords : Meta {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 0)
+            AnchorData.Pivot = (0.5, 0)
+            AnchorData.SizeDelta = (0, 18)
+            FontSize = 11
+            HAlign = Right
+        }
+    }
+
+    // ---- What was picked up, right of the middle.
+    Widget Toasts {
+        AnchorData.AnchorMin = (1, 0.5)
+        AnchorData.AnchorMax = (1, 0.5)
+        AnchorData.Pivot = (1, 0.5)
+        AnchorData.AnchoredPosition = (-60, 40)
+        AnchorData.SizeDelta = (360, 200)
+        RenderTransformPivot = (1, 0.5)
+        RenderRotation = (0, 12, 0)
+        Widget Toast0 : ToastBox {
+            AnchorData.AnchoredPosition = (0, 0)
+            RectBlock Toast0Back : ToastBack {}
+            RectBlock Toast0Bar : ToastBar {}
+            Text Toast0Tag : ToastTag { Text = "获得   ACQUIRED" }
+            Text Toast0Glyph : ToastGlyph {}
+            Text Toast0Name : ToastName {}
+            Text Toast0Count : ToastCount {}
+        }
+        Widget Toast1 : ToastBox {
+            AnchorData.AnchoredPosition = (0, -70)
+            RectBlock Toast1Back : ToastBack {}
+            RectBlock Toast1Bar : ToastBar {}
+            Text Toast1Tag : ToastTag { Text = "获得   ACQUIRED" }
+            Text Toast1Glyph : ToastGlyph {}
+            Text Toast1Name : ToastName {}
+            Text Toast1Count : ToastCount {}
+        }
+        Widget Toast2 : ToastBox {
+            AnchorData.AnchoredPosition = (0, -140)
+            RectBlock Toast2Back : ToastBack {}
+            RectBlock Toast2Bar : ToastBar {}
+            Text Toast2Tag : ToastTag { Text = "获得   ACQUIRED" }
+            Text Toast2Glyph : ToastGlyph {}
+            Text Toast2Name : ToastName {}
+            Text Toast2Count : ToastCount {}
+        }
+    }
+
+    // ---- The voyage begins.
+    Widget Banner : AtCentre {
+        AnchorData.AnchoredPosition = (0, 200)
+        AnchorData.SizeDelta = (700, 90)
+
+        Text BannerTitle : Heading {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 52)
+            FontSize = 40
+            HAlign = Center
+            Text = "航程开始"
+        }
+        Text BannerEn : Tag {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 0)
+            AnchorData.Pivot = (0.5, 0)
+            AnchorData.AnchoredPosition = (0, 6)
+            AnchorData.SizeDelta = (0, 20)
+            HAlign = Center
+        }
+        RectBlock BannerRuleL : Bar {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (40, 10)
+            AnchorData.SizeDelta = (140, 1)
+            BodyColor = @LineStrong
+        }
+        RectBlock BannerRuleR : Bar {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.Pivot = (1, 0.5)
+            AnchorData.AnchoredPosition = (-40, 10)
+            AnchorData.SizeDelta = (140, 1)
+            BodyColor = @LineStrong
+        }
+    }
+
+    }
+
+    PixelSort CenterSort : FillSort {}
+}

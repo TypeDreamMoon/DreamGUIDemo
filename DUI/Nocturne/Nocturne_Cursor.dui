@@ -1,0 +1,39 @@
+// The NOCTURNE//OS pointer the director draws on the screen in recordings: a thin cyan ring with four short ticks
+// and a small square at the hot spot, which is the centre -- so the root's pivot is too.
+class /Game/Nocturne/UI/WBP_Nocturne_Cursor
+use "Nocturne/Nocturne_Common.dui"
+
+Widget Root {
+    AnchorData.SizeDelta = (40, 40)
+    AnchorData.Pivot = (0.5, 0.5)
+    Raycastable = Disabled
+
+    + Overlay {}
+
+    Ring Halo {
+        StartAngle = 0
+        EndAngle = 360
+        LineWidth = 1.5
+        Segment = 64
+        Color = #8FE3FFCC
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+    }
+
+    Widget Ticks {
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+
+        RectBlock TickTop : AccentBar { AnchorData.AnchorMin = (0.5, 1)  AnchorData.AnchorMax = (0.5, 1)  AnchorData.Pivot = (0.5, 0)  AnchorData.AnchoredPosition = (0, 3)  AnchorData.SizeDelta = (1.5, 7) }
+        RectBlock TickBottom : AccentBar { AnchorData.AnchorMin = (0.5, 0)  AnchorData.AnchorMax = (0.5, 0)  AnchorData.Pivot = (0.5, 1)  AnchorData.AnchoredPosition = (0, -3)  AnchorData.SizeDelta = (1.5, 7) }
+        RectBlock TickLeft : AccentBar { AnchorData.AnchorMin = (0, 0.5)  AnchorData.AnchorMax = (0, 0.5)  AnchorData.Pivot = (1, 0.5)  AnchorData.AnchoredPosition = (-3, 0)  AnchorData.SizeDelta = (7, 1.5) }
+        RectBlock TickRight : AccentBar { AnchorData.AnchorMin = (1, 0.5)  AnchorData.AnchorMax = (1, 0.5)  AnchorData.Pivot = (0, 0.5)  AnchorData.AnchoredPosition = (3, 0)  AnchorData.SizeDelta = (7, 1.5) }
+    }
+
+    RectBlock Dot : Bar {
+        AnchorData.SizeDelta = (6, 6)
+        BodyColor = #FFFFFF
+        @slot HorizontalAlignment = Center
+        @slot VerticalAlignment = Center
+    }
+}

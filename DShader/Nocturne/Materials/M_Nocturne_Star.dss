@@ -1,0 +1,25 @@
+// M_Nocturne_Star.dss -- a star of the NOCTURNE//OS constellation, on a small sphere. A cyan-white core that faces the
+// camera, a cyan rim, and a slow breath. Bright enough that bloom gives it its glow. Hover and focus raise Strength.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = Opaque)
+
+/// @group Star|Look   @sort 10   @desc The core's colour (linear)
+uniform float4 CoreColor = float4(0.88, 0.96, 1.0, 1.0);
+/// @group Star|Look   @sort 20   @desc The rim's colour (linear)
+uniform float4 RimColor = float4(0.25, 0.70, 1.0, 1.0);
+/// @group Star|Look   @sort 30   @slider 0 60   @desc Overall brightness; the game raises it on hover
+uniform float Strength = 10.0;
+/// @group Star|Motion   @sort 40   @slider 0 1   @desc How much the star breathes
+uniform float Breath = 0.12;
+/// @group Star|Motion   @sort 50   @slider 0 6   @desc Breathing speed
+uniform float BreathSpeed = 1.4;
+
+export void M_Nocturne_Star(inout material m)
+{
+    float3 N = normalize(UE.VertexNormalWS());
+    float3 V = UE.CameraVectorWS();
+    float Facing = saturate(dot(N, V));
+    float Core = pow(Facing, 3.0);
+    float Rim = pow(1.0 - Facing, 2.5);
+    float Pulse = 1.0 - Breath + Breath * (0.5 + 0.5 * sin(UE.Time() * BreathSpeed));
+    m.EmissiveColor = (CoreColor.rgb * Core + RimColor.rgb * Rim * 0.8) * Strength * Pulse;
+}

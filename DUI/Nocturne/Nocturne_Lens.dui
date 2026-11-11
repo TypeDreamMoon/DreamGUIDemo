@@ -1,0 +1,25 @@
+// NOCTURNE//OS's lens (UNocturneLens): one layer over everything on the screen, under the cursor. A background pixelate
+// under a stylize stack -- glitch, CRT, chromatic aberration, film grain, vignette -- whose layers the C++ writes every
+// frame from how fast the camera goes, how damaged the hull is, the title's tube, and pulses for screens arriving,
+// hits, the wake and the dive. Both are switched off while nothing asks for them.
+class /Game/Nocturne/UI/WBP_Nocturne_Lens
+use "Nocturne/Nocturne_Common.dui"
+
+Widget Root : Fill {
+    Raycastable = Disabled
+
+    + Overlay {}
+
+    BackgroundPixelate Blocks {
+        PixelateStrength = 0
+        bRaycastTarget = false
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+    }
+    StylizeEffect Grade {
+        Target = Backdrop
+        bRaycastTarget = false
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+    }
+}

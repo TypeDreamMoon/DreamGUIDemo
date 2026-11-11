@@ -1,0 +1,452 @@
+// NOCTURNE//OS's music box (UNocturneMusicScreen), behind the star 吟, which sits in the middle of the frame. Round the
+// star: the track's progress as a ring, a spectrum standing out from it, and the line being sung running round the
+// top of it as text on a circle, the next line round the bottom. The track list on the left; on the right the whole
+// lyric, scrolling and lighting line by line (DreamGUI's lyrics view). Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_MusicBox
+use "Nocturne/Nocturne_Common.dui"
+
+resources {
+    Asset Cover1 = /Game/Nocturne/Textures/Covers/T_Cover_01
+    Asset Cover2 = /Game/Nocturne/Textures/Covers/T_Cover_02
+    Asset Cover3 = /Game/Nocturne/Textures/Covers/T_Cover_03
+    Asset Cover4 = /Game/Nocturne/Textures/Covers/T_Cover_04
+    Asset Cover5 = /Game/Nocturne/Textures/Covers/T_Cover_05
+    Asset Cover6 = /Game/Nocturne/Textures/Covers/T_Cover_06
+}
+
+style AtCentre {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+// A spectrum bar: placed on the ring and turned outward by the screen; it grows from its foot.
+style SpecBar : Bar {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0)
+    AnchorData.SizeDelta = (4, 8)
+    RenderTransformPivot = (0.5, 0)
+    BodyColor = #8FE3FF66
+}
+style TrackRow {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.SizeDelta = (0, 60)
+    + UIButton { TransitionType = None }
+}
+style TrackBack : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, -6)
+    BodyColor = @Clear
+    bRaycastTarget = true
+}
+style TrackBar : AccentBar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (3, -18)
+}
+style TrackCover {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (14, 0)
+    AnchorData.SizeDelta = (42, 42)
+    Brush.TintColor = #FFFFFF
+    bRaycastTarget = false
+}
+style TrackTitle : Label {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (68, 8)
+    AnchorData.SizeDelta = (170, 26)
+    FontSize = 17
+}
+style TrackEn : SubLabel {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (68, -13)
+    AnchorData.SizeDelta = (180, 16)
+    FontSize = 10
+}
+style TrackTime : Meta {
+    AnchorData.AnchorMin = (1, 0.5)
+    AnchorData.AnchorMax = (1, 0.5)
+    AnchorData.Pivot = (1, 0.5)
+    AnchorData.AnchoredPosition = (-16, 0)
+    AnchorData.SizeDelta = (60, 24)
+    FontSize = 12
+    HAlign = Right
+}
+style Orbit : Label {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (1000, 40)
+    HAlign = Center
+}
+
+Widget Root : Fill {
+    RectBlock Dim : ScreenDim { BodyColor = #03060A55 }
+
+    Widget Rig : Fill {
+
+        // ---- Round the star.
+        Widget Disc : AtCentre {
+            AnchorData.SizeDelta = (760, 760)
+            Raycastable = Disabled
+
+            PolygonLine SigilDisc : HexSigil {
+                AnchorData.AnchorMin = (0.5, 0.5)
+                AnchorData.AnchorMax = (0.5, 0.5)
+                AnchorData.SizeDelta = (478, 478)
+                Sides = 12
+                LineWidth = 1
+                Color = #8FE3FF24
+            }
+            Ring ProgressTrack : AtCentre {
+                AnchorData.SizeDelta = (520, 520)
+                StartAngle = 0
+                EndAngle = 360
+                LineWidth = 2
+                Segment = 128
+                Color = #8FE3FF22
+            }
+            Ring ProgressArc : AtCentre {
+                AnchorData.SizeDelta = (520, 520)
+                StartAngle = 0
+                EndAngle = 10
+                LineWidth = 3
+                Segment = 128
+                Color = @Cyan
+            }
+            Widget Spectrum : AtCentre {
+                AnchorData.SizeDelta = (760, 760)
+                RectBlock Spec0 : SpecBar {}
+                RectBlock Spec1 : SpecBar {}
+                RectBlock Spec2 : SpecBar {}
+                RectBlock Spec3 : SpecBar {}
+                RectBlock Spec4 : SpecBar {}
+                RectBlock Spec5 : SpecBar {}
+                RectBlock Spec6 : SpecBar {}
+                RectBlock Spec7 : SpecBar {}
+                RectBlock Spec8 : SpecBar {}
+                RectBlock Spec9 : SpecBar {}
+                RectBlock Spec10 : SpecBar {}
+                RectBlock Spec11 : SpecBar {}
+                RectBlock Spec12 : SpecBar {}
+                RectBlock Spec13 : SpecBar {}
+                RectBlock Spec14 : SpecBar {}
+                RectBlock Spec15 : SpecBar {}
+                RectBlock Spec16 : SpecBar {}
+                RectBlock Spec17 : SpecBar {}
+                RectBlock Spec18 : SpecBar {}
+                RectBlock Spec19 : SpecBar {}
+                RectBlock Spec20 : SpecBar {}
+                RectBlock Spec21 : SpecBar {}
+                RectBlock Spec22 : SpecBar {}
+                RectBlock Spec23 : SpecBar {}
+                RectBlock Spec24 : SpecBar {}
+                RectBlock Spec25 : SpecBar {}
+                RectBlock Spec26 : SpecBar {}
+                RectBlock Spec27 : SpecBar {}
+                RectBlock Spec28 : SpecBar {}
+                RectBlock Spec29 : SpecBar {}
+                RectBlock Spec30 : SpecBar {}
+                RectBlock Spec31 : SpecBar {}
+                RectBlock Spec32 : SpecBar {}
+                RectBlock Spec33 : SpecBar {}
+                RectBlock Spec34 : SpecBar {}
+                RectBlock Spec35 : SpecBar {}
+                RectBlock Spec36 : SpecBar {}
+                RectBlock Spec37 : SpecBar {}
+                RectBlock Spec38 : SpecBar {}
+                RectBlock Spec39 : SpecBar {}
+                RectBlock Spec40 : SpecBar {}
+                RectBlock Spec41 : SpecBar {}
+                RectBlock Spec42 : SpecBar {}
+                RectBlock Spec43 : SpecBar {}
+                RectBlock Spec44 : SpecBar {}
+                RectBlock Spec45 : SpecBar {}
+                RectBlock Spec46 : SpecBar {}
+                RectBlock Spec47 : SpecBar {}
+            }
+            Text OrbitNow : Orbit {
+                FontSize = 24
+                Color = #FFFFFF
+                + MeshModifierTextOnPath {
+                    Source = Circle
+                    Radius = 316
+                    CircleCentre = (0, 0)
+                    StartAngle = -90
+                    SweepAngle = 180
+                    bClockwise = true
+                    Align = Centre
+                    LetterSpacing = 4
+                }
+            }
+            Text OrbitNext : Orbit {
+                FontSize = 17
+                Color = @InkDim
+                + MeshModifierTextOnPath {
+                    Source = Circle
+                    Radius = 330
+                    CircleCentre = (0, 0)
+                    StartAngle = -90
+                    SweepAngle = 180
+                    bClockwise = false
+                    Align = Centre
+                    Anchor = Top
+                    LetterSpacing = 3
+                }
+            }
+        }
+
+        // What is playing and how far in, under the star.
+        Widget NowPlaying : AtCentre {
+            AnchorData.AnchoredPosition = (0, -412)
+            AnchorData.SizeDelta = (520, 64)
+            Raycastable = Disabled
+
+            Text NowTitle : Heading {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (0.5, 1)
+                AnchorData.SizeDelta = (0, 36)
+                FontSize = 26
+                HAlign = Center
+            }
+            Text NowTime : Readout {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.SizeDelta = (0, 22)
+                FontSize = 14
+                HAlign = Center
+            }
+        }
+
+        // ---- Left: the tracks. Turned in on its right edge.
+        Widget LeftPanel : Middle {
+            AnchorData.AnchoredPosition = (-700, 0)
+            AnchorData.SizeDelta = (340, 560)
+            RenderTransformPivot = (1, 0.5)
+            RenderRotation = (0, -14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock LeftPlate : PanelPlate {}
+            RectBlock LeftFrame : PanelFrame {}
+            Polygon TrimLeftTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimLeftTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimLeftBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimLeftBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock LeftTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget TrackList : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-40, 500)
+
+                Text ListTag : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (-8, 18)
+                    Text = "TRACKS  ·  曲目"
+                }
+                Text Breadcrumb : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -26)
+                    AnchorData.SizeDelta = (-8, 20)
+                    FontSize = 13
+                    Text = "星图   /   吟 · 音乐盒"
+                }
+                RectBlock ListRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -58)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+                Widget Track0 : TrackRow {
+                    AnchorData.AnchoredPosition = (0, -70)
+                    RectBlock Track0Back : TrackBack {}
+                    RectBlock Track0Bar : TrackBar {}
+                    Image Track0Cover : TrackCover { Brush.ResourceObject = @Cover1 }
+                    Text Track0Title : TrackTitle { Text = "夜曲" }
+                    Text Track0En : TrackEn { Text = "NOCTURNE" @noloc }
+                    Text Track0Time : TrackTime { Text = "3:42" @noloc }
+                }
+                Widget Track1 : TrackRow {
+                    AnchorData.AnchoredPosition = (0, -134)
+                    RectBlock Track1Back : TrackBack {}
+                    RectBlock Track1Bar : TrackBar {}
+                    Image Track1Cover : TrackCover { Brush.ResourceObject = @Cover2 }
+                    Text Track1Title : TrackTitle { Text = "旧港灯塔" }
+                    Text Track1En : TrackEn { Text = "HARBOR LIGHT" @noloc }
+                    Text Track1Time : TrackTime { Text = "2:58" @noloc }
+                }
+                Widget Track2 : TrackRow {
+                    AnchorData.AnchoredPosition = (0, -198)
+                    RectBlock Track2Back : TrackBack {}
+                    RectBlock Track2Bar : TrackBar {}
+                    Image Track2Cover : TrackCover { Brush.ResourceObject = @Cover3 }
+                    Text Track2Title : TrackTitle { Text = "第六颗星" }
+                    Text Track2En : TrackEn { Text = "THE SIXTH STAR" @noloc }
+                    Text Track2Time : TrackTime { Text = "4:05" @noloc }
+                }
+                Widget Track3 : TrackRow {
+                    AnchorData.AnchoredPosition = (0, -262)
+                    RectBlock Track3Back : TrackBack {}
+                    RectBlock Track3Bar : TrackBar {}
+                    Image Track3Cover : TrackCover { Brush.ResourceObject = @Cover4 }
+                    Text Track3Title : TrackTitle { Text = "弦上的风" }
+                    Text Track3En : TrackEn { Text = "WIND ON THE STRING" @noloc }
+                    Text Track3Time : TrackTime { Text = "3:16" @noloc }
+                }
+                Widget Track4 : TrackRow {
+                    AnchorData.AnchoredPosition = (0, -326)
+                    RectBlock Track4Back : TrackBack {}
+                    RectBlock Track4Bar : TrackBar {}
+                    Image Track4Cover : TrackCover { Brush.ResourceObject = @Cover5 }
+                    Text Track4Title : TrackTitle { Text = "未寄出的信" }
+                    Text Track4En : TrackEn { Text = "UNSENT LETTER" @noloc }
+                    Text Track4Time : TrackTime { Text = "2:37" @noloc }
+                }
+                Widget Track5 : TrackRow {
+                    AnchorData.AnchoredPosition = (0, -390)
+                    RectBlock Track5Back : TrackBack {}
+                    RectBlock Track5Bar : TrackBar {}
+                    Image Track5Cover : TrackCover { Brush.ResourceObject = @Cover6 }
+                    Text Track5Title : TrackTitle { Text = "启明之前" }
+                    Text Track5En : TrackEn { Text = "BEFORE THE DAWN" @noloc }
+                    Text Track5Time : TrackTime { Text = "5:01" @noloc }
+                }
+            }
+            PixelSort LeftSort : FillSort {}
+        }
+
+        // ---- Right: the whole lyric. Turned in on its left edge.
+        Widget RightPanel : Middle {
+            AnchorData.AnchoredPosition = (700, 0)
+            AnchorData.SizeDelta = (360, 560)
+            RenderTransformPivot = (0, 0.5)
+            RenderRotation = (0, 14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock RightPlate : PanelPlate {}
+            RectBlock RightFrame : PanelFrame {}
+            Polygon TrimRightTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimRightTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimRightBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimRightBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock RightTab : AccentBar {
+                AnchorData.AnchorMin = (1, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (1, 1)
+                AnchorData.AnchoredPosition = (-24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Text LyricTag : Meta {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (0.5, 1)
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-48, 18)
+                Text = "LYRICS  ·  歌词"
+            }
+            RectBlock LyricRule : Bar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (0.5, 1)
+                AnchorData.AnchoredPosition = (0, -58)
+                AnchorData.SizeDelta = (-48, 1)
+            }
+            Widget Lyrics {
+                AnchorData.AnchorMin = (0.5, 0)
+                AnchorData.AnchorMax = (0.5, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 24)
+                AnchorData.SizeDelta = (312, 460)
+                Clipping = ClipToBounds
+                Raycastable = Disabled
+                + LyricsView {
+                    Font = @Font
+                    FontSize = 21
+                    TextColor = #D7E2EA
+                    ActiveLineAnchor = 0.32
+                    InactiveAlpha = 0.32
+                    InactiveScale = 0.92
+                    HorizontalPadding = 0
+                }
+            }
+            PixelSort RightSort : FillSort {}
+        }
+    }
+
+    // ---- The key hints.
+    Widget KeyBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 60)
+
+        RectBlock KeyBarBack : Bar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BodyColor = #05080CCC
+        }
+        RectBlock KeyBarRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 1)
+        }
+        HorizontalBox Hints {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (80, 0)
+            AnchorData.SizeDelta = (1100, 30)
+            Spacing = 26
+
+            Widget HintPlay : HintItem {
+                @slot { MinDesiredSize = (170, 30)  MaxDesiredSize = (170, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "SPACE" @noloc }
+                Text : HintLabel { Text = "播放 / 暂停" }
+            }
+            Widget HintTrack : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "Q  E" @noloc }
+                Text : HintLabel { Text = "切换曲目" }
+            }
+            Widget HintBack : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                + UIButton { TransitionType = None }
+                RectBlock HintBackHit : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.SizeDelta = (16, 12)
+                    BodyColor = @Clear
+                    bRaycastTarget = true
+                }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "ESC" @noloc }
+                Text HintBackLabel : HintLabel { Text = "返回" }
+            }
+        }
+    }
+}

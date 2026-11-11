@@ -1,0 +1,26 @@
+// M_Nocturne_Wall.dss -- the world shot's wall and pillar (ANocturneDeck): a dark slab with a faint grid and lit edges.
+// Unlit, because the star field has no light in it: a lit material would come out black against a black sky.
+#pragma material(Backend = Graph, Domain = Surface, ShadingModel = Unlit, BlendMode = Opaque)
+
+/// @group Wall|Look   @sort 10   @desc The slab's colour (linear)
+uniform float4 BodyColor = float4(0.012, 0.018, 0.028, 1.0);
+/// @group Wall|Look   @sort 20   @desc The grid's and the edges' colour (linear)
+uniform float4 LineColor = float4(0.20, 0.55, 0.80, 1.0);
+/// @group Wall|Look   @sort 30   @slider 1 32   @desc Grid cells across a face
+uniform float GridCells = 12.0;
+/// @group Wall|Look   @sort 40   @slider 0 4   @desc How bright the lines are
+uniform float LineStrength = 0.7;
+
+export void M_Nocturne_Wall(inout material m)
+{
+    // The engine cube runs 0..1 across every face.
+    float2 UV = UE.TexCoord(Index = 0);
+    float2 Edge = min(UV, 1.0 - UV);
+    float EdgeLine = 1.0 - smoothstep(0.0, 0.015, min(Edge.x, Edge.y));
+    float2 Cell = abs(frac(UV * GridCells) - 0.5);
+    float GridLine = smoothstep(0.46, 0.5, max(Cell.x, Cell.y));
+    // A rim where the face turns away, so the slab's silhouette reads even where its edges are out of frame.
+    float Facing = saturate(dot(normalize(UE.VertexNormalWS()), UE.CameraVectorWS()));
+    float Rim = pow(1.0 - Facing, 3.0);
+    m.EmissiveColor = BodyColor.rgb + LineColor.rgb * LineStrength * (EdgeLine * 1.4 + GridLine * 0.22 + Rim * 0.35);
+}

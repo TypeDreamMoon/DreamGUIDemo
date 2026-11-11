@@ -1,0 +1,301 @@
+// NOCTURNE//OS's star map chrome (UNocturneMainMenu): what stays on the screen while the constellation is the menu --
+// the top bar, the list of routes in the lower left (one entry a star, the keyboard and pad's way through them), and
+// the key hints. The stars and their labels are in the world (ANocturneMenu). Design size 1920 x 1080; the lower left
+// is kept clear of every star label from the overview camera (NocturneStars.h).
+class /Game/Nocturne/UI/WBP_Nocturne_MainMenu
+use "Nocturne/Nocturne_Common.dui"
+
+style TopLeftAt {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style LeftMid {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+}
+
+// ---- One entry of the route list: 380 x 46, its parts placed from its left middle.
+style NavItem : TopLeftAt {
+    AnchorData.SizeDelta = (380, 46)
+    + UIButton { TransitionType = None }
+}
+style NavBack : Bar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, -4)
+    BodyColor = @Clear
+    bRaycastTarget = true
+}
+style NavBar : AccentBar {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (3, -14)
+}
+style NavNum : Meta {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (18, 0)
+    AnchorData.SizeDelta = (30, 24)
+    FontSize = 12
+}
+style NavGlyph : Label {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (54, 0)
+    AnchorData.SizeDelta = (70, 30)
+    FontSize = 21
+}
+style NavName : Label {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (132, 0)
+    AnchorData.SizeDelta = (130, 26)
+    FontSize = 15
+    Color = @InkDim
+}
+style NavState : SubLabel {
+    AnchorData.AnchorMin = (1, 0.5)
+    AnchorData.AnchorMax = (1, 0.5)
+    AnchorData.Pivot = (1, 0.5)
+    AnchorData.AnchoredPosition = (-16, 0)
+    AnchorData.SizeDelta = (90, 24)
+    HAlign = Right
+}
+
+// ---- Key hints, as on the settings screen.
+style MenuHintCap : Bar {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (64, 24)
+    bEnableBody = false
+    bEnableBorder = true
+    BorderWidth = 1
+    BorderColor = #8FE3FF88
+}
+style MenuHintKey : Tag {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (64, 24)
+    FontSize = 12
+    FontSpace = (1, 0)
+    HAlign = Center
+}
+style MenuHintLabel : Label {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (74, 0)
+    AnchorData.SizeDelta = (90, 30)
+    FontSize = 15
+    Color = @InkDim
+}
+
+Widget Root : Fill {
+
+    // ---- Top bar: where you are. No plate: the sky shows through; a hairline under it.
+    Widget TopBar {
+        AnchorData.AnchorMin = (0, 1)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.Pivot = (0.5, 1)
+        AnchorData.SizeDelta = (0, 72)
+
+        Text SysTag : Tag {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (60, 0)
+            AnchorData.SizeDelta = (200, 24)
+            FontSize = 15
+            Text = "NOCTURNE//OS" @noloc
+        }
+        Text Crumb : Meta {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (280, 0)
+            AnchorData.SizeDelta = (300, 24)
+            FontSize = 13
+            Color = @InkDim
+            Text = "星图   ·   STAR MAP"
+        }
+        Polygon StatusDot : MarkDiamond {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.AnchoredPosition = (-424, 0)
+            AnchorData.SizeDelta = (8, 8)
+            Color = @Amber
+        }
+        Text Status : Meta {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.Pivot = (1, 0.5)
+            AnchorData.AnchoredPosition = (-60, 0)
+            AnchorData.SizeDelta = (330, 24)
+            FontSize = 13
+            HAlign = Right
+            Text = "ONLINE      UID 0721      23:41" @noloc
+        }
+        RectBlock TopRule : Bar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 0)
+            AnchorData.Pivot = (0.5, 0)
+            AnchorData.SizeDelta = (-120, 1)
+        }
+        RectBlock TopTab : AccentBar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (0, 0)
+            AnchorData.Pivot = (0, 0)
+            AnchorData.AnchoredPosition = (60, 0)
+            AnchorData.SizeDelta = (96, 3)
+        }
+    }
+
+    // ---- The route list: one entry a star, in the menu's order.
+    Widget RouteList {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (0, 0)
+        AnchorData.Pivot = (0, 0)
+        AnchorData.AnchoredPosition = (60, 92)
+        AnchorData.SizeDelta = (380, 348)
+        // Curved round the eye: turned on its outer edge, the inner edge further away (NocturneMainMenu swings it in).
+        RenderTransformPivot = (0, 0.5)
+        RenderRotation = (0, -14, 0)
+
+        RectBlock ListPlate : PlateBody {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BodyColor = #0B0F1499
+        }
+        Text ListHead : Meta {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -16)
+            AnchorData.SizeDelta = (-36, 20)
+            Text = "航线   ·   ROUTES"
+        }
+        RectBlock ListRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -46)
+            AnchorData.SizeDelta = (-36, 1)
+        }
+
+        Widget Nav0 : NavItem {
+            AnchorData.AnchoredPosition = (0, -56)
+            RectBlock Nav0Back : NavBack {}
+            RectBlock Nav0Bar : NavBar {}
+            Text Nav0Num : NavNum {}
+            Text Nav0Glyph : NavGlyph {}
+            Text Nav0Name : NavName {}
+            Text Nav0State : NavState {}
+        }
+        Widget Nav1 : NavItem {
+            AnchorData.AnchoredPosition = (0, -104)
+            RectBlock Nav1Back : NavBack {}
+            RectBlock Nav1Bar : NavBar {}
+            Text Nav1Num : NavNum {}
+            Text Nav1Glyph : NavGlyph {}
+            Text Nav1Name : NavName {}
+            Text Nav1State : NavState {}
+        }
+        Widget Nav2 : NavItem {
+            AnchorData.AnchoredPosition = (0, -152)
+            RectBlock Nav2Back : NavBack {}
+            RectBlock Nav2Bar : NavBar {}
+            Text Nav2Num : NavNum {}
+            Text Nav2Glyph : NavGlyph {}
+            Text Nav2Name : NavName {}
+            Text Nav2State : NavState {}
+        }
+        Widget Nav3 : NavItem {
+            AnchorData.AnchoredPosition = (0, -200)
+            RectBlock Nav3Back : NavBack {}
+            RectBlock Nav3Bar : NavBar {}
+            Text Nav3Num : NavNum {}
+            Text Nav3Glyph : NavGlyph {}
+            Text Nav3Name : NavName {}
+            Text Nav3State : NavState {}
+        }
+        Widget Nav4 : NavItem {
+            AnchorData.AnchoredPosition = (0, -248)
+            RectBlock Nav4Back : NavBack {}
+            RectBlock Nav4Bar : NavBar {}
+            Text Nav4Num : NavNum {}
+            Text Nav4Glyph : NavGlyph {}
+            Text Nav4Name : NavName {}
+            Text Nav4State : NavState {}
+        }
+        Widget Nav5 : NavItem {
+            AnchorData.AnchoredPosition = (0, -296)
+            RectBlock Nav5Back : NavBack {}
+            RectBlock Nav5Bar : NavBar {}
+            Text Nav5Num : NavNum {}
+            Text Nav5Glyph : NavGlyph {}
+            Text Nav5Name : NavName {}
+            Text Nav5State : NavState {}
+        }
+    }
+
+    // ---- Key hints, flat along the bottom.
+    Widget KeyBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 60)
+
+        RectBlock KeyBarBack : Bar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BodyColor = #05080CCC
+        }
+        RectBlock KeyBarRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 1)
+        }
+        Widget HintSelect : LeftMid {
+            AnchorData.AnchoredPosition = (80, 0)
+            AnchorData.SizeDelta = (170, 30)
+            RectBlock : MenuHintCap {}
+            Text : MenuHintKey { Text = "W  S" @noloc }
+            Text : MenuHintLabel { Text = "选择星" }
+        }
+        Widget HintEnter : LeftMid {
+            AnchorData.AnchoredPosition = (290, 0)
+            AnchorData.SizeDelta = (170, 30)
+            RectBlock : MenuHintCap {}
+            Text : MenuHintKey { Text = "ENTER" @noloc }
+            Text : MenuHintLabel { Text = "进入" }
+        }
+        Widget HintBack : LeftMid {
+            AnchorData.AnchoredPosition = (500, 0)
+            AnchorData.SizeDelta = (170, 30)
+            RectBlock : MenuHintCap {}
+            Text : MenuHintKey { Text = "ESC" @noloc }
+            Text : MenuHintLabel { Text = "返回" }
+        }
+        Text Version : Meta {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.Pivot = (1, 0.5)
+            AnchorData.AnchoredPosition = (-80, 0)
+            AnchorData.SizeDelta = (300, 24)
+            FontSize = 12
+            HAlign = Right
+            Text = "NOCTURNE//OS   BUILD N.26.11" @noloc
+        }
+    }
+}

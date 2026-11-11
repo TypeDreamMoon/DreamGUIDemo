@@ -1,0 +1,682 @@
+// NOCTURNE//OS's settings screen (UNocturneSettingsScreen). Three panels in a shallow arc over the dimmed star map --
+// the tab rail on the left and the detail on the right each turned 14 degrees in on their inner edge and set a little
+// back, the options flat in the middle -- and a flat key-hint bar along the bottom of the screen. The screen canvas
+// draws in perspective, so the turned panels foreshorten and are still clicked exactly. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_Settings
+use "Nocturne/Nocturne_Common.dui"
+use "Nocturne/Components/Nocturne_OptionRow.dui" as OptionRow
+
+// ---- Rows
+
+style RowBase {
+    AnchorData.SizeDelta = (840, 46)
+}
+style SelectorRow : RowBase { Kind = Selector }
+style SliderRow : RowBase { Kind = Slider }
+style SegmentRow : RowBase { Kind = Segment }
+style ToggleRow : RowBase { Kind = Toggle }
+style KeyRow : RowBase { Kind = Key }
+style ActionRow : RowBase { Kind = Action }
+style SectionHead : Meta {
+    AnchorData.SizeDelta = (840, 44)
+    VAlign = Bottom
+    Margin = (22, 0, 0, 6)
+}
+style PageArea {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.AnchoredPosition = (0, -112)
+    AnchorData.SizeDelta = (-80, 580)
+}
+
+Widget Root : Fill {
+    // The star map behind, dimmed rather than blurred: still alive, no longer in front.
+    RectBlock Dim : Bar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        BodyColor = #03060A99
+    }
+
+    // The three panels; the screen leans this a degree or two toward the pointer.
+    Widget Rig : Fill {
+
+        // ---- Left: where you are, and the tabs. Turned in on its right edge.
+        Widget LeftPanel : Middle {
+            AnchorData.AnchoredPosition = (-655, 12)
+            AnchorData.SizeDelta = (340, 660)
+            RenderTransformPivot = (1, 0.5)
+            RenderRotation = (0, -14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock LeftPlate : PanelPlate {}
+            RectBlock LeftFrame : PanelFrame {}
+            Polygon TrimLeftTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimLeftTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimLeftBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimLeftBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock LeftTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+
+            Widget LeftHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-48, 80)
+
+                Text SysTag : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 22)
+                    Text = "NOCTURNE//OS" @noloc
+                }
+                Text Breadcrumb : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -28)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                    Text = "星图   /   弦 · 设置"
+                }
+                RectBlock LeftRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -66)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+            }
+
+            VerticalBox TabList : TopBand {
+                AnchorData.AnchoredPosition = (0, -120)
+                AnchorData.SizeDelta = (-40, 420)
+                Spacing = 4
+
+                Widget Tab0 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Tab0Back : TabBack {}
+                    RectBlock Tab0Bar : TabBar {}
+                    Text Tab0Num : TabNum { Text = "01" @noloc }
+                    Text Tab0Text : TabText { Text = "画面" }
+                    Text Tab0En : TabEn { Text = "GRAPHICS" @noloc }
+                }
+                Widget Tab1 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Tab1Back : TabBack {}
+                    RectBlock Tab1Bar : TabBar {}
+                    Text Tab1Num : TabNum { Text = "02" @noloc }
+                    Text Tab1Text : TabText { Text = "显示" }
+                    Text Tab1En : TabEn { Text = "DISPLAY" @noloc }
+                }
+                Widget Tab2 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Tab2Back : TabBack {}
+                    RectBlock Tab2Bar : TabBar {}
+                    Text Tab2Num : TabNum { Text = "03" @noloc }
+                    Text Tab2Text : TabText { Text = "音频" }
+                    Text Tab2En : TabEn { Text = "AUDIO" @noloc }
+                }
+                Widget Tab3 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Tab3Back : TabBack {}
+                    RectBlock Tab3Bar : TabBar {}
+                    Text Tab3Num : TabNum { Text = "04" @noloc }
+                    Text Tab3Text : TabText { Text = "操作" }
+                    Text Tab3En : TabEn { Text = "CONTROLS" @noloc }
+                }
+                Widget Tab4 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Tab4Back : TabBack {}
+                    RectBlock Tab4Bar : TabBar {}
+                    Text Tab4Num : TabNum { Text = "05" @noloc }
+                    Text Tab4Text : TabText { Text = "辅助功能" }
+                    Text Tab4En : TabEn { Text = "ACCESSIBILITY" @noloc }
+                }
+                Widget Tab5 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Tab5Back : TabBack {}
+                    RectBlock Tab5Bar : TabBar {}
+                    Text Tab5Num : TabNum { Text = "06" @noloc }
+                    Text Tab5Text : TabText { Text = "语言" }
+                    Text Tab5En : TabEn { Text = "LANGUAGE" @noloc }
+                }
+            }
+
+            Text LeftFoot : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 22)
+                AnchorData.SizeDelta = (-48, 18)
+                FontSize = 11
+                Text = "PROFILE  0721    BUILD  N.26.11" @noloc
+            }
+        }
+
+        // ---- Middle: the options of the open tab.
+        Widget CenterPanel : Middle {
+            AnchorData.AnchoredPosition = (0, 4)
+            AnchorData.SizeDelta = (920, 720)
+
+            RectBlock CenterPlate : PanelPlate {}
+            RectBlock CenterFrame : PanelFrame {}
+            Polygon TrimCenterTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimCenterTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimCenterBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimCenterBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock CenterTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (40, 0)
+                AnchorData.SizeDelta = (96, 3)
+            }
+
+            Widget PageHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -24)
+                AnchorData.SizeDelta = (-80, 70)
+
+                Text PageTitle : Heading {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (0, 1)
+                    AnchorData.Pivot = (0, 1)
+                    AnchorData.SizeDelta = (200, 52)
+                    FontSize = 38
+                    Text = "画面"
+                }
+                Text PageEn : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (0, 1)
+                    AnchorData.Pivot = (0, 1)
+                    AnchorData.AnchoredPosition = (190, -16)
+                    AnchorData.SizeDelta = (300, 22)
+                    Text = "GRAPHICS" @noloc
+                }
+                Text PageIndex : Meta {
+                    AnchorData.AnchorMin = (1, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (1, 1)
+                    AnchorData.AnchoredPosition = (0, -16)
+                    AnchorData.SizeDelta = (120, 22)
+                    HAlign = Right
+                    Text = "01 / 06" @noloc
+                }
+                RectBlock PageRule : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 0)
+                    AnchorData.Pivot = (0.5, 0)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+                PolygonLine SigilPage : HexSigil { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            }
+
+            VerticalBox Page0 : PageArea {
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "预设  ·  PRESET" }
+                rows OptionRow : SegmentRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "画质预设", "QUALITY PRESET", "低|中|高|极高|自定义", 2, 4, "一次调整下方所有画质选项。改动任意一项后自动切到「自定义」。"
+                }
+                rows OptionRow : SliderRow (Label, En, Value, Min, Max, Step, Unit, Impact, Description) {
+                    "渲染比例", "RENDER SCALE", 80, 50, 100, 5, "%", 5, "先以较低分辨率渲染，再放大到屏幕。降低比例最能提升帧率，画面会略微变软。"
+                }
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "细节  ·  DETAIL" }
+                rows OptionRow : SelectorRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "抗锯齿", "ANTI-ALIASING", "关|FXAA|TAA|TSR", 3, 3, "平滑物体边缘的锯齿。TSR 画质最好，代价也最高。"
+                    "全局光照", "GLOBAL ILLUMINATION", "关|屏幕空间|动态全局光照", 2, 5, "光线在场景中的反弹。关闭后阴影里会明显变暗。" { bNeedsRestart = true }
+                    "反射", "REFLECTIONS", "屏幕空间|动态反射", 1, 4, "水面、金属和玻璃上的反射质量。"
+                }
+                rows OptionRow : SegmentRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "阴影质量", "SHADOW QUALITY", "低|中|高|极高", 2, 4, "阴影的分辨率与可见距离。"
+                    "纹理质量", "TEXTURE QUALITY", "低|中|高|极高", 3, 2, "贴图分辨率。显存不足时调低可以减少卡顿。"
+                }
+                rows OptionRow : ToggleRow (Label, En, ValueIndex, Impact, Description) {
+                    "体积雾", "VOLUMETRIC FOG", 1, 3, "星云与光束中的体积雾。"
+                    "景深", "DEPTH OF FIELD", 1, 1, "对焦以外的画面变得模糊，多用于过场。"
+                    "动态模糊", "MOTION BLUR", 0, 1, "镜头快速转动时的拖影。"
+                }
+            }
+
+            VerticalBox Page1 : PageArea {
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "窗口  ·  WINDOW" }
+                rows OptionRow : SelectorRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "显示模式", "DISPLAY MODE", "窗口|无边框全屏|全屏", 1, 0, "游戏窗口的显示方式。无边框全屏切换窗口最快。"
+                    "分辨率", "RESOLUTION", "1280 × 720|1920 × 1080|2560 × 1440|3840 × 2160", 2, 4, "输出到屏幕的画面尺寸。"
+                    "刷新率", "REFRESH RATE", "60 Hz|120 Hz|144 Hz|165 Hz|240 Hz", 2, 0, "显示器每秒刷新画面的次数。"
+                }
+                rows OptionRow : SliderRow (Label, En, Value, Min, Max, Step, Unit, Impact, Description) {
+                    "帧率上限", "FRAME RATE LIMIT", 120, 30, 240, 10, " FPS", 3, "限制每秒渲染的最大帧数。较低的上限能降低功耗与发热。"
+                }
+                rows OptionRow : ToggleRow (Label, En, ValueIndex, Impact, Description) {
+                    "垂直同步", "VERTICAL SYNC", 0, 1, "让画面刷新与显示器同步，消除撕裂，但会增加少许延迟。"
+                    "HDR", "HIGH DYNAMIC RANGE", 0, 0, "在支持 HDR 的显示器上输出更宽的亮度范围。" { bNeedsRestart = true }
+                }
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "画面  ·  VIEW" }
+                rows OptionRow : SliderRow (Label, En, Value, Min, Max, Step, Unit, Impact, Description) {
+                    "亮度", "BRIGHTNESS", 50, 0, 100, 1, "", 0, "调整整体亮度，以刚好看清暗处标记为准。"
+                    "视野", "FIELD OF VIEW", 90, 70, 110, 1, "°", 2, "镜头的水平视角。视野越大看到的越多，边缘变形也越明显。"
+                    "界面缩放", "UI SCALE", 100, 80, 120, 5, "%", 0, "所有界面元素的大小。"
+                }
+            }
+
+            VerticalBox Page2 : PageArea {
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "音量  ·  VOLUME" }
+                rows OptionRow : SliderRow (Label, En, Value, Min, Max, Step, Unit, Impact, Description) {
+                    "主音量", "MASTER VOLUME", 80, 0, 100, 1, "", 0, "所有声音的总音量。"
+                    "音乐", "MUSIC", 65, 0, 100, 1, "", 0, "背景音乐的音量。"
+                    "音效", "SOUND EFFECTS", 75, 0, 100, 1, "", 0, "战斗、环境与交互音效的音量。"
+                    "语音", "VOICE", 90, 0, 100, 1, "", 0, "角色对白的音量。"
+                    "界面音效", "INTERFACE", 50, 0, 100, 1, "", 0, "菜单与提示音的音量。"
+                }
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "输出  ·  OUTPUT" }
+                rows OptionRow : SelectorRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "扬声器", "SPEAKER SETUP", "耳机|立体声|5.1 环绕|7.1 环绕", 0, 0, "声音按哪种扬声器配置混音。"
+                }
+                rows OptionRow : SegmentRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "动态范围", "DYNAMIC RANGE", "窄|中|宽", 1, 0, "大小声的差距。夜间低音量游玩时选择「窄」。"
+                }
+                rows OptionRow : ToggleRow (Label, En, ValueIndex, Impact, Description) {
+                    "后台静音", "MUTE IN BACKGROUND", 1, 0, "切到其他窗口时自动静音。"
+                    "字幕", "SUBTITLES", 1, 0, "显示对白字幕。"
+                }
+            }
+
+            VerticalBox Page3 : PageArea {
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "移动  ·  MOVEMENT" }
+                rows OptionRow : KeyRow (Label, En, Values, Description) {
+                    "前进", "MOVE FORWARD", "W", "向前移动。点击后按下新的按键即可改绑。"
+                    "后退", "MOVE BACK", "S", "向后移动。"
+                    "左移", "STRAFE LEFT", "A", "向左平移。"
+                    "右移", "STRAFE RIGHT", "D", "向右平移。"
+                    "跳跃", "JUMP", "Space Bar", "跳跃，空中再按一次进行二段跳。"
+                }
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "界面  ·  INTERFACE" }
+                rows OptionRow : KeyRow (Label, En, Values, Description) {
+                    "星图", "STAR MAP", "M", "打开星图。"
+                    "交互", "INTERACT", "F", "与终端、物品和角色交互。"
+                }
+                rows OptionRow : SliderRow (Label, En, Value, Min, Max, Step, Unit, Impact, Description) {
+                    "鼠标灵敏度", "MOUSE SENSITIVITY", 1.0, 0.1, 3.0, 0.05, "", 0, "镜头随鼠标移动的速度。"
+                }
+                rows OptionRow : ToggleRow (Label, En, ValueIndex, Impact, Description) {
+                    "反转 Y 轴", "INVERT Y AXIS", 0, 0, "上下反转镜头的俯仰方向。"
+                }
+            }
+
+            VerticalBox Page4 : PageArea {
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "视觉  ·  VISUAL" }
+                rows OptionRow : SelectorRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "色觉辅助", "COLOR VISION", "关|红色弱|绿色弱|蓝色弱", 0, 0, "调整界面与标记的配色，便于区分。"
+                }
+                rows OptionRow : ToggleRow (Label, En, ValueIndex, Impact, Description) {
+                    "高对比度界面", "HIGH CONTRAST UI", 0, 0, "界面底板更深、文字更亮。"
+                    "减少动态效果", "REDUCE MOTION", 0, 0, "关闭界面的像素排序、视差与镜头漂移。"
+                }
+                rows OptionRow : SegmentRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "文字大小", "TEXT SIZE", "小|中|大|特大", 1, 0, "界面与字幕的文字大小。"
+                }
+                rows OptionRow : SliderRow (Label, En, Value, Min, Max, Step, Unit, Impact, Description) {
+                    "屏幕震动", "SCREEN SHAKE", 60, 0, 100, 5, "%", 0, "受击与爆炸时镜头的震动强度。"
+                }
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "操作  ·  INPUT" }
+                rows OptionRow : SegmentRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "瞄准辅助", "AIM ASSIST", "关|弱|标准|强", 2, 0, "使用手柄时，准星向目标吸附的程度。"
+                }
+                rows OptionRow : ToggleRow (Label, En, ValueIndex, Impact, Description) {
+                    "按住改为切换", "TOGGLE INSTEAD OF HOLD", 0, 0, "需要按住的操作改为按一下开启、再按一下关闭。"
+                    "手柄震动", "VIBRATION", 1, 0, "手柄的震动反馈。"
+                }
+            }
+
+            VerticalBox Page5 : PageArea {
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "语言  ·  LANGUAGE" }
+                rows OptionRow : SelectorRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "界面语言", "INTERFACE LANGUAGE", "简体中文|繁體中文|English|日本語|한국어", 0, 0, "菜单与提示的语言。" { bNeedsRestart = true }
+                    "语音语言", "VOICE LANGUAGE", "中文|日本語|English", 0, 0, "角色对白的语言。首次切换需要下载语音包。"
+                    "字幕语言", "SUBTITLE LANGUAGE", "简体中文|繁體中文|English|日本語|한국어", 0, 0, "字幕的语言，可以与语音不同。"
+                }
+                Text : SectionHead { @slot MinDesiredSize = (0, 44)  Text = "格式  ·  FORMAT" }
+                rows OptionRow : SegmentRow (Label, En, Values, ValueIndex, Impact, Description) {
+                    "时间格式", "TIME FORMAT", "24 小时|12 小时", 0, 0, "界面中时间的显示方式。"
+                    "单位", "UNITS", "公制|英制", 0, 0, "距离与速度的单位。"
+                }
+                rows OptionRow : ActionRow (Label, En, Values, Description) {
+                    "恢复默认", "RESET TO DEFAULTS", "执行", "把本页的所有选项恢复为默认值。" { Action = "reset" }
+                }
+            }
+
+            PixelSort CenterSort : FillSort {}
+        }
+
+        // ---- Right: what the highlighted option does. Turned in on its left edge.
+        Widget RightPanel : Middle {
+            AnchorData.AnchoredPosition = (675, 12)
+            AnchorData.SizeDelta = (380, 660)
+            RenderTransformPivot = (0, 0.5)
+            RenderRotation = (0, 14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock RightPlate : PanelPlate {}
+            RectBlock RightFrame : PanelFrame {}
+            Polygon TrimRightTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimRightTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimRightBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimRightBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock RightTab : AccentBar {
+                AnchorData.AnchorMin = (1, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (1, 1)
+                AnchorData.AnchoredPosition = (-24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+
+            Widget DetailBody : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-56, 600)
+
+                Text DetailTag : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 18)
+                    Text = "DETAIL  ·  说明"
+                }
+                Text DetailTitle : Heading {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -30)
+                    AnchorData.SizeDelta = (0, 40)
+                    FontSize = 28
+                }
+                Text DetailEn : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -74)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 12
+                }
+                RectBlock DetailRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -106)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+                Text DetailText : Label {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -122)
+                    AnchorData.SizeDelta = (0, 110)
+                    FontSize = 16
+                    Color = @InkDim
+                    VAlign = Top
+                    WrapTextAt = 320
+                    LineHeightPercentage = 1.35
+                }
+
+                // The value, large, in a framed readout.
+                Widget ValueBox : TopBand {
+                    AnchorData.AnchoredPosition = (0, -250)
+                    AnchorData.SizeDelta = (0, 120)
+
+                    RectBlock ReadoutBack : Bar {
+                        AnchorData.AnchorMin = (0, 0)
+                        AnchorData.AnchorMax = (1, 1)
+                        AnchorData.SizeDelta = (0, 0)
+                        BodyColor = #8FE3FF0C
+                        bEnableBorder = true
+                        BorderWidth = 1
+                        BorderColor = @Line
+                    }
+                    Text ReadoutTag : Meta {
+                        AnchorData.AnchorMin = (0, 1)
+                        AnchorData.AnchorMax = (1, 1)
+                        AnchorData.Pivot = (0.5, 1)
+                        AnchorData.AnchoredPosition = (0, -10)
+                        AnchorData.SizeDelta = (-28, 16)
+                        FontSize = 11
+                        Text = "VALUE" @noloc
+                    }
+                    Text DetailBig : Readout {
+                        AnchorData.AnchorMin = (0, 0)
+                        AnchorData.AnchorMax = (1, 0)
+                        AnchorData.Pivot = (0.5, 0)
+                        AnchorData.AnchoredPosition = (0, 14)
+                        AnchorData.SizeDelta = (-28, 60)
+                        FontSize = 40
+                        HAlign = Left
+                    }
+                }
+
+                Text DetailCurrent : Label {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -392)
+                    AnchorData.SizeDelta = (0, 26)
+                    FontSize = 16
+                }
+                Text DetailDefault : Label {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -422)
+                    AnchorData.SizeDelta = (0, 26)
+                    FontSize = 16
+                    Color = @InkDim
+                }
+
+                Text ImpactLabel : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (0, 1)
+                    AnchorData.Pivot = (0, 1)
+                    AnchorData.AnchoredPosition = (0, -470)
+                    AnchorData.SizeDelta = (140, 20)
+                    Text = "性能影响"
+                }
+                RectBlock Impact0 : Bar { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.AnchoredPosition = (170, -474)  AnchorData.SizeDelta = (26, 10) }
+                RectBlock Impact1 : Bar { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.AnchoredPosition = (200, -474)  AnchorData.SizeDelta = (26, 10) }
+                RectBlock Impact2 : Bar { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.AnchoredPosition = (230, -474)  AnchorData.SizeDelta = (26, 10) }
+                RectBlock Impact3 : Bar { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.AnchoredPosition = (260, -474)  AnchorData.SizeDelta = (26, 10) }
+                RectBlock Impact4 : Bar { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.AnchoredPosition = (290, -474)  AnchorData.SizeDelta = (26, 10) }
+
+                Text RestartNote : Label {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -512)
+                    AnchorData.SizeDelta = (0, 24)
+                    FontSize = 14
+                    Color = @Amber
+                    Text = "需要重启  ·  RESTART REQUIRED"
+                }
+            }
+
+            PixelSort RightSort : FillSort {}
+        }
+    }
+
+    // ---- The key hints, flat along the bottom of the screen: the one thing that never turns.
+    Widget KeyBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 60)
+
+        RectBlock KeyBarBack : Bar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BodyColor = #05080CCC
+        }
+        RectBlock KeyBarRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 1)
+        }
+        HorizontalBox Hints {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (80, 0)
+            AnchorData.SizeDelta = (1100, 30)
+            Spacing = 26
+
+            Widget HintSelect : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "W  S" @noloc }
+                Text : HintLabel { Text = "选择" }
+            }
+            Widget HintAdjust : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "A  D" @noloc }
+                Text : HintLabel { Text = "调整" }
+            }
+            Widget HintTab : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "Q  E" @noloc }
+                Text : HintLabel { Text = "切换分类" }
+            }
+            Widget HintReset : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "R" @noloc }
+                Text : HintLabel { Text = "恢复默认" }
+            }
+            // The one hint that is also a button: a click on it goes back, as Esc does.
+            Widget HintBack : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                + UIButton { TransitionType = None }
+                RectBlock HintBackHit : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.SizeDelta = (16, 12)
+                    BodyColor = @Clear
+                    bRaycastTarget = true
+                }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "ESC" @noloc }
+                Text HintBackLabel : HintLabel { Text = "返回" }
+            }
+        }
+        Text DirtyNote : Label {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.Pivot = (1, 0.5)
+            AnchorData.AnchoredPosition = (-80, 0)
+            AnchorData.SizeDelta = (300, 30)
+            FontSize = 15
+            HAlign = Right
+            Color = @Amber
+            Text = "●  有未保存的更改"
+        }
+    }
+
+    // ---- Asked before a page goes back to its defaults: a scrim over everything, the panel on it.
+    RectBlock ConfirmScrim : Bar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        BodyColor = #000000A8
+        bRaycastTarget = true
+    }
+    Widget ConfirmPanel : Middle {
+        AnchorData.SizeDelta = (560, 236)
+
+        RectBlock ConfirmPlate : PanelPlate { BodyColor = #070A0E }
+        RectBlock ConfirmFrame : PanelFrame { BorderColor = #FFB45488 }
+        RectBlock ConfirmTab : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (32, 0)
+            AnchorData.SizeDelta = (80, 3)
+            BodyColor = @Amber
+        }
+        Text ConfirmTitle : Heading {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -30)
+            AnchorData.SizeDelta = (-64, 40)
+            FontSize = 26
+            Text = "恢复默认设置？"
+        }
+        Text ConfirmText : Label {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -80)
+            AnchorData.SizeDelta = (-64, 50)
+            FontSize = 16
+            Color = @InkDim
+            VAlign = Top
+            WrapTextAt = 496
+            Text = "本页的所有选项将恢复为默认值。这一操作无法撤销。"
+        }
+        Widget ConfirmNo {
+            AnchorData.AnchorMin = (1, 0)
+            AnchorData.AnchorMax = (1, 0)
+            AnchorData.Pivot = (1, 0)
+            AnchorData.AnchoredPosition = (-232, 28)
+            AnchorData.SizeDelta = (170, 46)
+            + UIButton { TransitionType = None }
+            RectBlock ConfirmNoBack : Bar {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.SizeDelta = (0, 0)
+                BodyColor = #FFFFFF10
+                bEnableBorder = true
+                BorderWidth = 1
+                BorderColor = @Line
+                bRaycastTarget = true
+            }
+            Text ConfirmNoText : Label {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.SizeDelta = (0, 0)
+                FontSize = 17
+                HAlign = Center
+                Text = "取消"
+            }
+        }
+        Widget ConfirmYes {
+            AnchorData.AnchorMin = (1, 0)
+            AnchorData.AnchorMax = (1, 0)
+            AnchorData.Pivot = (1, 0)
+            AnchorData.AnchoredPosition = (-32, 28)
+            AnchorData.SizeDelta = (180, 46)
+            + UIButton { TransitionType = None }
+            RectBlock ConfirmYesBack : Bar {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.SizeDelta = (0, 0)
+                BodyColor = #FFB45426
+                bEnableBorder = true
+                BorderWidth = 1
+                BorderColor = #FFB454AA
+                bRaycastTarget = true
+            }
+            Text ConfirmYesText : Label {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.SizeDelta = (0, 0)
+                FontSize = 17
+                Color = @Amber
+                HAlign = Center
+                Text = "确认恢复"
+            }
+        }
+    }
+}

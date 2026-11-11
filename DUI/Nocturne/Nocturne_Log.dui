@@ -1,0 +1,543 @@
+// NOCTURNE//OS's log (UNocturneLogScreen), behind the star 笺. Categories on the left; in the middle the quests and
+// messages, each a DreamGUI expandable area that opens on its objectives (opening one closes the others); on the right
+// the open entry's detail, which wipes in under a mask transition when it changes. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_Log
+use "Nocturne/Nocturne_Common.dui"
+
+style CatCount : Readout {
+    AnchorData.AnchorMin = (1, 0.5)
+    AnchorData.AnchorMax = (1, 0.5)
+    AnchorData.Pivot = (1, 0.5)
+    AnchorData.AnchoredPosition = (-18, 0)
+    AnchorData.SizeDelta = (60, 28)
+    FontSize = 16
+    Color = @InkDim
+}
+style QuestArea {
+    // Open and shut at once: an animated close keeps the body at full height until the travel ends, with the header
+    // already showing "+". The opened entry's lines flip up on their own (NocturneLogScreen).
+    ExpansionDuration = 0
+    Style.bOverride_HeaderHeight = true
+    Style.HeaderHeight = 56
+    Style.bOverride_HeaderNormal = true
+    Style.HeaderNormal = #FFFFFF08
+    Style.bOverride_HeaderHovered = true
+    Style.HeaderHovered = #8FE3FF16
+    Style.bOverride_HeaderPressed = true
+    Style.HeaderPressed = #8FE3FF26
+    Style.bOverride_HeaderFocused = true
+    Style.HeaderFocused = #8FE3FF16
+    Style.bOverride_LabelColor = true
+    Style.LabelColor = #D7E2EA
+    Style.bOverride_FontSize = true
+    Style.FontSize = 18
+    Style.bOverride_ContentBackground = true
+    Style.ContentBackground = #FFFFFF04
+    Style.bOverride_ArrowColor = true
+    Style.ArrowColor = #8FE3FF
+    Style.bOverride_CornerRadius = true
+    Style.CornerRadius = 0
+}
+style ObjList {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style ObjDia : MarkDiamond {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+}
+style ObjDiaLine : MarkDiamondLine {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+}
+style ObjText : Label {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+    AnchorData.SizeDelta = (640, 20)
+    FontSize = 14
+    Color = @Ink
+}
+style ObjCount : Meta {
+    AnchorData.AnchorMin = (1, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (1, 1)
+    AnchorData.SizeDelta = (100, 20)
+    FontSize = 12
+    HAlign = Right
+    Color = @Cyan
+}
+style InfoLabel : Meta {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+    AnchorData.SizeDelta = (130, 22)
+    FontSize = 12
+}
+style InfoValue : Label {
+    AnchorData.AnchorMin = (1, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (1, 1)
+    AnchorData.SizeDelta = (190, 22)
+    FontSize = 14
+    HAlign = Right
+}
+
+Widget Root : Fill {
+    RectBlock Dim : ScreenDim {}
+
+    Widget Rig : Fill {
+
+        // ---- Left: where you are, and the categories. Turned in on its right edge.
+        Widget LeftPanel : Middle {
+            AnchorData.AnchoredPosition = (-655, 12)
+            AnchorData.SizeDelta = (340, 660)
+            RenderTransformPivot = (1, 0.5)
+            RenderRotation = (0, -14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock LeftPlate : PanelPlate {}
+            RectBlock LeftFrame : PanelFrame {}
+            Polygon TrimLeftTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimLeftTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimLeftBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimLeftBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock LeftTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget LeftHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-48, 80)
+
+                Text SysTag : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 22)
+                    Text = "NOCTURNE//OS" @noloc
+                }
+                Text Breadcrumb : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -28)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                    Text = "星图   /   笺 · 日志"
+                }
+                RectBlock LeftRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -66)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+            }
+            VerticalBox CatList : TopBand {
+                AnchorData.AnchoredPosition = (0, -120)
+                AnchorData.SizeDelta = (-40, 290)
+                Spacing = 4
+                Widget Cat0 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Cat0Back : TabBack {}
+                    RectBlock Cat0Bar : TabBar {}
+                    Text Cat0Num : TabNum { Text = "01" @noloc }
+                    Text Cat0Text : TabText { Text = "全部" }
+                    Text Cat0En : TabEn { Text = "ALL" @noloc }
+                    Text Cat0Count : CatCount {}
+                }
+                Widget Cat1 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Cat1Back : TabBack {}
+                    RectBlock Cat1Bar : TabBar {}
+                    Text Cat1Num : TabNum { Text = "02" @noloc }
+                    Text Cat1Text : TabText { Text = "主线" }
+                    Text Cat1En : TabEn { Text = "MAIN" @noloc }
+                    Text Cat1Count : CatCount {}
+                }
+                Widget Cat2 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Cat2Back : TabBack {}
+                    RectBlock Cat2Bar : TabBar {}
+                    Text Cat2Num : TabNum { Text = "03" @noloc }
+                    Text Cat2Text : TabText { Text = "支线" }
+                    Text Cat2En : TabEn { Text = "SIDE" @noloc }
+                    Text Cat2Count : CatCount {}
+                }
+                Widget Cat3 : TabItem {
+                    @slot { MinDesiredSize = (300, 66)  MaxDesiredSize = (300, 66) }
+                    RectBlock Cat3Back : TabBack {}
+                    RectBlock Cat3Bar : TabBar {}
+                    Text Cat3Num : TabNum { Text = "04" @noloc }
+                    Text Cat3Text : TabText { Text = "讯息" }
+                    Text Cat3En : TabEn { Text = "MESSAGES" @noloc }
+                    Text Cat3Count : CatCount {}
+                }
+            }
+            Text LeftFoot : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 22)
+                AnchorData.SizeDelta = (-48, 18)
+                FontSize = 11
+            }
+        }
+
+        // ---- Middle: the entries.
+        Widget CenterPanel : Middle {
+            AnchorData.AnchoredPosition = (0, 4)
+            AnchorData.SizeDelta = (920, 720)
+
+            RectBlock CenterPlate : PanelPlate {}
+            RectBlock CenterFrame : PanelFrame {}
+            Polygon TrimCenterTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimCenterTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimCenterBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimCenterBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock CenterTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (40, 0)
+                AnchorData.SizeDelta = (96, 3)
+            }
+            Widget PageHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -24)
+                AnchorData.SizeDelta = (-80, 70)
+
+                Text PageTitle : Heading {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (0, 1)
+                    AnchorData.Pivot = (0, 1)
+                    AnchorData.SizeDelta = (200, 52)
+                    FontSize = 38
+                    Text = "日志"
+                }
+                Text PageEn : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (0, 1)
+                    AnchorData.Pivot = (0, 1)
+                    AnchorData.AnchoredPosition = (190, -16)
+                    AnchorData.SizeDelta = (300, 22)
+                    Text = "LOG" @noloc
+                }
+                Text PageCount : Meta {
+                    AnchorData.AnchorMin = (1, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (1, 1)
+                    AnchorData.AnchoredPosition = (0, -16)
+                    AnchorData.SizeDelta = (260, 22)
+                    HAlign = Right
+                }
+                RectBlock PageRule : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 0)
+                    AnchorData.Pivot = (0.5, 0)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+                PolygonLine SigilPage : HexSigil { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            }
+            // The entries scroll: open ones can run past the panel, and the list is clipped to its own rect (a scroll box
+            // clips by default; said again here). The wheel, a drag or pad focus scrolls it; NocturneLogScreen keeps an
+            // opened entry in view and runs the thin bar on the right.
+            ScrollBox QuestList {
+                AnchorData.AnchorMin = (0.5, 1)
+                AnchorData.AnchorMax = (0.5, 1)
+                AnchorData.Pivot = (0.5, 1)
+                AnchorData.AnchoredPosition = (0, -116)
+                AnchorData.SizeDelta = (840, 570)
+                Clipping = ClipToBounds
+                Orientation = Vertical
+                Spacing = 6
+                ScrollWhenFocusChanges = AnimatedScroll
+                NavigationScrollPadding = 24
+                bAnimateWheelScrolling = true
+                Native.ExpandableArea Quest0 : QuestArea {
+                    @slot { MinDesiredSize = (840, 56) }
+                    Label = "旧港的灯"
+                    Widget Q0Objectives : ObjList {
+                        @slot { MinDesiredSize = (840, 138)  MaxDesiredSize = (840, 138) }
+                        AnchorData.SizeDelta = (840, 138)
+                        Polygon Q0Box0 : ObjDia { AnchorData.AnchoredPosition = (29, -20) }
+                        Text Q0Text0 : ObjText { AnchorData.AnchoredPosition = (48, -10)  Text = "抵达旧港"  Color = @InkFaint }
+                        Polygon Q0Box1 : ObjDia { AnchorData.AnchoredPosition = (29, -50) }
+                        Text Q0Text1 : ObjText { AnchorData.AnchoredPosition = (48, -40)  Text = "找到灯塔看守"  Color = @InkFaint }
+                        PolygonLine Q0Box2 : ObjDiaLine { AnchorData.AnchoredPosition = (29, -80) }
+                        Text Q0Text2 : ObjText { AnchorData.AnchoredPosition = (48, -70)  Text = "取得航标灯芯" }
+                        Text Q0Count2 : ObjCount { AnchorData.AnchoredPosition = (-24, -70)  Text = "0 / 1" @noloc }
+                        PolygonLine Q0Box3 : ObjDiaLine { AnchorData.AnchoredPosition = (29, -110) }
+                        Text Q0Text3 : ObjText { AnchorData.AnchoredPosition = (48, -100)  Text = "点亮灯塔" }
+                    }
+                }
+                Native.ExpandableArea Quest1 : QuestArea {
+                    @slot { MinDesiredSize = (840, 56) }
+                    Label = "第六颗星"
+                    Widget Q1Objectives : ObjList {
+                        @slot { MinDesiredSize = (840, 108)  MaxDesiredSize = (840, 108) }
+                        AnchorData.SizeDelta = (840, 108)
+                        Polygon Q1Box0 : ObjDia { AnchorData.AnchoredPosition = (29, -20) }
+                        Text Q1Text0 : ObjText { AnchorData.AnchoredPosition = (48, -10)  Text = "读完那封未寄出的信"  Color = @InkFaint }
+                        PolygonLine Q1Box1 : ObjDiaLine { AnchorData.AnchoredPosition = (29, -50) }
+                        Text Q1Text1 : ObjText { AnchorData.AnchoredPosition = (48, -40)  Text = "校准星图残卷" }
+                        Text Q1Count1 : ObjCount { AnchorData.AnchoredPosition = (-24, -40)  Text = "2 / 3" @noloc }
+                        PolygonLine Q1Box2 : ObjDiaLine { AnchorData.AnchoredPosition = (29, -80) }
+                        Text Q1Text2 : ObjText { AnchorData.AnchoredPosition = (48, -70)  Text = "前往第六象限" }
+                    }
+                }
+                Native.ExpandableArea Quest2 : QuestArea {
+                    @slot { MinDesiredSize = (840, 56) }
+                    Label = "走调的八音盒"
+                    Widget Q2Objectives : ObjList {
+                        @slot { MinDesiredSize = (840, 78)  MaxDesiredSize = (840, 78) }
+                        AnchorData.SizeDelta = (840, 78)
+                        Polygon Q2Box0 : ObjDia { AnchorData.AnchoredPosition = (29, -20) }
+                        Text Q2Text0 : ObjText { AnchorData.AnchoredPosition = (48, -10)  Text = "找到八音盒机芯"  Color = @InkFaint }
+                        PolygonLine Q2Box1 : ObjDiaLine { AnchorData.AnchoredPosition = (29, -50) }
+                        Text Q2Text1 : ObjText { AnchorData.AnchoredPosition = (48, -40)  Text = "用调音音叉校音" }
+                    }
+                }
+                Native.ExpandableArea Quest3 : QuestArea {
+                    @slot { MinDesiredSize = (840, 56) }
+                    Label = "银丝与帆"
+                    Widget Q3Objectives : ObjList {
+                        @slot { MinDesiredSize = (840, 78)  MaxDesiredSize = (840, 78) }
+                        AnchorData.SizeDelta = (840, 78)
+                        Polygon Q3Box0 : ObjDia { AnchorData.AnchoredPosition = (29, -20) }
+                        Text Q3Text0 : ObjText { AnchorData.AnchoredPosition = (48, -10)  Text = "收集银丝"  Color = @InkFaint }
+                        Text Q3Count0 : ObjCount { AnchorData.AnchoredPosition = (-24, -10)  Text = "20 / 20" @noloc }
+                        Polygon Q3Box1 : ObjDia { AnchorData.AnchoredPosition = (29, -50) }
+                        Text Q3Text1 : ObjText { AnchorData.AnchoredPosition = (48, -40)  Text = "修补太阳帆"  Color = @InkFaint }
+                    }
+                }
+                Native.ExpandableArea Quest4 : QuestArea {
+                    @slot { MinDesiredSize = (840, 56) }
+                    Label = "流星雨之夜"
+                    Widget Q4Objectives : ObjList {
+                        @slot { MinDesiredSize = (840, 78)  MaxDesiredSize = (840, 78) }
+                        AnchorData.SizeDelta = (840, 78)
+                        Polygon Q4Box0 : ObjDia { AnchorData.AnchoredPosition = (29, -20) }
+                        Text Q4Text0 : ObjText { AnchorData.AnchoredPosition = (48, -10)  Text = "在第二象限等到流星雨"  Color = @InkFaint }
+                        Polygon Q4Box1 : ObjDia { AnchorData.AnchoredPosition = (29, -50) }
+                        Text Q4Text1 : ObjText { AnchorData.AnchoredPosition = (48, -40)  Text = "拾起星鳞"  Color = @InkFaint }
+                        Text Q4Count1 : ObjCount { AnchorData.AnchoredPosition = (-24, -40)  Text = "4 / 4" @noloc }
+                    }
+                }
+                Native.ExpandableArea Quest5 : QuestArea {
+                    @slot { MinDesiredSize = (840, 56) }
+                    Label = "来自 0721 的留言"
+                    Widget Q5Objectives : ObjList {
+                        @slot { MinDesiredSize = (840, 48)  MaxDesiredSize = (840, 48) }
+                        AnchorData.SizeDelta = (840, 48)
+                        PolygonLine Q5Box0 : ObjDiaLine { AnchorData.AnchoredPosition = (29, -20) }
+                        Text Q5Text0 : ObjText { AnchorData.AnchoredPosition = (48, -10)  Text = "「灯芯在补给舱第三格。别忘了关舱门。」" }
+                    }
+                }
+                Native.ExpandableArea Quest6 : QuestArea {
+                    @slot { MinDesiredSize = (840, 56) }
+                    Label = "补给到港"
+                    Widget Q6Objectives : ObjList {
+                        @slot { MinDesiredSize = (840, 48)  MaxDesiredSize = (840, 48) }
+                        AnchorData.SizeDelta = (840, 48)
+                        Polygon Q6Box0 : ObjDia { AnchorData.AnchoredPosition = (29, -20) }
+                        Text Q6Text0 : ObjText { AnchorData.AnchoredPosition = (48, -10)  Text = "启明补给已送达：太阳帆片 x2"  Color = @InkFaint }
+                    }
+                }
+            }
+            // The list's scroll bar: a hairline track beside it, the lit part where the view is. Shown only while there
+            // is something to scroll.
+            RectBlock QuestTrack : Bar {
+                AnchorData.AnchorMin = (0.5, 1)
+                AnchorData.AnchorMax = (0.5, 1)
+                AnchorData.Pivot = (0.5, 1)
+                AnchorData.AnchoredPosition = (436, -116)
+                AnchorData.SizeDelta = (1, 570)
+                BodyColor = @LineStrong
+            }
+            RectBlock QuestThumb : AccentBar {
+                AnchorData.AnchorMin = (0.5, 1)
+                AnchorData.AnchorMax = (0.5, 1)
+                AnchorData.Pivot = (0.5, 1)
+                AnchorData.AnchoredPosition = (436, -116)
+                AnchorData.SizeDelta = (3, 120)
+            }
+            PixelSort CenterSort : FillSort {}
+        }
+
+        // ---- Right: the open entry. Turned in on its left edge.
+        Widget RightPanel : Middle {
+            AnchorData.AnchoredPosition = (675, 12)
+            AnchorData.SizeDelta = (380, 660)
+            RenderTransformPivot = (0, 0.5)
+            RenderRotation = (0, 14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock RightPlate : PanelPlate {}
+            RectBlock RightFrame : PanelFrame {}
+            Polygon TrimRightTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimRightTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimRightBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimRightBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock RightTab : AccentBar {
+                AnchorData.AnchorMin = (1, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (1, 1)
+                AnchorData.AnchoredPosition = (-24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget DetailBody : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-56, 600)
+                + MaskTransition { Preset = Wipe  Angle = 0  Softness = 0.12  Progress = 1 }
+
+                Text DetailTag : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 18)
+                }
+                Text DetailTitle : Heading {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -30)
+                    AnchorData.SizeDelta = (0, 40)
+                    FontSize = 28
+                }
+                Text DetailEn : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -76)
+                    AnchorData.SizeDelta = (0, 18)
+                    FontSize = 11
+                }
+                Text DetailStatus : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -104)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                }
+                RectBlock DetailRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -140)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+                Text DetailText : Label {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -158)
+                    AnchorData.SizeDelta = (0, 110)
+                    FontSize = 15
+                    Color = @InkDim
+                    VAlign = Top
+                }
+                Text InfoPlaceLabel : InfoLabel { AnchorData.AnchoredPosition = (0, -292)  Text = "地点   PLACE" }
+                Text InfoPlace : InfoValue { AnchorData.AnchoredPosition = (0, -292) }
+                Text InfoGiverLabel : InfoLabel { AnchorData.AnchoredPosition = (0, -324)  Text = "委托   FROM" }
+                Text InfoGiver : InfoValue { AnchorData.AnchoredPosition = (0, -324) }
+                Text InfoRewardLabel : InfoLabel { AnchorData.AnchoredPosition = (0, -356)  Text = "报酬   REWARD" }
+                Text InfoReward : InfoValue { AnchorData.AnchoredPosition = (0, -356) }
+                RectBlock InfoRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -392)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+                Text ProgressLabel : InfoLabel { AnchorData.AnchoredPosition = (0, -410)  Text = "进度   PROGRESS" }
+                Text ProgressValue : Readout {
+                    AnchorData.AnchorMin = (1, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (1, 1)
+                    AnchorData.AnchoredPosition = (0, -406)
+                    AnchorData.SizeDelta = (100, 26)
+                    FontSize = 18
+                }
+                Native.ProgressBar ProgressBar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -444)
+                    AnchorData.SizeDelta = (0, 6)
+                    Percent = 0.5
+                    Style.bOverride_Height = true
+                    Style.Height = 6
+                    Style.bOverride_TrackColor = true
+                    Style.TrackColor = #FFFFFF1C
+                    Style.bOverride_FillColor = true
+                    Style.FillColor = #8FE3FF
+                    Style.bOverride_CornerRadius = true
+                    Style.CornerRadius = 0
+                }
+            }
+            PixelSort RightSort : FillSort {}
+        }
+    }
+
+    // ---- The key hints.
+    Widget KeyBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 60)
+
+        RectBlock KeyBarBack : Bar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BodyColor = #05080CCC
+        }
+        RectBlock KeyBarRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 1)
+        }
+        HorizontalBox Hints {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (80, 0)
+            AnchorData.SizeDelta = (1100, 30)
+            Spacing = 26
+
+            Widget HintOpen : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "CLICK" @noloc }
+                Text : HintLabel { Text = "展开" }
+            }
+            Widget HintTab : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "Q  E" @noloc }
+                Text : HintLabel { Text = "切换分类" }
+            }
+            Widget HintBack : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                + UIButton { TransitionType = None }
+                RectBlock HintBackHit : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.SizeDelta = (16, 12)
+                    BodyColor = @Clear
+                    bRaycastTarget = true
+                }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "ESC" @noloc }
+                Text HintBackLabel : HintLabel { Text = "返回" }
+            }
+        }
+    }
+}

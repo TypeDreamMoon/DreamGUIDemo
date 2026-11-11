@@ -1,0 +1,25 @@
+// NOCTURNE//OS's screen-wide effects layer, over the 3D view and under the cursor. A pixel sort the director drives
+// from the camera's speed: while the camera flies between stars, only the brightest pixels -- star cores and the
+// middle of their glows -- are sorted into streaks along the rows (the threshold keeps the sky and the nebula out of
+// it), and they settle back into points as it slows down. Off (strength 0 draws nothing) whenever the camera is still.
+class /Game/Nocturne/UI/WBP_Nocturne_ScreenFX
+use "Nocturne/Nocturne_Common.dui"
+
+Widget Root : Fill {
+    Raycastable = Disabled
+
+    + Overlay {}
+
+    PixelSort Warp {
+        SortAxis = Horizontal
+        IntervalMode = Threshold
+        ThresholdMin = 0.4
+        ThresholdMax = 1
+        SortKey = Luminance
+        SortStrength = 0
+        MaxSortPasses = 140
+        bRaycastTarget = false
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+    }
+}

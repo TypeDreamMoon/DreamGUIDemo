@@ -1,0 +1,331 @@
+// The first NOCTURNE//OS pane: the Settings star's panel, cut down to what the first test shot needs -- a dark plate
+// floating in space beside its star, a slider, a toggle and a button the director clicks at an angle.
+//
+// How it comes in (the director starts it): the plate cuts in at once under a pixel sort that settles in a quarter of a
+// second (the director drives Sort), then Reveal staggers the rows in from the left and draws the divider out from its
+// centre. The director also runs the volume counter and the toggle's ON/OFF readout.
+class /Game/Nocturne/UI/WBP_Nocturne_TestPanel
+use "Nocturne/Nocturne_Common.dui"
+
+// A row of the panel: stretched across the plate, hung from its top edge.
+style Row {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+}
+
+Widget Root {
+    AnchorData.SizeDelta = (720, 440)
+
+    + Overlay {}
+    + PointerLight {
+        bFollowPointer = true
+        LightColor = #BFF0FF
+        Intensity = 1.4
+        Radius = 240
+        Height = 30
+        bRevealBorders = true
+    }
+
+    // A little frost on what is behind, so the stars read as depth rather than noise through the plate.
+    BackgroundBlur Frost {
+        BlurStrength = 6
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+    }
+
+    RectBlock Plate : PlateBody {
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+    }
+
+    // Decoration placed by anchors: corner brackets just outside the plate, an inner frame with two cut corners, and
+    // the accent tab on the top edge.
+    Widget Decor {
+        Raycastable = Disabled
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+
+        Line2DRaw Frame {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            LineWidth = 1
+            Color = @Line
+            PointArray = [(-328, 208), (348, 208), (348, -188), (328, -208), (-348, -208), (-348, 188), (-328, 208)]
+        }
+
+        RectBlock TabTop : AccentBar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (0, 1)
+            AnchorData.Pivot = (0, 1)
+            AnchorData.AnchoredPosition = (32, 0)
+            AnchorData.SizeDelta = (96, 3)
+        }
+
+        RectBlock CornerTLh : AccentBar { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.AnchoredPosition = (-7, 7)  AnchorData.SizeDelta = (30, 3) }
+        RectBlock CornerTLv : AccentBar { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1)  AnchorData.Pivot = (0, 1)  AnchorData.AnchoredPosition = (-7, 7)  AnchorData.SizeDelta = (3, 30) }
+        RectBlock CornerTRh : AccentBar { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.AnchoredPosition = (7, 7)  AnchorData.SizeDelta = (30, 3) }
+        RectBlock CornerTRv : AccentBar { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1)  AnchorData.Pivot = (1, 1)  AnchorData.AnchoredPosition = (7, 7)  AnchorData.SizeDelta = (3, 30) }
+        RectBlock CornerBLh : AccentBar { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.AnchoredPosition = (-7, -7)  AnchorData.SizeDelta = (30, 3) }
+        RectBlock CornerBLv : AccentBar { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0)  AnchorData.Pivot = (0, 0)  AnchorData.AnchoredPosition = (-7, -7)  AnchorData.SizeDelta = (3, 30) }
+        RectBlock CornerBRh : AccentBar { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.AnchoredPosition = (7, -7)  AnchorData.SizeDelta = (30, 3) }
+        RectBlock CornerBRv : AccentBar { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0)  AnchorData.Pivot = (1, 0)  AnchorData.AnchoredPosition = (7, -7)  AnchorData.SizeDelta = (3, 30) }
+    }
+
+    // The rows are placed by anchors, each a fixed distance from the plate's top and 44 in from either side: the plate
+    // is a fixed 720 x 440, and the rows' heights are the design's, not whatever their contents measure.
+    Widget Content {
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+
+        HorizontalBox HeaderMeta : Row {
+            AnchorData.AnchoredPosition = (0, -30)
+            AnchorData.SizeDelta = (-88, 16)
+            Spacing = 10
+
+            Text MetaLeft : Meta {
+                AnchorData.SizeDelta = (420, 16)
+                Text = "NOC//SYS    STAR 02 / 06" @noloc
+                @slot SizeRule = Auto
+            }
+            Widget MetaGap {
+                @slot SizeRule = Fill
+            }
+            RectBlock StatusDot : Bar {
+                AnchorData.SizeDelta = (7, 7)
+                BodyColor = @Amber
+                @slot SizeRule = Auto
+                @slot VerticalAlignment = Center
+            }
+            Text MetaRight : Meta {
+                AnchorData.SizeDelta = (64, 16)
+                Text = "ONLINE" @noloc
+                @slot SizeRule = Auto
+            }
+        }
+
+        HorizontalBox Header : Row {
+            AnchorData.AnchoredPosition = (0, -58)
+            AnchorData.SizeDelta = (-88, 58)
+            Spacing = 18
+
+            Text Title : Heading {
+                AnchorData.SizeDelta = (96, 58)
+                Text = "设置"
+                @slot SizeRule = Auto
+            }
+            VerticalBox Titles {
+                AnchorData.SizeDelta = (420, 58)
+                Spacing = 2
+                @slot SizeRule = Auto
+                @slot VerticalAlignment = Center
+
+                Text TitleTag : Tag {
+                    AnchorData.SizeDelta = (420, 22)
+                    Text = "SETTINGS" @noloc
+                    @slot HorizontalAlignment = Fill
+                    @slot SizeRule = Auto
+                }
+                Text TitleSub : Meta {
+                    AnchorData.SizeDelta = (420, 18)
+                    Text = "系统参数  ·  SYSTEM PARAMETERS"
+                    @slot HorizontalAlignment = Fill
+                    @slot SizeRule = Auto
+                }
+            }
+        }
+
+        RectBlock Divider : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.AnchoredPosition = (0, -130)
+            AnchorData.SizeDelta = (-88, 1)
+        }
+
+        HorizontalBox VolumeRow : Row {
+            AnchorData.AnchoredPosition = (0, -150)
+            AnchorData.SizeDelta = (-88, 56)
+            Spacing = 20
+
+            VerticalBox VolumeLabels {
+                AnchorData.SizeDelta = (150, 56)
+                @slot SizeRule = Auto
+                @slot VerticalAlignment = Center
+
+                Text VolumeLabel : Label {
+                    AnchorData.SizeDelta = (150, 30)
+                    Text = "主音量"
+                    @slot HorizontalAlignment = Fill
+                    @slot SizeRule = Auto
+                }
+                Text VolumeSub : SubLabel {
+                    AnchorData.SizeDelta = (150, 16)
+                    Text = "MASTER VOLUME" @noloc
+                    @slot HorizontalAlignment = Fill
+                    @slot SizeRule = Auto
+                }
+            }
+            Native.Slider Volume {
+                AnchorData.SizeDelta = (330, 56)
+                Value = 0.35
+                Style.bOverride_TrackThickness = true
+                Style.TrackThickness = 2
+                Style.bOverride_TrackColor = true
+                Style.TrackColor = @Track
+                Style.bOverride_FillColor = true
+                Style.FillColor = @Cyan
+                Style.bOverride_HandleSize = true
+                Style.HandleSize = (6, 26)
+                Style.bOverride_HandleNormal = true
+                Style.HandleNormal = @Ink
+                Style.bOverride_HandleHovered = true
+                Style.HandleHovered = #FFFFFF
+                Style.bOverride_HandlePressed = true
+                Style.HandlePressed = @Cyan
+                @slot SizeRule = Auto
+                @slot VerticalAlignment = Center
+            }
+            Widget VolumeGap {
+                @slot SizeRule = Fill
+            }
+            Text VolumeValue : Readout {
+                AnchorData.SizeDelta = (70, 56)
+                Text = "035" @noloc
+                @slot SizeRule = Auto
+            }
+        }
+
+        HorizontalBox SubtitleRow : Row {
+            AnchorData.AnchoredPosition = (0, -218)
+            AnchorData.SizeDelta = (-88, 56)
+            Spacing = 20
+
+            VerticalBox SubtitleLabels {
+                AnchorData.SizeDelta = (150, 56)
+                @slot SizeRule = Auto
+                @slot VerticalAlignment = Center
+
+                Text SubtitleLabel : Label {
+                    AnchorData.SizeDelta = (150, 30)
+                    Text = "字幕"
+                    @slot HorizontalAlignment = Fill
+                    @slot SizeRule = Auto
+                }
+                Text SubtitleSub : SubLabel {
+                    AnchorData.SizeDelta = (150, 16)
+                    Text = "SUBTITLES" @noloc
+                    @slot HorizontalAlignment = Fill
+                    @slot SizeRule = Auto
+                }
+            }
+            Native.Toggle Subtitles {
+                AnchorData.SizeDelta = (44, 44)
+                Style.bOverride_BoxSize = true
+                Style.BoxSize = (22, 22)
+                Style.bOverride_TickSize = true
+                Style.TickSize = (12, 12)
+                Style.bOverride_BoxNormal = true
+                Style.BoxNormal = #FFFFFF3A
+                Style.bOverride_BoxHovered = true
+                Style.BoxHovered = @CyanSoft
+                Style.bOverride_BoxPressed = true
+                Style.BoxPressed = @CyanFaint
+                Style.bOverride_TickChecked = true
+                Style.TickChecked = @Cyan
+                Style.bOverride_CornerRadius = true
+                Style.CornerRadius = 0
+                @slot SizeRule = Auto
+                @slot VerticalAlignment = Center
+            }
+            Widget SubtitleGap {
+                @slot SizeRule = Fill
+            }
+            Text SubtitleState : Readout {
+                AnchorData.SizeDelta = (70, 56)
+                Text = "OFF" @noloc
+                Color = @InkFaint
+                @slot SizeRule = Auto
+            }
+        }
+
+        HorizontalBox Footer : Row {
+            AnchorData.AnchoredPosition = (0, -366)
+            AnchorData.SizeDelta = (-88, 46)
+
+            Text Hint : Meta {
+                AnchorData.SizeDelta = (320, 46)
+                Text = "LMB  选择      ESC  返回"
+                @slot SizeRule = Auto
+            }
+            Widget FooterGap {
+                @slot SizeRule = Fill
+            }
+            Native.Button Apply {
+                Style.bOverride_Normal = true
+                Style.Normal = @CyanFaint
+                Style.bOverride_Hovered = true
+                Style.Hovered = @CyanSoft
+                Style.bOverride_Pressed = true
+                Style.Pressed = #8FE3FF5A
+                Style.bOverride_CornerRadius = true
+                Style.CornerRadius = 0
+                Style.bOverride_ContentPadding = true
+                Style.ContentPadding = (0, 0, 0, 0)
+                @slot SizeRule = Auto
+
+                Widget ApplyFace {
+                    AnchorData.SizeDelta = (180, 46)
+                    Raycastable = Disabled
+                    + Overlay {}
+
+                    RectBlock ApplyBorder : Bar {
+                        bEnableBody = false
+                        bEnableBorder = true
+                        BorderWidth = 1
+                        BorderColor = #8FE3FF99
+                        @slot HorizontalAlignment = Fill
+                        @slot VerticalAlignment = Fill
+                    }
+                    Text ApplyLabel : Label {
+                        Text = "应用   APPLY"
+                        FontSize = 17
+                        FontSpace = (2, 0)
+                        Color = @Cyan
+                        HAlign = Center
+                        @slot HorizontalAlignment = Fill
+                        @slot VerticalAlignment = Fill
+                    }
+                }
+            }
+        }
+    }
+
+    // Off (strength 0 draws nothing) until the director drives it through the plate's entrance.
+    PixelSort Sort {
+        SortAxis = Horizontal
+        IntervalMode = Random
+        IntervalLength = 48
+        Randomness = 0.25
+        SortKey = Luminance
+        SortStrength = 0
+        MaxSortPasses = 180
+        bRaycastTarget = false
+        @slot HorizontalAlignment = Fill
+        @slot VerticalAlignment = Fill
+    }
+}
+
+// The rows' slide; their fade runs on the same schedule in the director (RenderOpacity is not a property an
+// animation track can drive).
+timeline Reveal {
+    duration = 0.6
+
+    Content/HeaderMeta.RenderTranslation  : 0.0 = (-28, 0, 0), 0.10 = (-28, 0, 0), 0.38 = (0, 0, 0) ease OutCubic
+    Content/Header.RenderTranslation      : 0.0 = (-28, 0, 0), 0.14 = (-28, 0, 0), 0.42 = (0, 0, 0) ease OutCubic
+    Content/Divider.RenderScale           : 0.0 = (0, 1, 1), 0.18 = (0, 1, 1), 0.46 = (1, 1, 1) ease OutCubic
+    Content/VolumeRow.RenderTranslation   : 0.0 = (-28, 0, 0), 0.22 = (-28, 0, 0), 0.50 = (0, 0, 0) ease OutCubic
+    Content/SubtitleRow.RenderTranslation : 0.0 = (-28, 0, 0), 0.26 = (-28, 0, 0), 0.54 = (0, 0, 0) ease OutCubic
+    Content/Footer.RenderTranslation      : 0.0 = (-28, 0, 0), 0.30 = (-28, 0, 0), 0.58 = (0, 0, 0) ease OutCubic
+}

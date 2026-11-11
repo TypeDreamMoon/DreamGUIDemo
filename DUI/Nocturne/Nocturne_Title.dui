@@ -1,0 +1,376 @@
+// NOCTURNE//OS's title screen (UNocturneTitleScreen): the system waking at night. The wordmark and a boot log on the
+// left, under the moon; the administrator's card on the right, turned in on its left edge like a settings side panel;
+// "press any key" at the bottom. Any key or a click anywhere wakes the system into the star map. Design size 1920 x 1080;
+// placed from the top left unless said otherwise.
+class /Game/Nocturne/UI/WBP_Nocturne_Title
+use "Nocturne/Nocturne_Common.dui"
+
+resources {
+    Asset AdminArt = /Game/Nocturne/Textures/T_Nocturne_Admin
+}
+
+style FromTop {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+}
+style FromTopRight {
+    AnchorData.AnchorMin = (1, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (1, 1)
+}
+style Picture {
+    Brush.TintColor = #FFFFFF
+    bRaycastTarget = false
+}
+
+// One line of the boot log: a status, what woke, and a reading on the right.
+style BootRow : FromTop {
+    AnchorData.SizeDelta = (560, 24)
+}
+style BootStatus : Tag {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.SizeDelta = (64, 20)
+    FontSize = 11
+    FontSpace = (1, 0)
+    Text = "[ .. ]" @noloc
+}
+style BootLabel : Meta {
+    AnchorData.AnchorMin = (0, 0.5)
+    AnchorData.AnchorMax = (0, 0.5)
+    AnchorData.Pivot = (0, 0.5)
+    AnchorData.AnchoredPosition = (72, 0)
+    AnchorData.SizeDelta = (330, 20)
+    FontSize = 12
+    FontSpace = (2, 0)
+    Color = @InkDim
+}
+style BootValue : Meta {
+    AnchorData.AnchorMin = (1, 0.5)
+    AnchorData.AnchorMax = (1, 0.5)
+    AnchorData.Pivot = (1, 0.5)
+    AnchorData.SizeDelta = (150, 20)
+    FontSize = 12
+    FontSpace = (2, 0)
+    HAlign = Right
+    Color = @Ink
+}
+
+Widget Root : Fill {
+    + UIButton { TransitionType = None }
+
+    // What a click anywhere lands on.
+    RectBlock Catch : Bar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 1)
+        AnchorData.SizeDelta = (0, 0)
+        BodyColor = @Clear
+        bRaycastTarget = true
+    }
+
+    Widget Rig : Fill {
+        Raycastable = Disabled
+
+        // ---- The wordmark and the boot log, under the moon.
+        Widget Brand : FromTop {
+            AnchorData.AnchoredPosition = (140, -300)
+            AnchorData.SizeDelta = (720, 400)
+
+            PolygonLine SigilWake : HexSigil {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.AnchoredPosition = (8, -10)
+                AnchorData.SizeDelta = (15, 15)
+            }
+            Text WakeTag : Tag {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (26, 0)
+                AnchorData.SizeDelta = (600, 20)
+                FontSize = 13
+                Text = "SYS.WAKE   ·   夜间唤醒"
+            }
+            Text Logo : Tag {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (-4, -30)
+                AnchorData.SizeDelta = (720, 84)
+                FontSize = 64
+                FontSpace = (14, 0)
+                Color = @Ink
+                TextStyle.GlowColor = #8FE3FF55
+                TextStyle.GlowWidth = 0.18
+                TextStyle.GlowPower = 2
+                Text = "NOCTURNE//OS" @noloc
+            }
+            Text LogoCn : Heading {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (0, -124)
+                AnchorData.SizeDelta = (170, 48)
+                FontSize = 36
+                Text = "夜曲系统"
+            }
+            Text LogoEn : Meta {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (186, -140)
+                AnchorData.SizeDelta = (420, 20)
+                FontSize = 13
+                Color = @InkDim
+                Text = "NIGHT-SONG OPERATING SYSTEM" @noloc
+            }
+            RectBlock BrandRule : Bar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (0, -190)
+                AnchorData.SizeDelta = (560, 1)
+            }
+            RectBlock BrandTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (0, -189)
+                AnchorData.SizeDelta = (72, 3)
+            }
+
+            Widget BootLog : FromTop {
+                AnchorData.AnchoredPosition = (0, -214)
+                AnchorData.SizeDelta = (560, 144)
+
+                Widget Boot0 : BootRow {
+                    Text Boot0Status : BootStatus {}
+                    Text Boot0Label : BootLabel { Text = "星图索引  ·  STAR INDEX" }
+                    Text Boot0Value : BootValue { Text = "6 / 6" @noloc }
+                }
+                Widget Boot1 : BootRow {
+                    AnchorData.AnchoredPosition = (0, -24)
+                    Text Boot1Status : BootStatus {}
+                    Text Boot1Label : BootLabel { Text = "航线校准  ·  ROUTES" }
+                    Text Boot1Value : BootValue { Text = "0.003 ARCSEC" @noloc }
+                }
+                Widget Boot2 : BootRow {
+                    AnchorData.AnchoredPosition = (0, -48)
+                    Text Boot2Status : BootStatus {}
+                    Text Boot2Label : BootLabel { Text = "声学模块  ·  ACOUSTICS" }
+                    Text Boot2Value : BootValue { Text = "READY" @noloc }
+                }
+                Widget Boot3 : BootRow {
+                    AnchorData.AnchoredPosition = (0, -72)
+                    Text Boot3Status : BootStatus {}
+                    Text Boot3Label : BootLabel { Text = "输入设备  ·  INPUT" }
+                    Text Boot3Value : BootValue { Text = "3 FOUND" @noloc }
+                }
+                Widget Boot4 : BootRow {
+                    AnchorData.AnchoredPosition = (0, -96)
+                    Text Boot4Status : BootStatus {}
+                    Text Boot4Label : BootLabel { Text = "管理员验证  ·  ADMIN" }
+                    Text Boot4Value : BootValue { Text = "ID 0721" @noloc }
+                }
+                Widget Boot5 : BootRow {
+                    AnchorData.AnchoredPosition = (0, -120)
+                    Text Boot5Status : BootStatus {}
+                    Text Boot5Label : BootLabel { Text = "唤醒完成  ·  AWAKE" }
+                    Text Boot5Value : BootValue { Text = "23:41" @noloc }
+                }
+            }
+        }
+
+        // ---- The administrator's card, turned in on its left edge.
+        Widget AdminCard : Middle {
+            AnchorData.AnchoredPosition = (500, 0)
+            AnchorData.SizeDelta = (560, 760)
+            RenderTransformPivot = (0, 0.5)
+            RenderRotation = (0, 10, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock RightPlate : PanelPlate {}
+            RectBlock RightFrame : PanelFrame {}
+            Polygon TrimRightTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimRightTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimRightBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimRightBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock CardTab : AccentBar {
+                AnchorData.AnchorMin = (1, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (1, 1)
+                AnchorData.AnchoredPosition = (-24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+
+            Widget CardBody : Fill {
+                Text CardTag : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -18)
+                    AnchorData.SizeDelta = (-48, 20)
+                    FontSize = 13
+                    Text = "SYS.ADMIN   ·   管理员"
+                }
+                Text CardId : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -18)
+                    AnchorData.SizeDelta = (-48, 20)
+                    HAlign = Right
+                    Text = "NO. 0721" @noloc
+                }
+                RectBlock CardRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -50)
+                    AnchorData.SizeDelta = (-48, 1)
+                }
+                Image AdminImage : Picture {
+                    AnchorData.AnchorMin = (0.5, 1)
+                    AnchorData.AnchorMax = (0.5, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -60)
+                    AnchorData.SizeDelta = (480, 640)
+                    Brush.ResourceObject = @AdminArt
+                }
+                // A scan line running down the picture.
+                RectBlock ScanLine : Bar {
+                    AnchorData.AnchorMin = (0.5, 1)
+                    AnchorData.AnchorMax = (0.5, 1)
+                    AnchorData.Pivot = (0.5, 0.5)
+                    AnchorData.AnchoredPosition = (0, -60)
+                    AnchorData.SizeDelta = (480, 2)
+                    BodyColor = #8FE3FF40
+                }
+                RectBlock CardFootRule : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 0)
+                    AnchorData.Pivot = (0.5, 0)
+                    AnchorData.AnchoredPosition = (0, 48)
+                    AnchorData.SizeDelta = (-48, 1)
+                }
+                Text CardFoot : Meta {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 0)
+                    AnchorData.Pivot = (0.5, 0)
+                    AnchorData.AnchoredPosition = (0, 16)
+                    AnchorData.SizeDelta = (-48, 20)
+                    FontSize = 11
+                    Text = "LV.4      ONLINE" @noloc
+                }
+                Text CardUptime : Meta {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 0)
+                    AnchorData.Pivot = (0.5, 0)
+                    AnchorData.AnchoredPosition = (0, 16)
+                    AnchorData.SizeDelta = (-48, 20)
+                    FontSize = 11
+                    HAlign = Right
+                    Text = "UPTIME  00:00:00" @noloc
+                }
+            }
+            PixelSort RightSort : FillSort {}
+        }
+
+        // ---- Press any key.
+        Widget Prompt {
+            AnchorData.AnchorMin = (0.5, 0)
+            AnchorData.AnchorMax = (0.5, 0)
+            AnchorData.Pivot = (0.5, 0)
+            AnchorData.AnchoredPosition = (0, 112)
+            AnchorData.SizeDelta = (520, 64)
+
+            RectBlock PromptRuleL : Bar {
+                AnchorData.AnchorMin = (0, 0.5)
+                AnchorData.AnchorMax = (0, 0.5)
+                AnchorData.Pivot = (0, 0.5)
+                AnchorData.AnchoredPosition = (0, 8)
+                AnchorData.SizeDelta = (96, 1)
+                BodyColor = @LineStrong
+            }
+            RectBlock PromptRuleR : Bar {
+                AnchorData.AnchorMin = (1, 0.5)
+                AnchorData.AnchorMax = (1, 0.5)
+                AnchorData.Pivot = (1, 0.5)
+                AnchorData.AnchoredPosition = (0, 8)
+                AnchorData.SizeDelta = (96, 1)
+                BodyColor = @LineStrong
+            }
+            Polygon PromptDiaL : MarkDiamond {
+                AnchorData.AnchorMin = (0, 0.5)
+                AnchorData.AnchorMax = (0, 0.5)
+                AnchorData.AnchoredPosition = (-6, 8)
+                AnchorData.SizeDelta = (7, 7)
+            }
+            Polygon PromptDiaR : MarkDiamond {
+                AnchorData.AnchorMin = (1, 0.5)
+                AnchorData.AnchorMax = (1, 0.5)
+                AnchorData.AnchoredPosition = (6, 8)
+                AnchorData.SizeDelta = (7, 7)
+            }
+            Text PromptCn : Label {
+                AnchorData.AnchorMin = (0.5, 1)
+                AnchorData.AnchorMax = (0.5, 1)
+                AnchorData.Pivot = (0.5, 1)
+                AnchorData.SizeDelta = (280, 32)
+                FontSize = 22
+                HAlign = Center
+                Text = "按任意键继续"
+            }
+            Text PromptEn : Tag {
+                AnchorData.AnchorMin = (0.5, 0)
+                AnchorData.AnchorMax = (0.5, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 4)
+                AnchorData.SizeDelta = (280, 20)
+                FontSize = 12
+                HAlign = Center
+                Text = "PRESS ANY KEY" @noloc
+            }
+        }
+    }
+
+    // ---- Along the bottom.
+    Widget KeyBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 48)
+        Raycastable = Disabled
+
+        RectBlock FootRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (-160, 1)
+        }
+        Text FootLeft : Meta {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (80, 0)
+            AnchorData.SizeDelta = (400, 20)
+            FontSize = 11
+            Text = "NOCTURNE//OS   BUILD N.26.11" @noloc
+        }
+        Text FootRight : Meta {
+            AnchorData.AnchorMin = (1, 0.5)
+            AnchorData.AnchorMax = (1, 0.5)
+            AnchorData.Pivot = (1, 0.5)
+            AnchorData.AnchoredPosition = (-80, 0)
+            AnchorData.SizeDelta = (520, 20)
+            FontSize = 11
+            HAlign = Right
+            Text = "DREAMGUI DEMO   ·   UNREAL ENGINE 5.8" @noloc
+        }
+    }
+
+    // Over everything: the wake folds the whole screen away under it.
+    PixelSort CenterSort : FillSort {}
+}

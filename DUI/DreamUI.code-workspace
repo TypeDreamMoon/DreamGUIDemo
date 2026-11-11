@@ -1,0 +1,21 @@
+{
+	"folders": [
+		{
+			"name": "DreamUI Source",
+			"path": "."
+		}
+	],
+	"settings":
+	{
+		"files.associations":
+		{
+			"*.dui": "dui"
+		}
+	},
+	"extensions":
+	{
+		"recommendations": [
+			"typedreammoon.dreamui-language-support"
+		]
+	}
+}

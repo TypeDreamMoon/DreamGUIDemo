@@ -1,0 +1,607 @@
+// NOCTURNE//OS's layer effects screen (UNocturneLayerFxScreen), the video's layer effects shot. The left panel lists
+// the layers as an image editor does and lights each as it is turned on; the middle panel is a picture built from a
+// stack of sheets, one effect each -- a backdrop, a portrait revealed through a clip mask, a title clipping a picture
+// to its letters, light beams by blend mode, a layer group, a progressively blurred band and a slab of glass; the
+// right panel reads out the effect being shown and, last, a layered document imported as a widget. At the end the
+// stack swings round and comes apart in depth, a sheet a layer, then closes again. Design size 1920 x 1080.
+class /Game/Nocturne/UI/WBP_Nocturne_LayerFx
+use "Nocturne/Nocturne_Common.dui"
+use "Nocturne/Psd/WBP_LayerSample.dui" as PsdSample
+
+resources {
+    Asset AdminArt = /Game/Nocturne/Textures/T_Nocturne_Admin
+    Asset Harbor = /Game/Nocturne/Textures/Saves/T_Save_01
+    Asset Station = /Game/Nocturne/Textures/Saves/T_Save_02
+}
+
+// ---- The stack: every sheet is the whole picture's size and clips what it holds to it.
+
+style Sheet {
+    AnchorData.AnchorMin = (0, 0)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.SizeDelta = (0, 0)
+    Clipping = ClipToBounds
+    Raycastable = Disabled
+}
+// A sheet's outline and name: hidden, shown while the stack is apart.
+style SheetEdge : PanelFrame {
+    BorderColor = #8FE3FF88
+    RenderOpacity = 0
+}
+style SheetTag : Meta {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (0, 1)
+    AnchorData.Pivot = (0, 1)
+    AnchorData.AnchoredPosition = (14, -10)
+    AnchorData.SizeDelta = (300, 18)
+    Color = @Cyan
+    RenderOpacity = 0
+}
+style AtCentre {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+}
+style Dot : Bar {
+    AnchorData.AnchorMin = (0.5, 0.5)
+    AnchorData.AnchorMax = (0.5, 0.5)
+    AnchorData.Pivot = (0.5, 0.5)
+    AnchorData.SizeDelta = (112, 112)
+    CornerRadius.X = 56
+    CornerRadius.Y = 56
+    CornerRadius.Z = 56
+    CornerRadius.W = 56
+}
+
+// ---- The layer list.
+
+style LayerRow {
+    AnchorData.SizeDelta = (260, 58)
+}
+style RowEye : MarkDiamond {
+    AnchorData.AnchorMin = (1, 0.5)
+    AnchorData.AnchorMax = (1, 0.5)
+    AnchorData.AnchoredPosition = (-22, 0)
+    Color = #8FE3FF
+    RenderOpacity = 0.18
+}
+
+// ---- The properties read-out.
+
+style PropKey : Meta {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.SizeDelta = (0, 24)
+    FontSize = 12
+}
+style PropValue : Readout {
+    AnchorData.AnchorMin = (0, 1)
+    AnchorData.AnchorMax = (1, 1)
+    AnchorData.Pivot = (0.5, 1)
+    AnchorData.SizeDelta = (0, 24)
+    FontSize = 15
+}
+
+Widget Root : Fill {
+    RectBlock Dim : ScreenDim {}
+
+    Widget Rig : Fill {
+
+        // ---- Left: the layers. Turned in on its right edge.
+        Widget LeftPanel : Middle {
+            AnchorData.AnchoredPosition = (-700, 8)
+            AnchorData.SizeDelta = (300, 680)
+            RenderTransformPivot = (1, 0.5)
+            RenderRotation = (0, -14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock LeftPlate : PanelPlate {}
+            RectBlock LeftFrame : PanelFrame {}
+            Polygon TrimLeftTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimLeftTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimLeftBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimLeftBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock LeftTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget LeftHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-48, 80)
+
+                Text SysTag : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 22)
+                    Text = "LAYERS" @noloc
+                }
+                Text Breadcrumb : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -28)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                    Text = "图层   /   07"
+                }
+                RectBlock LeftRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -66)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+            }
+            VerticalBox LayerList : TopBand {
+                AnchorData.AnchoredPosition = (0, -118)
+                AnchorData.SizeDelta = (-40, 448)
+                Spacing = 6
+                Widget Row0 : LayerRow {
+                    @slot { MinDesiredSize = (260, 58)  MaxDesiredSize = (260, 58) }
+                    RectBlock Row0Back : TabBack { bRaycastTarget = false }
+                    RectBlock Row0Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Row0Num : TabNum { Text = "01" @noloc }
+                    Text Row0Text : TabText { Text = "遮罩" }
+                    Text Row0En : TabEn { Text = "CLIP MASK" @noloc }
+                    Polygon Row0Eye : RowEye {}
+                }
+                Widget Row1 : LayerRow {
+                    @slot { MinDesiredSize = (260, 58)  MaxDesiredSize = (260, 58) }
+                    RectBlock Row1Back : TabBack { bRaycastTarget = false }
+                    RectBlock Row1Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Row1Num : TabNum { Text = "02" @noloc }
+                    Text Row1Text : TabText { Text = "剪贴蒙版" }
+                    Text Row1En : TabEn { Text = "CLIP TO BELOW" @noloc }
+                    Polygon Row1Eye : RowEye {}
+                }
+                Widget Row2 : LayerRow {
+                    @slot { MinDesiredSize = (260, 58)  MaxDesiredSize = (260, 58) }
+                    RectBlock Row2Back : TabBack { bRaycastTarget = false }
+                    RectBlock Row2Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Row2Num : TabNum { Text = "03" @noloc }
+                    Text Row2Text : TabText { Text = "混合模式" }
+                    Text Row2En : TabEn { Text = "BLEND MODE" @noloc }
+                    Polygon Row2Eye : RowEye {}
+                }
+                Widget Row3 : LayerRow {
+                    @slot { MinDesiredSize = (260, 58)  MaxDesiredSize = (260, 58) }
+                    RectBlock Row3Back : TabBack { bRaycastTarget = false }
+                    RectBlock Row3Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Row3Num : TabNum { Text = "04" @noloc }
+                    Text Row3Text : TabText { Text = "图层组" }
+                    Text Row3En : TabEn { Text = "LAYER GROUP" @noloc }
+                    Polygon Row3Eye : RowEye {}
+                }
+                Widget Row4 : LayerRow {
+                    @slot { MinDesiredSize = (260, 58)  MaxDesiredSize = (260, 58) }
+                    RectBlock Row4Back : TabBack { bRaycastTarget = false }
+                    RectBlock Row4Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Row4Num : TabNum { Text = "05" @noloc }
+                    Text Row4Text : TabText { Text = "渐进模糊" }
+                    Text Row4En : TabEn { Text = "PROGRESSIVE BLUR" @noloc }
+                    Polygon Row4Eye : RowEye {}
+                }
+                Widget Row5 : LayerRow {
+                    @slot { MinDesiredSize = (260, 58)  MaxDesiredSize = (260, 58) }
+                    RectBlock Row5Back : TabBack { bRaycastTarget = false }
+                    RectBlock Row5Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Row5Num : TabNum { Text = "06" @noloc }
+                    Text Row5Text : TabText { Text = "折射玻璃" }
+                    Text Row5En : TabEn { Text = "GLASS" @noloc }
+                    Polygon Row5Eye : RowEye {}
+                }
+                Widget Row6 : LayerRow {
+                    @slot { MinDesiredSize = (260, 58)  MaxDesiredSize = (260, 58) }
+                    RectBlock Row6Back : TabBack { bRaycastTarget = false }
+                    RectBlock Row6Bar : TabBar { BodyColor = @Amber  RenderOpacity = 0 }
+                    Text Row6Num : TabNum { Text = "07" @noloc }
+                    Text Row6Text : TabText { Text = "PSD 导入" }
+                    Text Row6En : TabEn { Text = "LAYERED DOCUMENT" @noloc }
+                    Polygon Row6Eye : RowEye {}
+                }
+            }
+            Text LeftFoot : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 22)
+                AnchorData.SizeDelta = (-48, 18)
+                FontSize = 11
+                Text = "COMPOSITE   1920 × 1080" @noloc
+            }
+            PixelSort LeftSort : FillSort {}
+        }
+
+        // ---- Middle: the picture, a stack of sheets.
+        Widget CenterPanel : Middle {
+            AnchorData.AnchoredPosition = (0, 8)
+            AnchorData.SizeDelta = (1010, 680)
+
+            RectBlock CenterPlate : PanelPlate {}
+            RectBlock CenterFrame : PanelFrame {}
+            Polygon TrimCenterTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimCenterTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimCenterBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimCenterBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock CenterTab : AccentBar {
+                AnchorData.AnchorMin = (0, 1)
+                AnchorData.AnchorMax = (0, 1)
+                AnchorData.Pivot = (0, 1)
+                AnchorData.AnchoredPosition = (24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget CenterHeader : TopBand {
+                AnchorData.AnchoredPosition = (0, -22)
+                AnchorData.SizeDelta = (-48, 52)
+                Text StageTag : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 22)
+                    Text = "LAYER FX" @noloc
+                }
+                Text StageMeta : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -26)
+                    AnchorData.SizeDelta = (0, 20)
+                    FontSize = 13
+                    Text = "图层效果   /   七层合成"
+                }
+                PolygonLine SigilStage : HexSigil {
+                    AnchorData.AnchorMin = (1, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.AnchoredPosition = (-10, -12)
+                }
+            }
+
+            // The picture. Its sheets come apart in depth at the end (the stack turns as one).
+            Widget Stack : AtCentre {
+                AnchorData.AnchoredPosition = (0, -34)
+                AnchorData.SizeDelta = (950, 540)
+
+                // L0: the backdrop.
+                Widget Sheet0 : Sheet {
+                    Image Backdrop : Fill {
+                        Brush.ResourceObject = @Harbor
+                        Brush.TintColor = #A9B6C4
+                        bRaycastTarget = false
+                    }
+                    RectBlock Sheet0Edge : SheetEdge {}
+                    Text Sheet0Tag : SheetTag { AnchorData.AnchoredPosition = (14, -10)  Text = "L0   BACKDROP" @noloc }
+                }
+                // L1: the portrait, opened through a radial clip mask.
+                Widget Sheet1 : Sheet {
+                    Image Portrait : AtCentre {
+                        AnchorData.AnchoredPosition = (250, -12)
+                        AnchorData.SizeDelta = (390, 520)
+                        Brush.ResourceObject = @AdminArt
+                        bRaycastTarget = false
+                        Clipping = ClipToBounds
+                        ClipMask.Source = Procedural
+                        ClipMask.Pattern = Radial
+                        ClipMask.bReverse = true
+                        ClipMask.Softness = 0.08
+                        ClipMask.Threshold = 1.1
+                    }
+                    RectBlock Sheet1Edge : SheetEdge {}
+                    Text Sheet1Tag : SheetTag { AnchorData.AnchoredPosition = (14, -36)  Text = "L1   CLIP MASK" @noloc }
+                }
+                // L2: the title, and a picture clipped to its letters.
+                Widget Sheet2 : Sheet {
+                    Text TitleText : AtCentre {
+                        AnchorData.AnchoredPosition = (-80, 150)
+                        AnchorData.SizeDelta = (790, 130)
+                        Font = @Font
+                        FontSize = 104
+                        FontSpace = (6, 0)
+                        Color = #FFFFFF
+                        HAlign = Left
+                        VAlign = Middle
+                        OverflowType = HorizontalOverflow
+                        Text = "NOCTURNE" @noloc
+                        RenderOpacity = 0
+                    }
+                    // A band of light, warm white to cyan, that sweeps through the letters and nowhere else.
+                    RectBlock TitleFill : Bar {
+                        AnchorData.AnchorMin = (0.5, 0.5)
+                        AnchorData.AnchorMax = (0.5, 0.5)
+                        AnchorData.Pivot = (0.5, 0.5)
+                        AnchorData.AnchoredPosition = (-80, 150)
+                        AnchorData.SizeDelta = (900, 220)
+                        BodyColor = #FFF1D6
+                        bEnableBodyGradient = true
+                        BodyGradientColor = #4FB8E8
+                        BodyGradientCenter = (0.5, 0.5)
+                        BodyGradientRadius = (0.24, 0.9)
+                        bClipToBelow = true
+                        RenderOpacity = 0
+                    }
+                    Text TitleSub : Tag {
+                        AnchorData.AnchorMin = (0.5, 0.5)
+                        AnchorData.AnchorMax = (0.5, 0.5)
+                        AnchorData.Pivot = (0, 0.5)
+                        AnchorData.AnchoredPosition = (-465, 70)
+                        AnchorData.SizeDelta = (520, 22)
+                        Text = "夜曲系统   ·   LAYERED COMPOSITE"
+                        RenderOpacity = 0
+                    }
+                    RectBlock Sheet2Edge : SheetEdge {}
+                    Text Sheet2Tag : SheetTag { AnchorData.AnchoredPosition = (14, -62)  Text = "L2   CLIP TO BELOW" @noloc }
+                }
+                // L3: light beams, composited by blend mode.
+                Widget Sheet3 : Sheet {
+                    RectBlock BeamA : Bar {
+                        AnchorData.AnchorMin = (0.5, 0.5)
+                        AnchorData.AnchorMax = (0.5, 0.5)
+                        AnchorData.Pivot = (0.5, 0.5)
+                        AnchorData.AnchoredPosition = (150, 30)
+                        AnchorData.SizeDelta = (1200, 40)
+                        RenderRotation = (0, 0, -14)
+                        BodyColor = #8FE3FF
+                        BlendMode = Difference
+                        RenderOpacity = 0
+                    }
+                    RectBlock BeamB : Bar {
+                        AnchorData.AnchorMin = (0.5, 0.5)
+                        AnchorData.AnchorMax = (0.5, 0.5)
+                        AnchorData.Pivot = (0.5, 0.5)
+                        AnchorData.AnchoredPosition = (190, -110)
+                        AnchorData.SizeDelta = (1200, 22)
+                        RenderRotation = (0, 0, -14)
+                        BodyColor = #FFB454
+                        BlendMode = Difference
+                        RenderOpacity = 0
+                    }
+                    RectBlock Sheet3Edge : SheetEdge {}
+                    Text Sheet3Tag : SheetTag { AnchorData.AnchoredPosition = (14, -88)  Text = "L3   BLEND MODE" @noloc }
+                }
+                // L4: a layer group -- three discs that fade and blend as one.
+                Widget Sheet4 : Sheet {
+                    Widget Cluster : AtCentre {
+                        AnchorData.AnchoredPosition = (-340, -40)
+                        AnchorData.SizeDelta = (260, 200)
+                        + DreamLayerGroup {
+                            Isolation = Isolated
+                            GroupOpacity = 0
+                        }
+                        RectBlock DotA : Dot { AnchorData.AnchoredPosition = (-46, 14)  BodyColor = #8FE3FFE6 }
+                        RectBlock DotB : Dot { AnchorData.AnchoredPosition = (20, 30)  BodyColor = #FFB454E6 }
+                        RectBlock DotC : Dot { AnchorData.AnchoredPosition = (0, -34)  BodyColor = #D7E2EAE6 }
+                    }
+                    RectBlock Sheet4Edge : SheetEdge {}
+                    Text Sheet4Tag : SheetTag { AnchorData.AnchoredPosition = (14, -114)  Text = "L4   LAYER GROUP" @noloc }
+                }
+                // L5: a band frosted at the bottom and clear at its top.
+                Widget Sheet5 : Sheet {
+                    BackgroundBlur FrostBand {
+                        AnchorData.AnchorMin = (0, 0)
+                        AnchorData.AnchorMax = (1, 0)
+                        AnchorData.Pivot = (0.5, 0)
+                        AnchorData.SizeDelta = (0, 230)
+                        BlurStrength = 0
+                        StrengthMap.Kind = Linear
+                        StrengthMap.Start = (0.5, 1)
+                        StrengthMap.End = (0.5, 0)
+                        StrengthMap.StartStrength = 1
+                        StrengthMap.EndStrength = 0
+                        bRaycastTarget = false
+                    }
+                    Text FrostCaption : Tag {
+                        AnchorData.AnchorMin = (0, 0)
+                        AnchorData.AnchorMax = (0, 0)
+                        AnchorData.Pivot = (0, 0)
+                        AnchorData.AnchoredPosition = (28, 26)
+                        AnchorData.SizeDelta = (520, 22)
+                        Text = "PROGRESSIVE BLUR   渐进模糊"
+                        RenderOpacity = 0
+                    }
+                    RectBlock Sheet5Edge : SheetEdge {}
+                    Text Sheet5Tag : SheetTag { AnchorData.AnchoredPosition = (14, -140)  Text = "L5   PROGRESSIVE BLUR" @noloc }
+                }
+                // L6: a slab of glass that slides across.
+                Widget Sheet6 : Sheet {
+                    Glass GlassSlab : AtCentre {
+                        AnchorData.AnchoredPosition = (-790, 110)
+                        AnchorData.SizeDelta = (300, 220)
+                        CornerRadius.X = 30
+                        CornerRadius.Y = 30
+                        CornerRadius.Z = 30
+                        CornerRadius.W = 30
+                        EdgeWidth = 40
+                        Refraction = 52
+                        Dispersion = 0.4
+                        Frost = 0.1
+                        GlassTint = #8FE3FF
+                        GlassTintStrength = 0.08
+                        HighlightStrength = 1
+                        HighlightWidth = 3
+                        bRaycastTarget = false
+                    }
+                    RectBlock Sheet6Edge : SheetEdge {}
+                    Text Sheet6Tag : SheetTag { AnchorData.AnchoredPosition = (14, -166)  Text = "L6   GLASS" @noloc }
+                }
+            }
+            Text CenterFoot : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 16)
+                AnchorData.SizeDelta = (-48, 18)
+                FontSize = 11
+                Text = "DREAMGUI   ·   LAYER EFFECTS" @noloc
+            }
+            PixelSort CenterSort : FillSort {}
+        }
+
+        // ---- Right: what the layer being shown is set to, and last, a document imported as a widget.
+        Widget RightPanel : Middle {
+            AnchorData.AnchoredPosition = (712, 8)
+            AnchorData.SizeDelta = (340, 680)
+            RenderTransformPivot = (0, 0.5)
+            RenderRotation = (0, 14, 0)
+            RenderTranslation = (24, 0, 0)
+
+            RectBlock RightPlate : PanelPlate {}
+            RectBlock RightFrame : PanelFrame {}
+            Polygon TrimRightTL : TrimDiamond { AnchorData.AnchorMin = (0, 1)  AnchorData.AnchorMax = (0, 1) }
+            Polygon TrimRightTR : TrimDiamond { AnchorData.AnchorMin = (1, 1)  AnchorData.AnchorMax = (1, 1) }
+            Polygon TrimRightBL : TrimDiamond { AnchorData.AnchorMin = (0, 0)  AnchorData.AnchorMax = (0, 0) }
+            Polygon TrimRightBR : TrimDiamond { AnchorData.AnchorMin = (1, 0)  AnchorData.AnchorMax = (1, 0) }
+            RectBlock RightTab : AccentBar {
+                AnchorData.AnchorMin = (1, 1)
+                AnchorData.AnchorMax = (1, 1)
+                AnchorData.Pivot = (1, 1)
+                AnchorData.AnchoredPosition = (-24, 0)
+                AnchorData.SizeDelta = (64, 3)
+            }
+            Widget PropBody : TopBand {
+                AnchorData.AnchoredPosition = (0, -26)
+                AnchorData.SizeDelta = (-56, 300)
+
+                Text PropTag : Meta {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.SizeDelta = (0, 18)
+                    Text = "PROPERTIES   属性"
+                }
+                Text PropTitle : Heading {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -30)
+                    AnchorData.SizeDelta = (0, 40)
+                    FontSize = 28
+                    Text = "合成"
+                }
+                Text PropEn : Tag {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -76)
+                    AnchorData.SizeDelta = (0, 18)
+                    FontSize = 11
+                    Text = "COMPOSITE" @noloc
+                }
+                RectBlock PropRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -108)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+                Text PropKey0 : PropKey { AnchorData.AnchoredPosition = (0, -124) }
+                Text PropValue0 : PropValue { AnchorData.AnchoredPosition = (0, -124) }
+                Text PropKey1 : PropKey { AnchorData.AnchoredPosition = (0, -156) }
+                Text PropValue1 : PropValue { AnchorData.AnchoredPosition = (0, -156) }
+                Text PropKey2 : PropKey { AnchorData.AnchoredPosition = (0, -188) }
+                Text PropValue2 : PropValue { AnchorData.AnchoredPosition = (0, -188) }
+                RectBlock PropFootRule : Bar {
+                    AnchorData.AnchorMin = (0, 1)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.Pivot = (0.5, 1)
+                    AnchorData.AnchoredPosition = (0, -228)
+                    AnchorData.SizeDelta = (0, 1)
+                }
+            }
+            Text PsdTag : Tag {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 268)
+                AnchorData.SizeDelta = (-56, 18)
+                Text = "LayerSample.psd   →   WBP"
+                RenderOpacity = 0
+            }
+            Widget PsdHolder {
+                AnchorData.AnchorMin = (0.5, 0)
+                AnchorData.AnchorMax = (0.5, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 70)
+                AnchorData.SizeDelta = (288, 180)
+                Raycastable = Disabled
+                PsdSample Psd {
+                    AnchorData.AnchorMin = (0.5, 0.5)
+                    AnchorData.AnchorMax = (0.5, 0.5)
+                    AnchorData.Pivot = (0.5, 0.5)
+                    AnchorData.SizeDelta = (512, 320)
+                    RenderScale = (1, 0.5625, 0.5625)
+                    RenderOpacity = 0
+                }
+            }
+            Text RightFoot : Meta {
+                AnchorData.AnchorMin = (0, 0)
+                AnchorData.AnchorMax = (1, 0)
+                AnchorData.Pivot = (0.5, 0)
+                AnchorData.AnchoredPosition = (0, 22)
+                AnchorData.SizeDelta = (-56, 18)
+                FontSize = 11
+                Text = "DREAMGUIPSD   ·   .PSD → .DUI" @noloc
+            }
+            PixelSort RightSort : FillSort {}
+        }
+    }
+
+    // ---- The key hints.
+    Widget KeyBar {
+        AnchorData.AnchorMin = (0, 0)
+        AnchorData.AnchorMax = (1, 0)
+        AnchorData.Pivot = (0.5, 0)
+        AnchorData.SizeDelta = (0, 60)
+
+        RectBlock KeyBarBack : Bar {
+            AnchorData.AnchorMin = (0, 0)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.SizeDelta = (0, 0)
+            BodyColor = #05080CCC
+        }
+        RectBlock KeyBarRule : Bar {
+            AnchorData.AnchorMin = (0, 1)
+            AnchorData.AnchorMax = (1, 1)
+            AnchorData.Pivot = (0.5, 1)
+            AnchorData.SizeDelta = (0, 1)
+        }
+        HorizontalBox Hints {
+            AnchorData.AnchorMin = (0, 0.5)
+            AnchorData.AnchorMax = (0, 0.5)
+            AnchorData.Pivot = (0, 0.5)
+            AnchorData.AnchoredPosition = (80, 0)
+            AnchorData.SizeDelta = (1100, 30)
+            Spacing = 26
+
+            Widget HintToggle : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "V" @noloc }
+                Text : HintLabel { Text = "显隐图层" }
+            }
+            Widget HintExplode : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "TAB" @noloc }
+                Text : HintLabel { Text = "分层视图" }
+            }
+            Widget HintBack : HintItem {
+                @slot { MinDesiredSize = (150, 30)  MaxDesiredSize = (150, 30) }
+                + UIButton { TransitionType = None }
+                RectBlock HintBackHit : Bar {
+                    AnchorData.AnchorMin = (0, 0)
+                    AnchorData.AnchorMax = (1, 1)
+                    AnchorData.SizeDelta = (16, 12)
+                    BodyColor = @Clear
+                    bRaycastTarget = true
+                }
+                RectBlock : HintCap {}
+                Text : HintKey { Text = "ESC" @noloc }
+                Text HintBackLabel : HintLabel { Text = "返回" }
+            }
+        }
+    }
+}
