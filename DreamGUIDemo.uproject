@@ -1,0 +1,50 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "5.8",
+	"Category": "",
+	"Description": "DreamGUI demo project: the original NOCTURNE//OS interface and the feature shots of the DreamGUI demo video, the NieR / Detroit / Persona 3 Reload style studies, with DreamShader materials and DreamFX effects beside them.",
+	"Modules": [
+		{
+			"Name": "DreamGUIDemo",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "P3RUIDemo",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		},
+		{
+			"Name": "DreamGUIDemoEditor",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	],
+	"Plugins": [
+		{
+			"Name": "DreamGUI",
+			"Enabled": true
+		},
+		{
+			"Name": "DreamShader",
+			"Enabled": true
+		},
+		{
+			"Name": "DreamFX",
+			"Enabled": true
+		},
+		{
+			"Name": "DevUITests",
+			"Enabled": true
+		},
+		{
+			"Name": "EnhancedInput",
+			"Enabled": true
+		},
+		{
+			"Name": "UnrealBridge",
+			"Enabled": true,
+			"Optional": true
+		}
+	]
+}

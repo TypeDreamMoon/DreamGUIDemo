@@ -1,0 +1,26 @@
+# Build products and caches
+Binaries/
+Intermediate/
+Saved/
+DerivedDataCache/
+*.sln
+.vs/
+.idea/
+Plugins/*/Binaries/
+Plugins/*/Intermediate/
+
+# Reference material and working notes stay local
+Plan/
+
+# The VS Code extension's caches
+DUI/.dui-diagnostics.json
+DUI/.dui-symbols.json
+
+# DreamShader custom pass cache
+DShader/.dreampass/
+
+# Optional editor bridge, synced from its own repository
+Plugins/UnrealBridge/
+.agents/
+.claude/
+Tools/Local.ps1
