@@ -7,6 +7,7 @@
 #include "NocturneMenu.generated.h"
 
 class UCameraComponent;
+class UDreamScreenCreationRequest;
 class UDreamUserWidget;
 class UDreamWorldWidgetComponent;
 class ANocturneSpace;
@@ -42,6 +43,7 @@ public:
 	void SetStartAtTitle(bool bInStartAtTitle) { bStartAtTitle = bInStartAtTitle; }
 
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void Tick(float DeltaSeconds) override;
 
 	/** The title's "any key": the system wakes into the map. */
@@ -92,7 +94,8 @@ private:
 	void BindLabels();
 	void FadeLabels(bool bIn, float InDelay);
 	void ApplyFocus();
-	void OpenStarScreen();
+	UFUNCTION() void StarScreenFinished(UDreamScreenCreationRequest* Request);
+	void CancelStarRequest();
 	void EnterMap();
 	/** Whether the map takes the pointer and the keys: not while it is still building in. */
 	bool AcceptsInput() const;
@@ -133,7 +136,9 @@ private:
 	EMenuState State = EMenuState::Overview;
 	/** The open star first: Enter at once goes somewhere. */
 	int32 Focused = 1;
-	TSharedPtr<struct FStreamableHandle> IncomingScreen;
+	UPROPERTY(Transient) TObjectPtr<UDreamScreenCreationRequest> IncomingScreen;
+	double ScreenRequestedAt = 0;
+	bool bObserveScreen = false;
 	int32 Visiting = INDEX_NONE;
 	int32 LaunchSlot = 0;
 	float MenuTime = 0.0f;
@@ -147,7 +152,7 @@ private:
 	FPose FlightFrom;
 	FPose FlightTo;
 	bool bFlightCaptured = false;
-	bool bScreenOpened = false;
+
 	bool bChromeBack = false;
 	/** The focused label opens only once the labels have built in. */
 	bool bFocusRevealed = false;

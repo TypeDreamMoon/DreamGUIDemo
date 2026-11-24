@@ -16,8 +16,7 @@
 #include "Core/DreamUserWidget.h"
 #include "Core/DreamWorldWidgetComponent.h"
 #include "DreamUIBPLibrary.h"
-#include "Engine/AssetManager.h"
-#include "Engine/StreamableManager.h"
+#include "Core/DreamScreenUISubsystem.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNocturneMenu, Log, All);
 
@@ -60,7 +59,7 @@ namespace NocturneMenuLocal
 	constexpr float FlySeconds = 1.5f;
 	constexpr float ReturnSeconds = 1.4f;
 	constexpr float ReturnDelay = 0.12f;
-	constexpr float ScreenLead = 0.25f;
+
 	constexpr float ChromeLead = 0.45f;
 	constexpr float ScreenRemoveDelay = 0.36f;
 	const FVector FlightLift(0.0, -110.0, 60.0);
@@ -233,6 +232,12 @@ void ANocturneMenu::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 	MenuTime += DeltaSeconds;
+	if (bObserveScreen && IsValid(Screen) && Screen->IsRendered() && Screen->GetRenderCanvas())
+	{
+		UE_LOG(LogNocturneMenu, Display, TEXT("First render-eligible tick %s frame=%llu since-input=%.2fms frame-delta=%.2fms"),
+			*Screen->GetName(), GFrameCounter, (FPlatformTime::Seconds()-ScreenRequestedAt)*1000., DeltaSeconds*1000.);
+		bObserveScreen = false;
+	}
 
 	BindLabels();
 	const bool bMapUp = State == EMenuState::Overview || State == EMenuState::Waking;
@@ -374,11 +379,6 @@ void ANocturneMenu::UpdateCamera(float DeltaSeconds)
 	{
 		const double Alpha = (MenuTime - FlightStart) / FlySeconds;
 		Pose = FlightPose(FlightFrom, FlightTo, Alpha, true);
-		if (!bScreenOpened && MenuTime >= FlightStart + FlySeconds - ScreenLead)
-		{
-			bScreenOpened = true;
-			OpenStarScreen();
-		}
 		if (Alpha >= 1.0)
 		{
 			State = EMenuState::AtStar;
@@ -596,7 +596,7 @@ void ANocturneMenu::ApplyFocus()
 
 bool ANocturneMenu::AcceptsInput() const
 {
-	return State == EMenuState::Overview && MenuTime >= MapFrom + NocturneMenuLocal::InputFrom;
+	return (State == EMenuState::Overview && MenuTime >= MapFrom + NocturneMenuLocal::InputFrom) || IncomingScreen != nullptr;
 }
 
 void ANocturneMenu::FocusStar(int32 InIndex)
@@ -637,58 +637,70 @@ void ANocturneMenu::ChooseStar(int32 InIndex)
 		UE_LOG(LogNocturneMenu, Log, TEXT("Menu: star %d is not open"), InIndex);
 		return;
 	}
+	CancelStarRequest();
 	Visiting = InIndex;
 	const FString PageName = NocturneStars::Stars[Visiting].Screen;
 	const FSoftObjectPath Path(FString::Printf(TEXT("/Game/Nocturne/UI/%s.%s_C"), *PageName, *PageName));
-	IncomingScreen = UAssetManager::GetStreamableManager().RequestAsyncLoad(Path);
+	auto* Screens = UDreamScreenUISubsystem::Get(GetWorld());
+	IncomingScreen = Screens ? Screens->OpenScreenBudgeted(TSoftClassPtr<UDreamUserWidget>(Path), GetWorld()->GetFirstPlayerController(), 200) : nullptr;
+	if (!IncomingScreen) return;
+	ScreenRequestedAt = FPlatformTime::Seconds();
+	IncomingScreen->OnFinished.AddDynamic(this, &ANocturneMenu::StarScreenFinished);
 	State = EMenuState::Flying;
 	FlightStart = MenuTime;
 	ArrivedAt = MenuTime + NocturneMenuLocal::FlySeconds;
 	FlightFrom = Current;
 	FlightTo = VisitPose(InIndex);
-	bScreenOpened = false;
-	FadeLabels(false, 0.0f);
-	if (IsValid(MenuWidget))
-	{
-		MenuWidget->PlayExit();
-	}
+	// The map stays actionable until the incoming screen is ready.
 	UE_LOG(LogNocturneMenu, Log, TEXT("Menu: flying to star %d"), InIndex);
 }
 
-void ANocturneMenu::OpenStarScreen()
+void ANocturneMenu::CancelStarRequest()
 {
-	if (Visiting < 0 || Visiting >= NocturneStars::Count)
+	if (!IncomingScreen) return;
+	IncomingScreen->OnFinished.RemoveDynamic(this, &ANocturneMenu::StarScreenFinished);
+	IncomingScreen->Cancel();
+	IncomingScreen = nullptr;
+}
+
+void ANocturneMenu::EndPlay(const EEndPlayReason::Type Reason)
+{
+	CancelStarRequest();
+	Super::EndPlay(Reason);
+}
+
+void ANocturneMenu::StarScreenFinished(UDreamScreenCreationRequest* Request)
+{
+	if (Request != IncomingScreen) return;
+	IncomingScreen = nullptr;
+	Screen = Cast<UNocturneStarScreen>(Request->GetPage());
+	if (!Screen)
 	{
+		if (auto* Page = Request->GetPage()) UDreamUIBPLibrary::RemoveFromViewport(this, Page);
+		if (GetWorld() && !GetWorld()->bIsTearingDown) Back();
 		return;
-	}
-	const FString Name = NocturneStars::Stars[Visiting].Screen;
-	const TSoftClassPtr<UDreamUserWidget> ScreenClass(FSoftObjectPath(FString::Printf(TEXT("/Game/Nocturne/UI/%s.%s_C"), *Name, *Name)));
-	const double Start = FPlatformTime::Seconds();
-	UClass* Loaded = ScreenClass.LoadSynchronous();
-	const double LoadedAt = FPlatformTime::Seconds();
-	if (Loaded)
-	{
-		Screen = Cast<UNocturneStarScreen>(UDreamUIBPLibrary::AddWidgetOfClassToViewport(this, Loaded, 200));
 	}
 	if (IsValid(Screen))
 	{
+		FadeLabels(false, 0.0f);
+		if (IsValid(MenuWidget)) MenuWidget->PlayExit();
 		Screen->OnBackRequested.AddUObject(this, &ANocturneMenu::Back);
 		if (UNocturneDepartScreen* Depart = Cast<UNocturneDepartScreen>(Screen))
 		{
 			Depart->OnLaunch.AddUObject(this, &ANocturneMenu::Launch);
 		}
 		Screen->PlayEntrance();
+		bObserveScreen = true;
+		UE_LOG(LogNocturneMenu, Display, TEXT("Screen handlers installed %s frame=%llu since-input=%.2fms"),
+			*Screen->GetName(), GFrameCounter, (FPlatformTime::Seconds()-ScreenRequestedAt)*1000.);
 	}
-	IncomingScreen.Reset();
-	UE_LOG(LogNocturneMenu, Display, TEXT("Menu: %s %s load=%.2fms create/enter=%.2fms"), *Name, IsValid(Screen) ? TEXT("open") : TEXT("FAILED to open"), (LoadedAt-Start)*1000., (FPlatformTime::Seconds()-LoadedAt)*1000.);
+
 }
 
 void ANocturneMenu::Back()
 {
-	if (State != EMenuState::AtStar)
-	{
-		return;
-	}
+	if (State != EMenuState::AtStar && State != EMenuState::Flying) return;
+	CancelStarRequest();
 	if (IsValid(Screen))
 	{
 		Screen->PlayExit();
