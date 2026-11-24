@@ -133,6 +133,7 @@ private:
 	EMenuState State = EMenuState::Overview;
 	/** The open star first: Enter at once goes somewhere. */
 	int32 Focused = 1;
+	TSharedPtr<struct FStreamableHandle> IncomingScreen;
 	int32 Visiting = INDEX_NONE;
 	int32 LaunchSlot = 0;
 	float MenuTime = 0.0f;

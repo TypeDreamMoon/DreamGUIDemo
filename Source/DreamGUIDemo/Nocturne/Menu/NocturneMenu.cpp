@@ -16,6 +16,8 @@
 #include "Core/DreamUserWidget.h"
 #include "Core/DreamWorldWidgetComponent.h"
 #include "DreamUIBPLibrary.h"
+#include "Engine/AssetManager.h"
+#include "Engine/StreamableManager.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogNocturneMenu, Log, All);
 
@@ -636,6 +638,9 @@ void ANocturneMenu::ChooseStar(int32 InIndex)
 		return;
 	}
 	Visiting = InIndex;
+	const FString PageName = NocturneStars::Stars[Visiting].Screen;
+	const FSoftObjectPath Path(FString::Printf(TEXT("/Game/Nocturne/UI/%s.%s_C"), *PageName, *PageName));
+	IncomingScreen = UAssetManager::GetStreamableManager().RequestAsyncLoad(Path);
 	State = EMenuState::Flying;
 	FlightStart = MenuTime;
 	ArrivedAt = MenuTime + NocturneMenuLocal::FlySeconds;
@@ -658,7 +663,10 @@ void ANocturneMenu::OpenStarScreen()
 	}
 	const FString Name = NocturneStars::Stars[Visiting].Screen;
 	const TSoftClassPtr<UDreamUserWidget> ScreenClass(FSoftObjectPath(FString::Printf(TEXT("/Game/Nocturne/UI/%s.%s_C"), *Name, *Name)));
-	if (UClass* Loaded = ScreenClass.LoadSynchronous())
+	const double Start = FPlatformTime::Seconds();
+	UClass* Loaded = ScreenClass.LoadSynchronous();
+	const double LoadedAt = FPlatformTime::Seconds();
+	if (Loaded)
 	{
 		Screen = Cast<UNocturneStarScreen>(UDreamUIBPLibrary::AddWidgetOfClassToViewport(this, Loaded, 200));
 	}
@@ -671,7 +679,8 @@ void ANocturneMenu::OpenStarScreen()
 		}
 		Screen->PlayEntrance();
 	}
-	UE_LOG(LogNocturneMenu, Log, TEXT("Menu: %s %s"), *Name, IsValid(Screen) ? TEXT("open") : TEXT("FAILED to open"));
+	IncomingScreen.Reset();
+	UE_LOG(LogNocturneMenu, Display, TEXT("Menu: %s %s load=%.2fms create/enter=%.2fms"), *Name, IsValid(Screen) ? TEXT("open") : TEXT("FAILED to open"), (LoadedAt-Start)*1000., (FPlatformTime::Seconds()-LoadedAt)*1000.);
 }
 
 void ANocturneMenu::Back()
