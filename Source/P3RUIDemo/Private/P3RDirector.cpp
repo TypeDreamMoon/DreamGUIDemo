@@ -14,6 +14,13 @@
 #include "GameFramework/PlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
+#include "Core/Components/DreamCanvas.h"
+#include "Core/DreamScreenUISubsystem.h"
+#include "Engine/GameViewportClient.h"
+#include "Widgets/Input/SButton.h"
+#include "Widgets/Layout/SBox.h"
+#include "Widgets/SBoxPanel.h"
+#include "Widgets/Text/STextBlock.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogP3R, Log, All);
 
@@ -36,17 +43,20 @@ UP3RScreen* AP3RDirector::Make(const TCHAR* Asset, int32 SortOrder)
 	// Widget Blueprints are loaded here, never from a constructor (the editor module that owns their class may not be
 	// loaded yet when a game module's CDO is built).
 	const FString Path = FString::Printf(TEXT("/Game/P3R/UI/%s.%s_C"), Asset, Asset);
+	const double Start = FPlatformTime::Seconds();
 	UClass* Class = TSoftClassPtr<UDreamUserWidget>(FSoftObjectPath(Path)).LoadSynchronous();
 	if (Class == nullptr)
 	{
 		UE_LOG(LogP3R, Error, TEXT("Cannot load %s (run the setup and compile the widgets first)."), *Path);
 		return nullptr;
 	}
+	const double Loaded = FPlatformTime::Seconds();
 	UP3RScreen* Screen = Cast<UP3RScreen>(UDreamUIBPLibrary::AddWidgetOfClassToViewport(this, Class, SortOrder));
 	if (Screen != nullptr)
 	{
 		Screen->Hide();
 	}
+	UE_LOG(LogP3R, Display, TEXT("PageInit %s load=%.2fms create/hide=%.2fms"), Asset, (Loaded-Start)*1000., (FPlatformTime::Seconds()-Loaded)*1000.);
 	return Screen;
 }
 
@@ -63,6 +73,19 @@ void AP3RDirector::BeginPlay()
 		Player->SetShowMouseCursor(true);
 	}
 
+#if PLATFORM_ANDROID
+	if (auto* Screen = UDreamScreenUISubsystem::Get(GetWorld()))
+	{
+		Screen->GetOrCreateScreenRootForUserIndex(0);
+		if (auto* Canvas = Screen->GetScreenCanvas())
+		{
+			Canvas->SetReferenceResolution(FVector2D(1920,1080));
+			Canvas->SetScreenMatchMode(EDreamCanvasScreenMatchMode::Shrink);
+			Canvas->SetScaleMode(EDreamCanvasScaleMode::ScaleWithScreenSize);
+		}
+	}
+	MountTouchBar();
+#endif
 	Backdrop = Cast<UP3RBackdrop>(Make(TEXT("WBP_P3R_Backdrop"), 100));
 	Field = Cast<UP3RFieldHud>(Make(TEXT("WBP_P3R_Field"), 150));
 	MainMenu = Cast<UP3RMainMenu>(Make(TEXT("WBP_P3R_MainMenu"), 200));
@@ -105,6 +128,40 @@ void AP3RDirector::BeginPlay()
 	{
 		MainMenu->SetDesignLabel(FText::FromString(P3RDirectorLocal::DesignLabels[DesignFinal]));
 	}
+}
+
+void AP3RDirector::MountTouchBar()
+{
+    UGameViewportClient* V = GetWorld()->GetGameViewport();
+    if (!V) return;
+    auto Row = SNew(SHorizontalBox);
+    const TWeakObjectPtr<AP3RDirector> Weak(this);
+    auto Add = [&](const TCHAR* Caption, EP3RKey Key)
+    {
+        Row->AddSlot().AutoWidth().Padding(2)[SNew(SButton).IsFocusable(false).ContentPadding(FMargin(12,8))
+            .Visibility_Lambda([Weak,Key](){
+                const auto* D=Weak.Get(); if (!D) return EVisibility::Collapsed;
+                const bool Visible = Key==EP3RKey::Open ? D->State==EState::Field :
+                    Key==EP3RKey::Design ? D->State==EState::Menu : Key==EP3RKey::Back ? D->State!=EState::Field :
+                    D->State==EState::Page && D->OpenPageScreen && D->OpenPageScreen==D->Status;
+                return Visible ? EVisibility::Visible : EVisibility::Collapsed;
+            }).OnClicked_Lambda([Weak,Key](){if(auto* D=Weak.Get(); D && !D->IsBusy()){
+                UP3RScreen* S=D->State==EState::Field ? static_cast<UP3RScreen*>(D->Field.Get()) : D->State==EState::Menu ? D->CurrentMenu() : D->OpenPageScreen.Get();
+                if(S) S->TouchAction(Key);
+            } return FReply::Handled();})[SNew(STextBlock).Text(FText::FromString(Caption))]];
+    };
+    Add(TEXT("打开菜单"),EP3RKey::Open); Add(TEXT("切换设计稿"),EP3RKey::Design);
+    Add(TEXT("上一栏"),EP3RKey::PrevTab); Add(TEXT("下一栏"),EP3RKey::NextTab); Add(TEXT("返回"),EP3RKey::Back);
+    TouchBar=SNew(SBox).Visibility(EVisibility::SelfHitTestInvisible).HAlign(HAlign_Center).VAlign(VAlign_Bottom).Padding(FMargin(0,0,0,12))[Row];
+    V->AddViewportWidgetContent(TouchBar.ToSharedRef(),9000);
+    TouchViewport=V;
+}
+
+void AP3RDirector::EndPlay(const EEndPlayReason::Type Reason)
+{
+    if(TouchViewport.IsValid() && TouchBar.IsValid()) TouchViewport->RemoveViewportWidgetContent(TouchBar.ToSharedRef());
+    TouchBar.Reset(); TouchViewport.Reset();
+    Super::EndPlay(Reason);
 }
 
 bool AP3RDirector::IsBusy() const

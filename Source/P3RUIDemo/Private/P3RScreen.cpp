@@ -82,6 +82,7 @@ void UP3RScreen::NativeOnInitialized()
 
 void UP3RScreen::Enter()
 {
+	const double Start = FPlatformTime::Seconds();
 	LeaveAt = -1.0f;
 	bActive = true;
 	EnteredAt = ScreenTime;
@@ -89,6 +90,7 @@ void UP3RScreen::Enter()
 	SetRenderOpacity(1.0f);
 	PlayEntrance();
 	KeepFocus();
+	UE_LOG(LogTemp, Display, TEXT("P3R PageEnter %s setup=%.2fms"), *GetName(), (FPlatformTime::Seconds()-Start)*1000.);
 }
 
 void UP3RScreen::Leave()

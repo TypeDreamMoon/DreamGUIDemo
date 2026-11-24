@@ -71,6 +71,10 @@ private:
 	double BusyUntil = 0.0;
 	bool IsBusy() const;
 	void Busy(double Seconds);
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
+	TSharedPtr<class SWidget> TouchBar;
+	TWeakObjectPtr<class UGameViewportClient> TouchViewport;
+	void MountTouchBar();
 };
 
 /** Spawns the director into whatever level it runs in; the empty Entry map is enough. No pawn. */
