@@ -25,6 +25,12 @@ DreamGUI 系列插件的演示工程：DreamGUI 演示视频里的画面都出�
 - 右键 `DreamGUIDemo.uproject` → Generate Visual Studio project files，编 `DreamGUIDemoEditor`（Development Editor），或直接双击 uproject 让引擎编译。
 - `UnrealBridge` 插件是可选的（只有 `Tools/Nocturne` 里经编辑器重编控件的脚本用到它），没有它工程照常打开。
 
+## Android 手机
+
+同一个工程也可以用 UE 5.8 打包 Android arm64。启用已安装的 Android 目标平台，用 Development、ETC2 打包；四张地图共用一个横屏 APK，数据包含在包内。编辑器仍然使用 DreamShader 和 DreamFX 制作资产，Android 目标使用已生成的材质和特效。
+
+手机上从右上角 **DEMOS** 切地图，**PAD** 展开导航键。P3R 另有「打开菜单」「返回」「切换设计稿」和 STATUS 翻栏按钮，不用打开 PAD。桌面端沿用下方的鼠标、键盘和手柄操作。
+
 ## 操作
 
 **NOCTURNE//OS**：打开工程点 Play。鼠标、键盘、手柄都能用；任意键或点击唤醒标题。编辑器里 Esc 会停 PIE，返回用 Backspace 或点「ESC 返回」。命令行加 `-DemoShot=<镜头名>` 回放视频里的镜头（Tour、Title、Menu、Settings、Archive、Wheel、Music、Log、Depart、Hud、Full、World、LayerFx、Text、Perf、CardOpen、CardEnd、Test…），`-DemoMeasure` 实时测帧率后退出。
