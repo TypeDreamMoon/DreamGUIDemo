@@ -14,6 +14,14 @@ public class DreamGUIDemo : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
+		if (Target.Platform == UnrealTargetPlatform.Android)
+		{
+			// These font assets open project-relative files at runtime, including the CJK fallbacks.
+			RuntimeDependencies.Add("$(ProjectDir)/Art/P3R/Fonts/*.ttf", StagedFileType.UFS);
+			RuntimeDependencies.Add("$(ProjectDir)/Art/P3R/Fonts/*.otf", StagedFileType.UFS);
+			RuntimeDependencies.Add("$(ProjectDir)/Art/Fonts/NotoColorEmoji.ttf", StagedFileType.UFS);
+		}
+
 		PrivateDependencyModuleNames.AddRange(new string[] { "DreamGUI", "DreamGUIInput", "DreamGUIControls", "DreamGUIExtensions", "DreamTween", "RHI", "Slate", "SlateCore", "DreamGUIRenderer" });
 	}
 }
