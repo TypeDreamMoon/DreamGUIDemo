@@ -637,6 +637,8 @@ void ANocturneMenu::ChooseStar(int32 InIndex)
 		UE_LOG(LogNocturneMenu, Log, TEXT("Menu: star %d is not open"), InIndex);
 		return;
 	}
+	// Repeated touch / confirm means the same navigation intent, not a fresh screen.
+	if (IncomingScreen && Visiting == InIndex) return;
 	CancelStarRequest();
 	Visiting = InIndex;
 	const FString PageName = NocturneStars::Stars[Visiting].Screen;
