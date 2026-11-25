@@ -73,6 +73,7 @@ private:
 	void Busy(double Seconds);
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	TSharedPtr<class SWidget> TouchBar;
+	TSharedPtr<class SWidget> TapToOpen;
 	TWeakObjectPtr<class UGameViewportClient> TouchViewport;
 	void MountTouchBar();
 };

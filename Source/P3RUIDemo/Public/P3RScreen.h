@@ -52,7 +52,8 @@ public:
 	/** Collapse at once, without an exit (a screen just made, waiting for its turn). */
 	void Hide();
 	bool IsActive() const { return bActive; }
-	bool TouchAction(EP3RKey Key) { return !IsInputLocked() && HandleKey(Key); }
+	/** A touch button or a tap, taken as Key would be. Logs what it found, so a press that does nothing says why. */
+	bool TouchAction(EP3RKey Key);
 
 	/** Ignore keys and the pointer for a moment (while a transition plays). */
 	void LockInput(float Seconds) { InputLockedUntil = FMath::Max(InputLockedUntil, ScreenTime + Seconds); }

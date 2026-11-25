@@ -16,7 +16,9 @@
 #include "TimerManager.h"
 #include "Core/Components/DreamCanvas.h"
 #include "Core/DreamScreenUISubsystem.h"
+#include "Brushes/SlateRoundedBoxBrush.h"
 #include "Engine/GameViewportClient.h"
+#include "Styling/CoreStyle.h"
 #include "Widgets/Input/SButton.h"
 #include "Widgets/Layout/SBox.h"
 #include "Widgets/SBoxPanel.h"
@@ -136,31 +138,63 @@ void AP3RDirector::MountTouchBar()
     if (!V) return;
     auto Row = SNew(SHorizontalBox);
     const TWeakObjectPtr<AP3RDirector> Weak(this);
+    // Sized for a thumb, in the menu's own blue and white: the engine's default button was a 40-pixel sliver on a phone.
+    static FButtonStyle Style = FButtonStyle()
+        .SetNormal(FSlateRoundedBoxBrush(FLinearColor(0.02f,0.06f,0.32f,0.82f), 6.0f, FLinearColor(0.55f,0.85f,1.0f,0.9f), 2.0f))
+        .SetHovered(FSlateRoundedBoxBrush(FLinearColor(0.02f,0.06f,0.32f,0.82f), 6.0f, FLinearColor(0.55f,0.85f,1.0f,0.9f), 2.0f))
+        .SetPressed(FSlateRoundedBoxBrush(FLinearColor(0.3f,0.75f,1.0f,0.95f), 6.0f, FLinearColor::White, 2.0f))
+        .SetNormalPadding(FMargin(0)).SetPressedPadding(FMargin(0));
+    // What a press does: the key to the screen in charge, as the keyboard would send it.
+    auto Press = [Weak](EP3RKey Key)
+    {
+        AP3RDirector* D=Weak.Get();
+        if(!D) return;
+        if(D->IsBusy())
+        {
+            UE_LOG(LogTemp, Verbose, TEXT("P3R Touch key=%d ignored: director busy, state=%d"), int32(Key), int32(D->State));
+            return;
+        }
+        UP3RScreen* S=D->State==EState::Field ? static_cast<UP3RScreen*>(D->Field.Get()) : D->State==EState::Menu ? D->CurrentMenu() : D->OpenPageScreen.Get();
+        if(S) S->TouchAction(Key);
+        else UE_LOG(LogTemp, Verbose, TEXT("P3R Touch key=%d ignored: no screen for state=%d"), int32(Key), int32(D->State));
+    };
     auto Add = [&](const TCHAR* Caption, EP3RKey Key)
     {
-        Row->AddSlot().AutoWidth().Padding(2)[SNew(SButton).IsFocusable(false).ContentPadding(FMargin(12,8))
+        Row->AddSlot().AutoWidth().Padding(10,0)[SNew(SButton).IsFocusable(false).ButtonStyle(&Style).ContentPadding(FMargin(34,20))
             .Visibility_Lambda([Weak,Key](){
                 const auto* D=Weak.Get(); if (!D) return EVisibility::Collapsed;
                 const bool Visible = Key==EP3RKey::Open ? D->State==EState::Field :
                     Key==EP3RKey::Design ? D->State==EState::Menu : Key==EP3RKey::Back ? D->State!=EState::Field :
                     D->State==EState::Page && D->OpenPageScreen && D->OpenPageScreen==D->Status;
                 return Visible ? EVisibility::Visible : EVisibility::Collapsed;
-            }).OnClicked_Lambda([Weak,Key](){if(auto* D=Weak.Get(); D && !D->IsBusy()){
-                UP3RScreen* S=D->State==EState::Field ? static_cast<UP3RScreen*>(D->Field.Get()) : D->State==EState::Menu ? D->CurrentMenu() : D->OpenPageScreen.Get();
-                if(S) S->TouchAction(Key);
-            } return FReply::Handled();})[SNew(STextBlock).Text(FText::FromString(Caption))]];
+            }).OnClicked_Lambda([Press,Key](){ Press(Key); return FReply::Handled(); })
+            [SNew(STextBlock).Text(FText::FromString(Caption)).Font(FCoreStyle::GetDefaultFontStyle("Bold",22)).ColorAndOpacity(FLinearColor::White)]];
     };
     Add(TEXT("打开菜单"),EP3RKey::Open); Add(TEXT("切换设计稿"),EP3RKey::Design);
     Add(TEXT("上一栏"),EP3RKey::PrevTab); Add(TEXT("下一栏"),EP3RKey::NextTab); Add(TEXT("返回"),EP3RKey::Back);
-    TouchBar=SNew(SBox).Visibility(EVisibility::SelfHitTestInvisible).HAlign(HAlign_Center).VAlign(VAlign_Bottom).Padding(FMargin(0,0,0,12))[Row];
+    // Well clear of the bottom edge: with gesture navigation Android keeps taps in the strip along it (~90px) for itself.
+    TouchBar=SNew(SBox).Visibility(EVisibility::SelfHitTestInvisible).HAlign(HAlign_Center).VAlign(VAlign_Bottom).Padding(FMargin(0,0,0,120))[Row];
     V->AddViewportWidgetContent(TouchBar.ToSharedRef(),9000);
+
+    // On the field a tap anywhere opens the menu: the whole screen is one invisible button, under the bar, there only
+    // while the field is up.
+    static FButtonStyle Clear = FButtonStyle().SetNormal(FSlateNoResource()).SetHovered(FSlateNoResource()).SetPressed(FSlateNoResource())
+        .SetNormalPadding(FMargin(0)).SetPressedPadding(FMargin(0));
+    TapToOpen=SNew(SButton).IsFocusable(false).ButtonStyle(&Clear)
+        .Visibility_Lambda([Weak](){ const auto* D=Weak.Get(); return D && D->State==EState::Field ? EVisibility::Visible : EVisibility::Collapsed; })
+        .OnClicked_Lambda([Press](){ Press(EP3RKey::Open); return FReply::Handled(); });
+    V->AddViewportWidgetContent(TapToOpen.ToSharedRef(),8900);
     TouchViewport=V;
 }
 
 void AP3RDirector::EndPlay(const EEndPlayReason::Type Reason)
 {
-    if(TouchViewport.IsValid() && TouchBar.IsValid()) TouchViewport->RemoveViewportWidgetContent(TouchBar.ToSharedRef());
-    TouchBar.Reset(); TouchViewport.Reset();
+    if(TouchViewport.IsValid())
+    {
+        if(TouchBar.IsValid()) TouchViewport->RemoveViewportWidgetContent(TouchBar.ToSharedRef());
+        if(TapToOpen.IsValid()) TouchViewport->RemoveViewportWidgetContent(TapToOpen.ToSharedRef());
+    }
+    TouchBar.Reset(); TapToOpen.Reset(); TouchViewport.Reset();
     Super::EndPlay(Reason);
 }
 

@@ -80,6 +80,15 @@ void UP3RScreen::NativeOnInitialized()
 	}
 }
 
+bool UP3RScreen::TouchAction(EP3RKey Key)
+{
+	const bool bLocked = IsInputLocked();
+	const bool bUsed = !bLocked && HandleKey(Key);
+	UE_LOG(LogTemp, Verbose, TEXT("P3R Touch %s key=%d active=%d time=%.2f lockedUntil=%.2f used=%d"), *GetName(), int32(Key),
+		bActive ? 1 : 0, ScreenTime, InputLockedUntil, bUsed ? 1 : 0);
+	return bUsed;
+}
+
 void UP3RScreen::Enter()
 {
 	const double Start = FPlatformTime::Seconds();
