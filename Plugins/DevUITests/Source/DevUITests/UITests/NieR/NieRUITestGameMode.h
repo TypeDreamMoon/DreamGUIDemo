@@ -18,9 +18,15 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 
 private:
 	void ShowStartScreen();
+	/** On a touch screen (or with -DemoTouch): OK, Back, Left and Right along the bottom, sent as the keys the screens read. */
+	void MountTouchBar();
+
+	TSharedPtr<class SWidget> TouchBar;
+	TWeakObjectPtr<class UGameViewportClient> TouchViewport;
 
 	/**
 	 * Every screen's class, loaded with the map and held for as long as it runs: a screen opened for the first time loaded

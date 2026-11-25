@@ -126,6 +126,17 @@ bool UNieRTitleScreen::NativeOnKeyDown(UDreamKeyEventData* EventData)
 	return Super::NativeOnKeyDown(EventData);
 }
 
+bool UNieRTitleScreen::NativeOnPointerClick(UDreamPointerEventData* EventData)
+{
+	// A touch screen has no key to press: a tap anywhere wakes the title.
+	if (!bInMenu)
+	{
+		ShowMenu();
+		return true;
+	}
+	return Super::NativeOnPointerClick(EventData);
+}
+
 void UNieRTitleScreen::OnRowClicked(UNieRRow* Row)
 {
 	if (Row->Action == TEXT("menu"))
