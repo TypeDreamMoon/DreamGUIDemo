@@ -27,10 +27,12 @@
 		},
 		{
 			"Name": "DreamShader",
+			"PlatformDenyList": [ "Android" ],
 			"Enabled": true
 		},
 		{
 			"Name": "DreamFX",
+			"PlatformDenyList": [ "Android" ],
 			"Enabled": true
 		},
 		{
@@ -43,6 +45,7 @@
 		},
 		{
 			"Name": "UnrealBridge",
+			"PlatformDenyList": [ "Android" ],
 			"Enabled": true,
 			"Optional": true
 		}

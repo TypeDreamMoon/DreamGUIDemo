@@ -25,6 +25,20 @@ DreamGUI 系列插件的演示工程：DreamGUI 演示视频里的画面都出�
 - 右键 `DreamGUIDemo.uproject` → Generate Visual Studio project files，编 `DreamGUIDemoEditor`（Development Editor），或直接双击 uproject 让引擎编译。
 - `UnrealBridge` 插件是可选的（只有 `Tools/Nocturne` 里经编辑器重编控件的脚本用到它），没有它工程照常打开。
 
+## Android 手机
+
+同一个工程也可以用 UE 5.8 打包 Android arm64。启用已安装的 Android 目标平台，用 Development、ETC2 打包；四张地图共用一个横屏 APK，数据包含在包内。编辑器仍然使用 DreamShader 和 DreamFX 制作资产，Android 目标使用已生成的材质和特效。
+
+NieR 和底特律的界面按 1920×1080 固定坐标设计。在比 16:9 更宽的手机屏上，选择页模块会把它们的页面摆成居中的 1920×1080 框，只有铺满整页的背景图拉宽到屏幕边缘（见 `Source/DreamGUIDemo/DreamGUIDemo.cpp` 的 `CenterDesign`）。
+
+手机启动后先进 Demo 选择页（引擎自带的空地图 Entry，只在 `Config/Android/AndroidEngine.ini` 里设为默认地图），点卡片进入；在任一 Demo 里点右上角「返回」回到选择页。各 Demo 自带触屏操作：
+
+- **P3R**：在场景画面上点任意位置打开菜单，点菜单项选择；底部有「返回」「切换设计稿」和 STATUS 翻栏按钮（离底边留出约 120px，避开手势导航条的触控区）。
+- **NieR**：点标题画面开始，点行选择；右侧一列按钮：「确定」「返回」，◀ ▶ 调整设置值。
+- **底特律**：左半屏按下出现摇杆移动，右半屏拖动转视角；右下角「跑」（开关）、「调查」、「分析」、「目标」，顶部 1–5 直接到线索。
+
+桌面端沿用下方的鼠标、键盘和手柄操作；NieR 和底特律在命令行加 `-DemoTouch` 可以在桌面上显示触屏按钮。
+
 ## 操作
 
 **NOCTURNE//OS**：打开工程点 Play。鼠标、键盘、手柄都能用；任意键或点击唤醒标题。编辑器里 Esc 会停 PIE，返回用 Backspace 或点「ESC 返回」。命令行加 `-DemoShot=<镜头名>` 回放视频里的镜头（Tour、Title、Menu、Settings、Archive、Wheel、Music、Log、Depart、Hud、Full、World、LayerFx、Text、Perf、CardOpen、CardEnd、Test…），`-DemoMeasure` 实时测帧率后退出。

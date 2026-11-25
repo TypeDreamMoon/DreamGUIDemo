@@ -65,16 +65,15 @@ void NocturneUI::SetShown(UDreamWidget* Widget, bool bShown)
 
 // ---------------------------------------------------------------------------------------------------------------------
 
-UDreamWidget* UNocturneOptionRow::Node(const TCHAR* Name) const
-{
-	const UDreamWidgetTree* Tree = GetWidgetTree();
-	return Tree != nullptr ? Tree->FindWidgetByVariableName(FName(Name)) : nullptr;
-}
-
 void UNocturneOptionRow::NativeOnInitialized()
 {
 	using namespace NocturneOptionRowLocal;
 	Super::NativeOnInitialized();
+
+	// Resolve the row's authored parts together. This snapshot is not kept across tree edits.
+	TMap<FName, TWeakObjectPtr<UDreamWidget>> Parts;
+	if (const UDreamWidgetTree* Tree = GetWidgetTree()) Tree->BuildVariableNameIndex(Parts);
+	const auto Node = [&Parts](FName Name) { return Parts.FindRef(Name).Get(); };
 
 	Back = Node(TEXT("Back"));
 	Accent = Node(TEXT("Accent"));

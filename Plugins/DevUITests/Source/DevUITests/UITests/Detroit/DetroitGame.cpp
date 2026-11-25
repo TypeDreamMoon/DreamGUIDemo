@@ -9,9 +9,11 @@
 #include "Core/DreamScreenUISubsystem.h"
 #include "Core/DreamUserWidget.h"
 #include "Core/DreamWorldWidgetComponent.h"
+#include "DetroitTouchControls.h"
 #include "DetroitUI.h"
 #include "Engine/CollisionProfile.h"
 #include "Engine/StaticMesh.h"
+#include "Engine/GameViewportClient.h"
 #include "Engine/World.h"
 #include "Event/DreamUIInputModeLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -299,6 +301,43 @@ ADetroitPlayerController::ADetroitPlayerController()
 	bShowMouseCursor = false;
 }
 
+void ADetroitPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+	if (!IsLocalController() || !(FPlatformMisc::SupportsTouchInput() || FParse::Param(FCommandLine::Get(), TEXT("DemoTouch"))))
+	{
+		return;
+	}
+	UGameViewportClient* Viewport = GetWorld() != nullptr ? GetWorld()->GetGameViewport() : nullptr;
+	if (Viewport == nullptr)
+	{
+		return;
+	}
+	const TWeakObjectPtr<ADetroitPlayerController> Weak(this);
+	Touch = SNew(SDetroitTouchControls);
+	// Only while Connor can be walked: not over the loading screen.
+	Touch->SetVisibility(TAttribute<EVisibility>::CreateLambda([Weak]()
+	{
+		const ADetroitPlayerController* Self = Weak.Get();
+		const ADetroitGameMode* Game = Self != nullptr && Self->GetWorld() != nullptr ? Self->GetWorld()->GetAuthGameMode<ADetroitGameMode>() : nullptr;
+		return Game != nullptr && Game->IsInvestigating() ? EVisibility::SelfHitTestInvisible : EVisibility::Collapsed;
+	}));
+	// Under the gallery's own buttons (10000), over the game.
+	Viewport->AddViewportWidgetContent(Touch.ToSharedRef(), 8000);
+	TouchViewport = Viewport;
+}
+
+void ADetroitPlayerController::EndPlay(const EEndPlayReason::Type Reason)
+{
+	if (TouchViewport.IsValid() && Touch.IsValid())
+	{
+		TouchViewport->RemoveViewportWidgetContent(Touch.ToSharedRef());
+	}
+	Touch.Reset();
+	TouchViewport.Reset();
+	Super::EndPlay(Reason);
+}
+
 void ADetroitPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
@@ -306,9 +345,19 @@ void ADetroitPlayerController::PlayerTick(float DeltaTime)
 	ADetroitCharacter* Connor = Cast<ADetroitCharacter>(GetPawn());
 	if (Game == nullptr || Connor == nullptr || !Game->IsInvestigating())
 	{
+		if (Touch.IsValid())
+		{
+			Touch->Reset();
+		}
 		return;
 	}
 	auto Down = [this](const FKey& Key) { return IsInputKeyDown(Key) ? 1.0f : 0.0f; };
+	const FVector2D TouchMove = Touch.IsValid() ? Touch->GetMove() : FVector2D::ZeroVector;
+	const FVector2D TouchLook = Touch.IsValid() ? Touch->ConsumeLook() : FVector2D::ZeroVector;
+	const EDetroitTouchAction TouchActions = Touch.IsValid() ? Touch->ConsumeActions() : EDetroitTouchAction::None;
+	const int32 TouchClue = Touch.IsValid() ? Touch->ConsumeClue() : INDEX_NONE;
+	// A drag across the look area, in Slate units: about a quarter turn for half the screen's width.
+	const float TouchDegrees = 0.18f;
 
 	float MouseX = 0.0f;
 	float MouseY = 0.0f;
@@ -317,28 +366,33 @@ void ADetroitPlayerController::PlayerTick(float DeltaTime)
 	// The arrows look too, for a keyboard alone.
 	const float KeyYaw = Down(EKeys::Right) - Down(EKeys::Left);
 	const float KeyPitch = Down(EKeys::Up) - Down(EKeys::Down);
-	Control.Yaw += MouseX * 2.2f + (GetInputAnalogKeyState(EKeys::Gamepad_RightX) + KeyYaw) * 120.0f * DeltaTime;
-	const float Pitch = FRotator::NormalizeAxis(Control.Pitch) + MouseY * 2.2f + (GetInputAnalogKeyState(EKeys::Gamepad_RightY) + KeyPitch) * 80.0f * DeltaTime;
+	Control.Yaw += MouseX * 2.2f + TouchLook.X * TouchDegrees + (GetInputAnalogKeyState(EKeys::Gamepad_RightX) + KeyYaw) * 120.0f * DeltaTime;
+	const float Pitch = FRotator::NormalizeAxis(Control.Pitch) + MouseY * 2.2f - TouchLook.Y * TouchDegrees
+		+ (GetInputAnalogKeyState(EKeys::Gamepad_RightY) + KeyPitch) * 80.0f * DeltaTime;
 	Control.Pitch = FMath::Clamp(Pitch, -55.0f, 40.0f);
 	Control.Roll = 0.0;
 	SetControlRotation(Control);
 
-	const float Forward = FMath::Clamp(Down(EKeys::W) - Down(EKeys::S) + GetInputAnalogKeyState(EKeys::Gamepad_LeftY), -1.0f, 1.0f);
-	const float Right = FMath::Clamp(Down(EKeys::D) - Down(EKeys::A) + GetInputAnalogKeyState(EKeys::Gamepad_LeftX), -1.0f, 1.0f);
+	const float Forward = FMath::Clamp(Down(EKeys::W) - Down(EKeys::S) + GetInputAnalogKeyState(EKeys::Gamepad_LeftY) + float(TouchMove.Y), -1.0f, 1.0f);
+	const float Right = FMath::Clamp(Down(EKeys::D) - Down(EKeys::A) + GetInputAnalogKeyState(EKeys::Gamepad_LeftX) + float(TouchMove.X), -1.0f, 1.0f);
 	const FRotationMatrix Yaw(FRotator(0.0, Control.Yaw, 0.0));
 	Connor->AddMovementInput(Yaw.GetUnitAxis(EAxis::X), Forward);
 	Connor->AddMovementInput(Yaw.GetUnitAxis(EAxis::Y), Right);
-	Connor->SetRunning(IsInputKeyDown(EKeys::LeftShift) || IsInputKeyDown(EKeys::Gamepad_LeftThumbstick));
+	Connor->SetRunning(IsInputKeyDown(EKeys::LeftShift) || IsInputKeyDown(EKeys::Gamepad_LeftThumbstick) || (Touch.IsValid() && Touch->IsRunning()));
 
-	if (WasInputKeyJustPressed(EKeys::Q) || WasInputKeyJustPressed(EKeys::RightMouseButton) || WasInputKeyJustPressed(EKeys::Gamepad_RightTrigger))
+	// The touch controls take every touch on the screen, so a tap reaches the game only through their buttons.
+	if (WasInputKeyJustPressed(EKeys::Q) || WasInputKeyJustPressed(EKeys::RightMouseButton) || WasInputKeyJustPressed(EKeys::Gamepad_RightTrigger)
+		|| EnumHasAnyFlags(TouchActions, EDetroitTouchAction::Analysis))
 	{
 		Game->ToggleAnalysis();
 	}
-	if (WasInputKeyJustPressed(EKeys::E) || WasInputKeyJustPressed(EKeys::LeftMouseButton) || WasInputKeyJustPressed(EKeys::Gamepad_FaceButton_Bottom))
+	if (WasInputKeyJustPressed(EKeys::E) || WasInputKeyJustPressed(EKeys::LeftMouseButton) || WasInputKeyJustPressed(EKeys::Gamepad_FaceButton_Bottom)
+		|| EnumHasAnyFlags(TouchActions, EDetroitTouchAction::Analyze))
 	{
 		Game->TryAnalyze();
 	}
-	if (WasInputKeyJustPressed(EKeys::Tab) || WasInputKeyJustPressed(EKeys::Gamepad_RightShoulder))
+	if (WasInputKeyJustPressed(EKeys::Tab) || WasInputKeyJustPressed(EKeys::Gamepad_RightShoulder)
+		|| EnumHasAnyFlags(TouchActions, EDetroitTouchAction::Objectives))
 	{
 		Game->ShowObjectives();
 	}
@@ -346,7 +400,7 @@ void ADetroitPlayerController::PlayerTick(float DeltaTime)
 	const FKey ClueKeys[] = { EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four, EKeys::Five };
 	for (int32 Index = 0; Index < int32(UE_ARRAY_COUNT(ClueKeys)); ++Index)
 	{
-		if (WasInputKeyJustPressed(ClueKeys[Index]))
+		if (WasInputKeyJustPressed(ClueKeys[Index]) || TouchClue == Index)
 		{
 			Game->GoToClue(Index);
 		}
@@ -925,6 +979,10 @@ void ADetroitGameMode::Boot()
 		Canvas->SetReferenceResolution(FVector2D(1920.0, 1080.0));
 		Canvas->SetScreenMatchMode(EDreamCanvasScreenMatchMode::MatchWidthOrHeight);
 		Canvas->SetMatchFromWidthToHeight(0.5f);
+#if PLATFORM_ANDROID
+		// A phone is wider than 16:9: matching halfway cropped the top and bottom of the design.
+		Canvas->SetScreenMatchMode(EDreamCanvasScreenMatchMode::Shrink);
+#endif
 	}
 	for (const TCHAR* Path : { DetroitUI::LoadingClass, DetroitUI::HUDClass, DetroitUI::ClueTagClass, DetroitUI::AnalysisPanelClass,
 		DetroitUI::ObjectivesClass, DetroitUI::JacketClass, DetroitUI::WallWritingClass })

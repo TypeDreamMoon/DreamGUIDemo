@@ -105,7 +105,6 @@ protected:
 	virtual void NativeOnTick(float DeltaTime) override;
 
 private:
-	UDreamWidget* Node(const TCHAR* Name) const;
 	void HandleState(EUISelectableSelectionState InState, bool bInImmediate);
 	void HandleClick();
 	void HandleSegmentClick(int32 Index);

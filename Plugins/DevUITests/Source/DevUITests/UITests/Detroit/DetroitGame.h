@@ -83,7 +83,10 @@ private:
 	bool bAnalyzing = false;
 };
 
-/** Reads the keys, the mouse and a pad every frame and drives Connor and the investigation. */
+/**
+ * Reads the keys, the mouse, a pad and, on a touch screen (or with -DemoTouch), the on-screen controls every frame and
+ * drives Connor and the investigation.
+ */
 UCLASS()
 class DEVUITESTS_API ADetroitPlayerController : public APlayerController
 {
@@ -93,7 +96,13 @@ public:
 	ADetroitPlayerController();
 
 protected:
+	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 	virtual void PlayerTick(float DeltaTime) override;
+
+private:
+	TSharedPtr<class SDetroitTouchControls> Touch;
+	TWeakObjectPtr<class UGameViewportClient> TouchViewport;
 };
 
 /** What makes a clue: its name on the tag, whether it opens the HIT MARKS panel, where the tag floats. */

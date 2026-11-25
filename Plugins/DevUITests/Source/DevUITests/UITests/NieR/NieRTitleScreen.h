@@ -25,6 +25,7 @@ protected:
 	virtual void NativeOnEnable() override;
 	virtual void NativeOnTick(float DeltaTime) override;
 	virtual bool NativeOnKeyDown(UDreamKeyEventData* EventData) override;
+	virtual bool NativeOnPointerClick(UDreamPointerEventData* EventData) override;
 	virtual void OnRowClicked(UNieRRow* Row) override;
 	virtual UNieRRow* GetEntryRow() const override;
 	virtual void PlayEntrance() override;
